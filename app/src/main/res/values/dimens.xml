@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="actionbar_icon_margin_top">16dp</dimen>
+    <dimen name="actionbar_margin">5dp</dimen>
+</resources>
