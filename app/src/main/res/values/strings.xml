@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Travel And Communication Assistant</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_treeview">TreeviewActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="activity_main_role">Role</string>
+    <string name="activity_main_role_tutor">Tutor</string>
+    <string name="activity_main_role_warded">Warded</string>
+    <string name="activity_main_login">Login</string>
+    <string name="activity_main_password">Password</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

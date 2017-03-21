@@ -18,6 +18,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TutorHomeActivity" />
+        <activity android:name=".ContactActivity" />
+        <activity android:name=".ContactDetailsActivity" />
+        <activity android:name=".RoomActivity" />
+        <activity android:name=".TutorDetailsActivity" />
+        <activity android:name=".EditRoomActivity" />
+        <activity android:name=".SearchRoomActivity" />
+        <activity android:name=".TreeviewActivity" />
+        <activity android:name=".EditPictogramActivity" />
+        <activity android:name=".KeywordActivity" />
+        <activity android:name=".EditKeywordActivity"></activity>
     </application>
 
 </manifest>

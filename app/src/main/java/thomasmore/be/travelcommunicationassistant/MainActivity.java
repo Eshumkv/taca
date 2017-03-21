@@ -1,8 +1,7 @@
 package thomasmore.be.travelcommunicationassistant;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -12,8 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -22,6 +20,16 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupActionbar();
+
+        final Button loginButton = (Button) findViewById(R.id.button_login);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), TutorHomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -39,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_home) {
             return true;
         }
 
@@ -51,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         setSupportActionBar(toolbar);
 
         final ViewGroup actionbarLayout = (ViewGroup) getLayoutInflater().inflate(
-                R.layout.actionbar_main,
+                R.layout.actionbar_treeview,
                 null);
 
         ActionBar actionbar = getSupportActionBar();
