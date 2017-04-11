@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/actionbar_margin">
+    
+    <ImageButton
+        android:id="@+id/menu"
+        android:src="@drawable/ic_menu_black_24dp"
+        android:background="@null"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        android:layout_width="@dimen/actionbar_imagesize"
+        android:layout_height="@dimen/actionbar_imagesize" />
+
+    <ImageButton
+        android:id="@+id/logout"
+        android:src="@drawable/ic_exit_to_app_black_24dp"
+        android:background="@null"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="@dimen/actionbar_margin"
+        android:layout_marginRight="@dimen/actionbar_margin"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true"
+        android:layout_width="@dimen/actionbar_imagesize"
+        android:layout_height="@dimen/actionbar_imagesize" />
+
+    <LinearLayout
+        android:layout_toLeftOf="@id/logout"
+        android:layout_toStartOf="@id/logout"
+        android:layout_toEndOf="@id/menu"
+        android:layout_toRightOf="@id/menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="@dimen/actionbar_titlesize"
+            android:text="@string/app_name"/>
+    </LinearLayout>
+
+</RelativeLayout>

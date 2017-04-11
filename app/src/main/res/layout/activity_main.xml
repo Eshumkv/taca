@@ -6,20 +6,6 @@
     android:layout_height="match_parent"
     tools:context="thomasmore.be.travelcommunicationassistant.MainActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
     <LinearLayout
         android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
@@ -28,25 +14,32 @@
         android:orientation="vertical"
         android:layout_margin="@dimen/activity_horizontal_margin">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!-- Dummy item to receive focus first. -->
+        <LinearLayout
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:text="@string/activity_main_role"/>
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:textOn="@string/activity_main_role_tutor"
-                android:textOff="@string/activity_main_role_warded"/>
-        </RelativeLayout>
+            <!--<TextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:text="@string/activity_main_role"/>-->
+
+            <!--<ToggleButton-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:textOn="@string/activity_main_role_tutor"-->
+                <!--android:textOff="@string/activity_main_role_warded"/>-->
+        <!--</RelativeLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -58,10 +51,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/activity_main_login"/>
 
+            <!-- nextFocusUp and nextFocusLeft are set here so the dummy doesn't get focus -->
             <EditText
                 android:id="@+id/login"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:nextFocusUp="@id/login"
+                android:nextFocusLeft="@id/login" />
         </LinearLayout>
 
         <LinearLayout
@@ -77,7 +74,8 @@
             <EditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
         </LinearLayout>
 
         <Button

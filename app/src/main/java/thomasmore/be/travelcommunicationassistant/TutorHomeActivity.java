@@ -1,71 +1,38 @@
 package thomasmore.be.travelcommunicationassistant;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageButton;
+
+import java.util.Arrays;
+
+import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
+import thomasmore.be.travelcommunicationassistant.adapter.misc.HomeScreenValues;
 
 public class TutorHomeActivity extends AppCompatActivity {
-
+    private static final HomeScreenValues[] values = new HomeScreenValues[] {
+            new HomeScreenValues("Messages", R.drawable.ic_message_black_24dp),
+            new HomeScreenValues("Rooms", R.drawable.ic_add_black_24dp),
+            new HomeScreenValues("Pictograms", R.drawable.ic_add_black_24dp),
+            new HomeScreenValues("Categories", R.drawable.ic_add_black_24dp),
+            new HomeScreenValues("Warded Persons", R.drawable.ic_add_black_24dp),
+            new HomeScreenValues("Contacts", R.drawable.ic_add_black_24dp),
+            new HomeScreenValues("", 0),
+            new HomeScreenValues("Personal Info", R.drawable.ic_add_black_24dp),
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutor_home);
         setupActionbar();
 
-        final Button contactsButton = (Button) findViewById(R.id.button_contacts);
-        contactsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), ContactActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        final Button roomsButton = (Button) findViewById(R.id.button_rooms);
-        roomsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), RoomActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        final Button editTutorButton = (Button) findViewById(R.id.button_tutor_settings);
-        editTutorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), TutorDetailsActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        final Button treeviewButton = (Button) findViewById(R.id.button_treeview);
-        treeviewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), TreeviewActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        final Button keywordButton = (Button) findViewById(R.id.button_edit_keywords);
-        keywordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), KeywordActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+        final GridView grid = (GridView) findViewById(R.id.grid);
+        grid.setAdapter(new HomeScreenAdapter(this, Arrays.asList(values)));
     }
 
 
@@ -74,12 +41,28 @@ public class TutorHomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final ViewGroup actionbarLayout = (ViewGroup) getLayoutInflater().inflate(
-                R.layout.actionbar_treeview,
+                R.layout.actionbar_tutor_home,
                 null);
 
-        ActionBar actionbar = getSupportActionBar();
+        android.support.v7.app.ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayShowTitleEnabled(false);
         actionbar.setDisplayShowCustomEnabled(true);
         actionbar.setCustomView(actionbarLayout);
+
+        final ImageButton logout = (ImageButton) actionbarLayout.findViewById(R.id.logout);
+        final ImageButton menu = (ImageButton) actionbarLayout.findViewById(R.id.menu);
+
+        logout.setOnClickListener(clickListenerFor(MainActivity.class));
+    }
+
+    private View.OnClickListener clickListenerFor(final Class<?> cls) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), cls);
+                startActivity(intent);
+                finish();
+            }
+        };
     }
 }

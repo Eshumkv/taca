@@ -9,6 +9,9 @@
 
     <dimen name="spinner_margin">8dp</dimen>
 
+    <dimen name="actionbar_titlesize">20sp</dimen>
+    <dimen name="actionbar_imagesize">42dp</dimen>
+
     <dimen name="contact_image_size">58dp</dimen>
     <dimen name="contact_image_margin">12dp</dimen>
     <dimen name="contact_name_size">22sp</dimen>
@@ -16,4 +19,9 @@
 
     <dimen name="contact_detail_image_size">95dp</dimen>
     <dimen name="contact_detail_name_size">43sp</dimen>
+
+    <dimen name="homescreen_item_textsize">21sp</dimen>
+    <dimen name="homescreen_item_imagesize">65dp</dimen>
+    <dimen name="homescreen_grid_vspacing">45dp</dimen>
+    <dimen name="homescreen_grid_hspacing">15dp</dimen>
 </resources>

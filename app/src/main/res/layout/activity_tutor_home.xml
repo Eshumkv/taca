@@ -19,42 +19,15 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <GridView
+        android:id="@+id/grid"
         android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/button_treeview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Treeview"/>
-
-        <Button
-            android:id="@+id/button_contacts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Contacts"/>
-
-        <Button
-            android:id="@+id/button_rooms"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Rooms"/>
-
-        <Button
-            android:id="@+id/button_tutor_settings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tutor Settings"/>
-
-        <Button
-            android:id="@+id/button_edit_keywords"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Edit keywords"/>
-    </LinearLayout>
+        android:numColumns="3"
+        android:verticalSpacing="@dimen/homescreen_grid_vspacing"
+        android:horizontalSpacing="@dimen/homescreen_grid_hspacing"
+        android:layout_gravity="center">
+    </GridView>
 
 </android.support.design.widget.CoordinatorLayout>
