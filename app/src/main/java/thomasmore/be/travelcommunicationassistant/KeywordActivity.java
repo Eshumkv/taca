@@ -9,13 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import thomasmore.be.travelcommunicationassistant.adapter.CreatedRoomAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.KeywordAdapter;
 
 public class KeywordActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
@@ -70,7 +67,7 @@ public class KeywordActivity extends AppCompatActivity implements PopupMenu.OnMe
         // This activity implements OnMenuItemClickListener
         popup.setOnMenuItemClickListener(this);
         MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_main, popup.getMenu());
+        inflater.inflate(R.menu.menu_home, popup.getMenu());
         popup.show();
     }
     @Override

@@ -81,22 +81,33 @@ public class HomeScreenAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
+
         if (convertView != null) {
-            return convertView;
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+        else {
+            LayoutInflater inflater = (LayoutInflater)
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.item_homescreen, null);
+
+            viewHolder = new ViewHolder();
+            viewHolder.title = (TextView) convertView.findViewById(R.id.text);
+            viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+
+            convertView.setTag(viewHolder);
         }
 
-        LayoutInflater inflater = (LayoutInflater)
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View gridView = inflater.inflate(R.layout.item_homescreen, null);
-
-        final TextView textView = (TextView) gridView.findViewById(R.id.text);
-        final ImageView imageView = (ImageView) gridView.findViewById(R.id.image);
         final HomeScreenValues value = this.values.get(position);
+        viewHolder.title.setText(value.getText());
+        viewHolder.image.setImageResource(value.getResourceId());
 
-        textView.setText(value.getText());
-        imageView.setImageResource(value.getResourceId());
+        return convertView;
+    }
 
-        return gridView;
+    static class ViewHolder {
+        private TextView title;
+        private ImageView image;
     }
 
     @Override

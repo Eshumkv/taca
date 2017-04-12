@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TutorHomeActivity" />
+        <activity android:name=".TutorHomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".ContactActivity" />
         <activity android:name=".ContactDetailsActivity" />
         <activity android:name=".RoomActivity" />
