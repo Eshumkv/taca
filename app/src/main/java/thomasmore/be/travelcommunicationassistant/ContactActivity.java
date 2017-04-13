@@ -1,7 +1,5 @@
 package thomasmore.be.travelcommunicationassistant;
 
-import android.app.ActionBar;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -296,7 +292,7 @@ public class ContactActivity extends AppCompatActivity {
     }
 
     public void goHome(View v) {
-        Intent intent = new Intent(this, TutorHomeActivity.class);
+        Intent intent = new Intent(this, NavigationDrawerActivity.class);
         startActivity(intent);
         finish();
     }

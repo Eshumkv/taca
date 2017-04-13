@@ -5,13 +5,15 @@ package thomasmore.be.travelcommunicationassistant.adapter.misc;
  */
 
 
-public class NavigationItems {
+public class NavigationItems<T> {
     int titleId;
     int iconId;
+    Class<T> cls;
 
-    public NavigationItems(int titleId, int imageId) {
+    public NavigationItems(int titleId, int imageId, Class<T> ncls) {
         this.titleId = titleId;
         this.iconId = imageId;
+        this.cls = ncls;
     }
 
     public int getTitleId() {
@@ -20,5 +22,11 @@ public class NavigationItems {
 
     public int getIconId() {
         return iconId;
+    }
+
+    public T getInstance() {
+        try {
+            return cls.newInstance();
+        } catch (Exception e) { return null; }
     }
 }

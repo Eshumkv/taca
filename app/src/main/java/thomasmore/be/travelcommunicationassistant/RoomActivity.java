@@ -90,7 +90,7 @@ public class RoomActivity extends AppCompatActivity implements CreatedRoomFragme
     }
 
     public void goHome(View v) {
-        Intent intent = new Intent(this, TutorHomeActivity.class);
+        Intent intent = new Intent(this, NavigationDrawerActivity.class);
         startActivity(intent);
         finish();
     }

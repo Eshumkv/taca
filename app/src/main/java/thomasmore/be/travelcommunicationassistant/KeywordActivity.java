@@ -57,7 +57,7 @@ public class KeywordActivity extends AppCompatActivity implements PopupMenu.OnMe
     }
 
     public void goHome(View v) {
-        Intent intent = new Intent(this, TutorHomeActivity.class);
+        Intent intent = new Intent(this, NavigationDrawerActivity.class);
         startActivity(intent);
         finish();
     }
@@ -74,7 +74,7 @@ public class KeywordActivity extends AppCompatActivity implements PopupMenu.OnMe
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_home:
-                Intent intent = new Intent(this, TutorHomeActivity.class);
+                Intent intent = new Intent(this, NavigationDrawerActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

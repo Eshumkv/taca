@@ -12,9 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
-import thomasmore.be.travelcommunicationassistant.adapter.FixedTabsPerAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.TreeviewTabsPager;
 import thomasmore.be.travelcommunicationassistant.fragments.CategoryFragment;
 import thomasmore.be.travelcommunicationassistant.fragments.PictogramFragment;
@@ -68,7 +66,7 @@ public class TreeviewActivity extends AppCompatActivity implements PopupMenu.OnM
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_home:
-                Intent intent = new Intent(this, TutorHomeActivity.class);
+                Intent intent = new Intent(this, NavigationDrawerActivity.class);
                 startActivity(intent);
                 finish();
                 return true;
