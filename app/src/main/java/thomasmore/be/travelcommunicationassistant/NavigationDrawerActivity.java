@@ -4,12 +4,10 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Debug;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +18,8 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.NavigationItems;
-import thomasmore.be.travelcommunicationassistant.fragments.HomeFragment;
-import thomasmore.be.travelcommunicationassistant.misc.Helper;
+import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
+import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
     ListView mDrawerList;
@@ -91,7 +88,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         switch(item.getItemId())
         {
             case R.id.action_logout:
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

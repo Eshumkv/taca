@@ -1,4 +1,4 @@
-package thomasmore.be.travelcommunicationassistant.adapter.misc;
+package thomasmore.be.travelcommunicationassistant.utils;
 
 /**
  * Created by Eshum on 12/04/2017.

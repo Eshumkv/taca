@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.HomeScreenValues;
+import thomasmore.be.travelcommunicationassistant.utils.HomeScreenValues;
 
 public class HomeFragment extends Fragment {
     private static final HomeScreenValues[] values = new HomeScreenValues[] {

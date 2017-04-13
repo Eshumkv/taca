@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.HomeScreenValues;
+import thomasmore.be.travelcommunicationassistant.utils.HomeScreenValues;
 
 /**
  * Created by Eshum on 11/04/2017.

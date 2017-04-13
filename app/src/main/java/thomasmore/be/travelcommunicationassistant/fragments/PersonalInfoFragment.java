@@ -5,13 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
-
-import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.HomeScreenValues;
 
 public class PersonalInfoFragment extends Fragment {
     public PersonalInfoFragment() {

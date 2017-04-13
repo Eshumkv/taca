@@ -1,7 +1,6 @@
-package thomasmore.be.travelcommunicationassistant.misc;
+package thomasmore.be.travelcommunicationassistant.utils;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.fragments.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragments.PersonalInfoFragment;
 

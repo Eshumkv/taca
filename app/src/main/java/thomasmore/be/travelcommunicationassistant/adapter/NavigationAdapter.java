@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.misc.NavigationItems;
+import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
 public class NavigationAdapter extends BaseAdapter {
 
