@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="colorContextMenu">#606060</color>
+    <color name="colorContextMenuText">#eeeeee</color>
+
+
+    <color name="colorPagingBackground">#3F51B5</color>
+
 </resources>

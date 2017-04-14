@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="thomasmore.be.travelcommunicationassistant.LoginActivity">
+
+    <item
+        android:id="@+id/menu_group_spinner"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1"
+        android:title="@string/group"
+        app:actionViewClass="android.widget.Spinner" />
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:orderInCategory="2"
+        android:title="@string/search"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
+</menu>

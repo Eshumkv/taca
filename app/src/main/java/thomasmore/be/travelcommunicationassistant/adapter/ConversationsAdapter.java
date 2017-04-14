@@ -18,14 +18,20 @@ import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
  * Created by Eshum on 11/04/2017.
  */
 
-public class HomeScreenAdapter extends BaseAdapter {
+public class ConversationsAdapter extends BaseAdapter {
 
     private Context context;
-    private List<NavigationItems> values;
+    private List<String> values;
 
-    public HomeScreenAdapter(Context ctx, List<NavigationItems> values) {
+    public ConversationsAdapter(Context ctx, List<String> values) {
         this.values = new ArrayList<>(values);
         context = ctx;
+    }
+
+    static class ViewHolder {
+        private TextView name;
+        private ImageView image;
+        private TextView message;
     }
 
     /**
@@ -89,43 +95,20 @@ public class HomeScreenAdapter extends BaseAdapter {
         else {
             LayoutInflater inflater = (LayoutInflater)
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.item_homescreen, null);
+            convertView = inflater.inflate(R.layout.item_messages_conversation, null);
 
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.text);
+            viewHolder.name = (TextView) convertView.findViewById(R.id.contact_name);
+            viewHolder.message = (TextView) convertView.findViewById(R.id.contact_message);
             viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
 
             convertView.setTag(viewHolder);
         }
 
-        final NavigationItems value = this.values.get(position);
-
-        // Check if it's a dummy item
-        if (value.getTitleId() != -1) {
-            viewHolder.title.setText(value.getTitleId());
-            viewHolder.image.setImageResource(value.getIconId());
-        } else {
-            viewHolder.title.setText("");
-            viewHolder.image.setVisibility(View.GONE);
-        }
+        final String value = this.values.get(position);
+        viewHolder.name.setText(value);
 
         return convertView;
-    }
-
-    static class ViewHolder {
-        private TextView title;
-        private ImageView image;
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        // Make the second-to-last item non-clickable.
-        return position != (values.size() - 2);
     }
 }
 

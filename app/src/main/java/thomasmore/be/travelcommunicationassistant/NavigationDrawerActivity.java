@@ -2,13 +2,15 @@ package thomasmore.be.travelcommunicationassistant;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,10 +20,14 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
+import thomasmore.be.travelcommunicationassistant.fragments.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
-public class NavigationDrawerActivity extends AppCompatActivity {
+public class NavigationDrawerActivity
+        extends AppCompatActivity
+        implements HomeFragment.OnHomeItemSelectedListener {
+
     ListView mDrawerList;
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
@@ -69,13 +75,24 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         selectItem(0);
+
+        handleIntent(getIntent());
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return super.onCreateOptionsMenu(menu);
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(getIntent());
     }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search your data somehow
+            Log.i("SEARCH", query);
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -84,17 +101,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
             return true;
         }
 
-        // Handle other menu items
-        switch(item.getItemId())
-        {
-            case R.id.action_logout:
-                Intent intent = new Intent(getBaseContext(), LoginActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -109,13 +116,30 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    private void selectItem(Class<?> cls)  {
+        int position = -1;
+        for (int i = 0; i < Helper.navigationItems.length; i++) {
+            if (Helper.navigationItems[i].getCls() == cls) {
+                position = i;
+                break;
+            }
+        }
+
+        if (position != -1)  {
+            selectItem(position);
+        } else {
+            throw new RuntimeException("Something went REALLY wrong.");
+        }
+    }
 
     private void selectItem(int position) {
         NavigationItems navItem = Helper.navigationItems[position];
         Fragment fragment = (Fragment) navItem.getInstance();
         FragmentManager fragmentManager = getFragmentManager();
 
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.commit();
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
@@ -130,5 +154,10 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
         }
+    }
+
+    // Homescreen listener.
+    public void onHomeItemSelected(Class<?> cls) {
+        selectItem(cls);
     }
 }

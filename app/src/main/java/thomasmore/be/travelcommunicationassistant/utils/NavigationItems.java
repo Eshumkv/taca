@@ -24,9 +24,9 @@ public class NavigationItems<T> {
         return iconId;
     }
 
+    public Class<T> getCls() { return cls; }
+
     public T getInstance() {
-        try {
-            return cls.newInstance();
-        } catch (Exception e) { return null; }
+        return Helper.NewInstanceOf(cls);
     }
 }

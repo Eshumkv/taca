@@ -24,4 +24,11 @@
     <dimen name="homescreen_item_imagesize">60dp</dimen>
     <dimen name="homescreen_grid_vspacing">50dp</dimen>
     <dimen name="homescreen_grid_hspacing">15dp</dimen>
+
+
+    <dimen name="c_menu_height">65dp</dimen>
+    <dimen name="c_menu_button_size">50dp</dimen>
+    <dimen name="c_menu_leftbutton_margin">15dp</dimen>
+
+    <dimen name="paging_height">50dp</dimen>
 </resources>
