@@ -1,4 +1,4 @@
-package thomasmore.be.travelcommunicationassistant.fragments;
+package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;

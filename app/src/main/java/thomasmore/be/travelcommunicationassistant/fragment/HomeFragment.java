@@ -1,12 +1,10 @@
-package thomasmore.be.travelcommunicationassistant.fragments;
+package thomasmore.be.travelcommunicationassistant.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.LoginActivity;

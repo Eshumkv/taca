@@ -1,4 +1,4 @@
-package thomasmore.be.travelcommunicationassistant.fragments;
+package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,30 @@ import java.util.List;
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
+import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class MessagesListFragment extends Fragment {
     private Menu activityMenu;
+
+    OnConversationItemSelectedListener callback;
+
+    public interface OnConversationItemSelectedListener {
+        void onConversationItemSelected(MessagesListViewModel convo);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure the container activity has implemented the callback.
+        // If not, throw an exception.
+        try {
+            callback = (MessagesListFragment.OnConversationItemSelectedListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString() +
+                    " must implement OnConversationItemSelectedListener");
+        }
+    }
 
     public MessagesListFragment() {
         // Empty constructor required for fragment subclasses
@@ -45,6 +67,25 @@ public class MessagesListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_messages_list, container, false);
+
+        List<MessagesListViewModel> tempList = new ArrayList<>();
+        tempList.add(new MessagesListViewModel("Ivan", "What're you doing?"));
+        tempList.add(new MessagesListViewModel("Viktor", "Hello"));
+        tempList.add(new MessagesListViewModel("Anna", "Sometimes"));
+        tempList.add(new MessagesListViewModel("John", "I think so ..."));
+        tempList.add(new MessagesListViewModel("Bobby", "Have fun :)"));
+
+        ListView list = (ListView) rootView.findViewById(R.id.conversations);
+        list.setAdapter(new ConversationsAdapter(getActivity(), tempList));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView text = (TextView) view.findViewById(R.id.contact_name);
+                MessagesListViewModel model = (MessagesListViewModel)text.getTag();
+                callback.onConversationItemSelected(model);
+            }
+        });
+
         return rootView;
     }
 
@@ -84,15 +125,6 @@ public class MessagesListFragment extends Fragment {
                 (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getActivity().getComponentName()));
-
-        List<String> tempList = new ArrayList<>();
-        tempList.add("John");
-        tempList.add("Bobby");
-        tempList.add("Ivan");
-        tempList.add("Viktor");
-
-        ListView list = (ListView) getActivity().findViewById(R.id.conversations);
-        list.setAdapter(new ConversationsAdapter(getActivity(), tempList));
 
         super.onCreateOptionsMenu(menu, inflater);
     }

@@ -20,13 +20,17 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
-import thomasmore.be.travelcommunicationassistant.fragments.HomeFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
+import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class NavigationDrawerActivity
         extends AppCompatActivity
-        implements HomeFragment.OnHomeItemSelectedListener {
+        implements HomeFragment.OnHomeItemSelectedListener,
+        MessagesListFragment.OnConversationItemSelectedListener {
 
     ListView mDrawerList;
     DrawerLayout mDrawerLayout;
@@ -74,7 +78,7 @@ public class NavigationDrawerActivity
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        selectItem(0);
+        selectNavigationItem(0);
 
         handleIntent(getIntent());
     }
@@ -116,7 +120,7 @@ public class NavigationDrawerActivity
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    private void selectItem(Class<?> cls)  {
+    private void selectNavigationItem(Class<?> cls)  {
         int position = -1;
         for (int i = 0; i < Helper.navigationItems.length; i++) {
             if (Helper.navigationItems[i].getCls() == cls) {
@@ -126,20 +130,15 @@ public class NavigationDrawerActivity
         }
 
         if (position != -1)  {
-            selectItem(position);
+            selectNavigationItem(position);
         } else {
             throw new RuntimeException("Something went REALLY wrong.");
         }
     }
 
-    private void selectItem(int position) {
+    private void selectNavigationItem(int position) {
         NavigationItems navItem = Helper.navigationItems[position];
-        Fragment fragment = (Fragment) navItem.getInstance();
-        FragmentManager fragmentManager = getFragmentManager();
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-        transaction.commit();
+        changeFragment((Fragment) navItem.getInstance(), false);
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
@@ -148,16 +147,33 @@ public class NavigationDrawerActivity
         mDrawerLayout.closeDrawer(view);
     }
 
+    private void changeFragment(Fragment fragment, boolean addBackToStack) {
+        FragmentManager fragmentManager = getFragmentManager();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+
+        if (addBackToStack) {
+            transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
+    }
+
     // The click listener for ListView in the navigation drawer
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
+            selectNavigationItem(position);
         }
     }
 
     // Homescreen listener.
     public void onHomeItemSelected(Class<?> cls) {
-        selectItem(cls);
+        selectNavigationItem(cls);
+    }
+
+    public void onConversationItemSelected(MessagesListViewModel convo) {
+        changeFragment(new MessagesConversationFragment(), true);
     }
 }

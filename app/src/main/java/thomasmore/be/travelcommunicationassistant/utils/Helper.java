@@ -1,9 +1,9 @@
 package thomasmore.be.travelcommunicationassistant.utils;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.fragments.HomeFragment;
-import thomasmore.be.travelcommunicationassistant.fragments.MessagesListFragment;
-import thomasmore.be.travelcommunicationassistant.fragments.PersonalInfoFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.PersonalInfoFragment;
 
 public class Helper {
     public final static NavigationItems[] navigationItems = new NavigationItems[] {
