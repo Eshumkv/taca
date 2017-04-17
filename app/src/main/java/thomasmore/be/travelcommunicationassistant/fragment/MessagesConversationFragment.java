@@ -1,12 +1,9 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.app.Fragment;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,22 +11,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.SingleConversationAdapter;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessageSingleConversationViewModel;
-import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class MessagesConversationFragment extends Fragment {
     private Menu activityMenu;

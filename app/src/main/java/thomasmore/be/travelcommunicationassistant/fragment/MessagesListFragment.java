@@ -25,7 +25,7 @@ import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
+import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapterMy;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class MessagesListFragment extends Fragment {
@@ -76,7 +76,7 @@ public class MessagesListFragment extends Fragment {
         tempList.add(new MessagesListViewModel("Bobby", "Have fun :)"));
 
         ListView list = (ListView) rootView.findViewById(R.id.conversations);
-        list.setAdapter(new ConversationsAdapter(getActivity(), tempList));
+        list.setAdapter(new ConversationsAdapterMy(getActivity(), tempList));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

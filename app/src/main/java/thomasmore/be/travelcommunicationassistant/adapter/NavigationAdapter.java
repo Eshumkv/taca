@@ -13,11 +13,7 @@ import java.util.List;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
-public class NavigationAdapter extends BaseAdapter {
-
-    private final Context context;
-    private final LayoutInflater inflater;
-    private final List<NavigationItems> values;
+public class NavigationAdapter extends MyBaseAdapter<NavigationItems> {
 
     static class ViewHolder {
         private TextView title;
@@ -25,42 +21,7 @@ public class NavigationAdapter extends BaseAdapter {
     }
 
     public NavigationAdapter(Context context, List<NavigationItems> values) {
-        this.context = context;
-        this.values = values;
-        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    /**
-     * How many items are in the data set represented by this Adapter.
-     *
-     * @return Count of items.
-     */
-    @Override
-    public int getCount() {
-        return values.size();
-    }
-
-    /**
-     * Get the data item associated with the specified position in the data set.
-     *
-     * @param position Position of the item whose data we want within the adapter's
-     *                 data set.
-     * @return The data at the specified position.
-     */
-    @Override
-    public Object getItem(int position) {
-        return values.get(position);
-    }
-
-    /**
-     * Get the row id associated with the specified position in the list.
-     *
-     * @param position The position of the item within the adapter's data set whose row id we want.
-     * @return The id of the item at the specified position.
-     */
-    @Override
-    public long getItemId(int position) {
-        return 0;
+        super(context, values);
     }
 
     @Override
@@ -69,8 +30,9 @@ public class NavigationAdapter extends BaseAdapter {
 
         if (convertView != null) {
             viewHolder = (ViewHolder) convertView.getTag();
-        }
-        else {
+        } else {
+            LayoutInflater inflater = (LayoutInflater)
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.item_navigation_drawer, null);
 
             viewHolder = new ViewHolder();
