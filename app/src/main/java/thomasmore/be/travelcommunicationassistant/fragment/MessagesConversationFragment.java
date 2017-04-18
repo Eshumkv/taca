@@ -45,6 +45,9 @@ public class MessagesConversationFragment extends BaseFragment {
         ListView list = (ListView) rootView.findViewById(R.id.conversation);
         list.setAdapter(new SingleConversationAdapter(getActivity(), tempList));
 
+        ActionBar actionbar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionbar.setTitle("Ivan");
+
         return rootView;
     }
 

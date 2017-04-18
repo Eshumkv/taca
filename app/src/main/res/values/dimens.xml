@@ -27,8 +27,10 @@
 
 
     <dimen name="c_menu_height">65dp</dimen>
-    <dimen name="c_menu_button_size">50dp</dimen>
+    <dimen name="c_menu_button_size">65dp</dimen>
     <dimen name="c_menu_leftbutton_margin">15dp</dimen>
+
+    <dimen name="context_textsize">16sp</dimen>
 
     <dimen name="paging_height">50dp</dimen>
 </resources>

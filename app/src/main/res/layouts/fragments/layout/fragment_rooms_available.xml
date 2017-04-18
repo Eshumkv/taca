@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -28,19 +27,37 @@
             android:text="@string/c_menu_add"/>
     </LinearLayout>
 
-    <include
-        layout="@layout/paging"
-        android:id="@+id/paging"
+    <LinearLayout
+        android:id="@+id/tabs"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/paging_height"
-        android:layout_alignParentBottom="true" />
+        android:layout_height="50dp"
+        style="?buttonBarStyle"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/rectangle_paging">
+
+        <Button
+            android:id="@+id/tabs_created"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tabs_created"/>
+
+        <Button
+            android:id="@+id/tabs_available"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="?buttonBarButtonStyle"
+            android:text="@string/tabs_available"/>
+    </LinearLayout>
 
     <ListView
-        android:id="@+id/conversations"
+        android:id="@+id/rooms"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/context_menu"
-        android:layout_above="@+id/paging">
+        android:layout_above="@+id/tabs">
     </ListView>
 
 </RelativeLayout>

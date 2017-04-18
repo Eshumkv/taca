@@ -21,9 +21,11 @@ import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
@@ -44,8 +46,7 @@ public class BackActivity
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            Class<?> cls = (Class<?>) bundle.get(DATA_STRING);
-            Helper.changeFragment(this, (Fragment) Helper.NewInstanceOf(cls), true);
+            Helper.changeFragment(this, getCorrectFragment(bundle), true);
         }
     }
 
@@ -65,5 +66,30 @@ public class BackActivity
 
         if (cls.equals(HomeFragment.class)) {
         }
+    }
+
+    private Fragment getCorrectFragment(Bundle bundle) {
+        Class<?> cls = (Class<?>) bundle.get(DATA_STRING);
+
+        Fragment fragment = (Fragment) Helper.NewInstanceOf(cls);
+
+        if (cls.equals(BasicEditFragment.class)) {
+            String classname = bundle.getString(BasicEditFragment.CLASSNAME);
+            fragment.setArguments(getBundleForFragment(classname, bundle));
+        }
+
+        return fragment;
+    }
+
+    private Bundle getBundleForFragment(String classname, Bundle oldBundle) {
+        Bundle bundle = new Bundle();
+        bundle.putString(BasicEditFragment.CLASSNAME, classname);
+
+        if (classname.equals(Room.class.getName())) {
+            Room room = oldBundle.getParcelable(classname);
+            bundle.putParcelable(Room.class.getName(), room);
+        }
+
+        return bundle;
     }
 }

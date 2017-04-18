@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -64,6 +65,10 @@ public abstract class BaseFragment extends Fragment {
             Bundle savedInstanceState);
 
     public boolean onBackPressed() {
+        return false;
+    }
+
+    public boolean onTouchEvent(View v, MotionEvent event) {
         return false;
     }
 }

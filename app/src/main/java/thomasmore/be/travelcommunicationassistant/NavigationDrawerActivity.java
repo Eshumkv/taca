@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -18,7 +19,9 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
+import thomasmore.be.travelcommunicationassistant.fragment.AvailableRoomsFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.CreatedRoomsFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
@@ -28,7 +31,8 @@ import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewMode
 
 public class NavigationDrawerActivity
         extends AppCompatActivity
-        implements BaseFragment.OnFragmentInteractionListener {
+        implements BaseFragment.OnFragmentInteractionListener,
+        View.OnTouchListener {
 
     ListView mDrawerList;
     DrawerLayout mDrawerLayout;
@@ -78,6 +82,8 @@ public class NavigationDrawerActivity
         selectNavigationItem(0);
 
         handleIntent(getIntent());
+
+        frame.setOnTouchListener(this);
     }
 
     @Override
@@ -127,6 +133,18 @@ public class NavigationDrawerActivity
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public boolean onTouch(View v, MotionEvent event) {
+        final BaseFragment fragment =
+                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+
+        return fragment.onTouchEvent(v, event);
+    }
+
     private void selectNavigationItem(Class<?> cls)  {
         int position = -1;
         for (int i = 0; i < Helper.navigationItems.length; i++) {
@@ -170,9 +188,15 @@ public class NavigationDrawerActivity
             selectNavigationItem(fragmentClass);
         } else if (cls.equals(MessagesListFragment.class)) {
             MessagesListViewModel model = (MessagesListViewModel) value;
-            Intent intent = new Intent(this, BackActivity.class);
-            intent.putExtra(BackActivity.DATA_STRING, MessagesConversationFragment.class);
-            startActivity(intent);
+            startActivity(Helper.getBackActivityIntent(this));
+        } else if (cls.equals(CreatedRoomsFragment.class)) {
+            if (value instanceof String) {
+                Helper.changeFragment(this, new AvailableRoomsFragment(), false);
+            }
+        } else if (cls.equals(AvailableRoomsFragment.class)) {
+            if (value instanceof String) {
+                Helper.changeFragment(this, new CreatedRoomsFragment(), false);
+            }
         }
     }
 }
