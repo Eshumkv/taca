@@ -24,43 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapterMy;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
-public class MessagesListFragment extends Fragment {
-    private Menu activityMenu;
-
-    OnConversationItemSelectedListener callback;
-
-    public interface OnConversationItemSelectedListener {
-        void onConversationItemSelected(MessagesListViewModel convo);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure the container activity has implemented the callback.
-        // If not, throw an exception.
-        try {
-            callback = (MessagesListFragment.OnConversationItemSelectedListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString() +
-                    " must implement OnConversationItemSelectedListener");
-        }
-    }
+public class MessagesListFragment extends BaseFragment {
 
     public MessagesListFragment() {
         // Empty constructor required for fragment subclasses
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Used to indicate this fragment has it's own menu
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -82,7 +54,7 @@ public class MessagesListFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView text = (TextView) view.findViewById(R.id.contact_name);
                 MessagesListViewModel model = (MessagesListViewModel)text.getTag();
-                callback.onConversationItemSelected(model);
+                callback.onFragmentInteraction(MessagesListFragment.class, model);
             }
         });
 
@@ -91,7 +63,6 @@ public class MessagesListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        activityMenu = menu;
         inflater.inflate(R.menu.menu_messages, menu);
 
         MenuItem groupSpinner = menu.findItem(R.id.menu_group_spinner);
@@ -132,11 +103,6 @@ public class MessagesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.action_logout:
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                getActivity().finish();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

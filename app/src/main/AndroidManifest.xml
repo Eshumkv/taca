@@ -32,6 +32,11 @@
                 android:resource="@xml/searchable" />
 
         </activity>
+        <activity
+            android:name=".BackActivity"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:label="Probably change this">
+        </activity>
     </application>
 
 </manifest>

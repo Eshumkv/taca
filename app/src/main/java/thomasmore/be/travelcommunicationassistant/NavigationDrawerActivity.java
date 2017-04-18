@@ -1,8 +1,6 @@
 package thomasmore.be.travelcommunicationassistant;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -20,6 +18,7 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
+import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
@@ -29,13 +28,12 @@ import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewMode
 
 public class NavigationDrawerActivity
         extends AppCompatActivity
-        implements HomeFragment.OnHomeItemSelectedListener,
-        MessagesListFragment.OnConversationItemSelectedListener {
+        implements BaseFragment.OnFragmentInteractionListener {
 
     ListView mDrawerList;
     DrawerLayout mDrawerLayout;
-    ActionBarDrawerToggle mDrawerToggle;
     FrameLayout frame;
+    ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +50,6 @@ public class NavigationDrawerActivity
 
         mDrawerList.setAdapter(new NavigationAdapter(this, Arrays.asList(Helper.navigationItems)));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,
                 mDrawerLayout,
@@ -77,7 +74,7 @@ public class NavigationDrawerActivity
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         selectNavigationItem(0);
 
         handleIntent(getIntent());
@@ -96,7 +93,6 @@ public class NavigationDrawerActivity
             Log.i("SEARCH", query);
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -120,6 +116,17 @@ public class NavigationDrawerActivity
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public void onBackPressed() {
+        final BaseFragment fragment =
+                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+
+        // If the fragment doesn't handle back press, handle it yourself.
+        if (!fragment.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
     private void selectNavigationItem(Class<?> cls)  {
         int position = -1;
         for (int i = 0; i < Helper.navigationItems.length; i++) {
@@ -138,26 +145,13 @@ public class NavigationDrawerActivity
 
     private void selectNavigationItem(int position) {
         NavigationItems navItem = Helper.navigationItems[position];
-        changeFragment((Fragment) navItem.getInstance(), false);
+        Helper.changeFragment(this, (Fragment) navItem.getInstance(), false);
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
         getSupportActionBar().setTitle(navItem.getTitleId());
         View view = findViewById(R.id.navigation_layout);
         mDrawerLayout.closeDrawer(view);
-    }
-
-    private void changeFragment(Fragment fragment, boolean addBackToStack) {
-        FragmentManager fragmentManager = getFragmentManager();
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-
-        if (addBackToStack) {
-            transaction.addToBackStack(null);
-        }
-
-        transaction.commit();
     }
 
     // The click listener for ListView in the navigation drawer
@@ -168,12 +162,17 @@ public class NavigationDrawerActivity
         }
     }
 
-    // Homescreen listener.
-    public void onHomeItemSelected(Class<?> cls) {
-        selectNavigationItem(cls);
-    }
+    // Fragment listener
+    public void onFragmentInteraction(Class<?> cls, Object value) {
 
-    public void onConversationItemSelected(MessagesListViewModel convo) {
-        changeFragment(new MessagesConversationFragment(), true);
+        if (cls.equals(HomeFragment.class)) {
+            Class<?> fragmentClass = (Class<?>) value;
+            selectNavigationItem(fragmentClass);
+        } else if (cls.equals(MessagesListFragment.class)) {
+            MessagesListViewModel model = (MessagesListViewModel) value;
+            Intent intent = new Intent(this, BackActivity.class);
+            intent.putExtra(BackActivity.DATA_STRING, MessagesConversationFragment.class);
+            startActivity(intent);
+        }
     }
 }

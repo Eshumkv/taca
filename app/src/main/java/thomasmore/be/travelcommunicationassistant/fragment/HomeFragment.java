@@ -23,39 +23,10 @@ import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
-public class HomeFragment extends Fragment {
-    private Menu activityMenu;
-
-    OnHomeItemSelectedListener callback;
-
-    public interface OnHomeItemSelectedListener {
-        void onHomeItemSelected(Class<?> cls);
-    }
+public class HomeFragment extends BaseFragment {
 
     public HomeFragment() {
         // Empty constructor required for fragment subclasses
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure the container activity has implemented the callback.
-        // If not, throw an exception.
-        try {
-            callback = (OnHomeItemSelectedListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString() +
-                    " must implement OnHomeItemSelectedListener");
-        }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Used to indicate this fragment has it's own menu
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -69,7 +40,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NavigationItems item = getCorrectItems().get(position);
-                callback.onHomeItemSelected(item.getCls());
+                callback.onFragmentInteraction(HomeFragment.class, item.getCls());
             }
         });
 
@@ -78,7 +49,6 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        activityMenu = menu;
         inflater.inflate(R.menu.menu_home, menu);
 
         super.onCreateOptionsMenu(menu, inflater);

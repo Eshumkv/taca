@@ -9,11 +9,20 @@ public class NavigationItems<T> {
     int titleId;
     int iconId;
     Class<T> cls;
+    boolean backActivity;
 
     public NavigationItems(int titleId, int imageId, Class<T> ncls) {
         this.titleId = titleId;
         this.iconId = imageId;
         this.cls = ncls;
+        this.backActivity = false;
+    }
+
+    public NavigationItems(int titleId, int imageId, Class<T> ncls, boolean backActivity) {
+        this.titleId = titleId;
+        this.iconId = imageId;
+        this.cls = ncls;
+        this.backActivity = backActivity;
     }
 
     public int getTitleId() {
@@ -28,5 +37,9 @@ public class NavigationItems<T> {
 
     public T getInstance() {
         return Helper.NewInstanceOf(cls);
+    }
+
+    public boolean isBackActivity() {
+        return backActivity;
     }
 }

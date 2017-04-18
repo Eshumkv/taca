@@ -4,7 +4,9 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,23 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.SingleConversationAdapter;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessageSingleConversationViewModel;
 
-public class MessagesConversationFragment extends Fragment {
-    private Menu activityMenu;
+public class MessagesConversationFragment extends BaseFragment {
 
     public MessagesConversationFragment() {
         // Empty constructor required for fragment subclasses
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Used to indicate this fragment has it's own menu
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -56,9 +50,7 @@ public class MessagesConversationFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        activityMenu = menu;
         inflater.inflate(R.menu.menu_simple_back, menu);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -66,13 +58,17 @@ public class MessagesConversationFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.action_logout:
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
+            case android.R.id.home:
                 getActivity().finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        getActivity().finish();
+        return true;
     }
 }

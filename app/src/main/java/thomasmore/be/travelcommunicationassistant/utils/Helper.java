@@ -1,5 +1,10 @@
 package thomasmore.be.travelcommunicationassistant.utils;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
@@ -45,5 +50,18 @@ public class Helper {
         try {
             return cls.newInstance();
         } catch (Exception e) { return null; }
+    }
+
+    public static void changeFragment(Activity act, Fragment fragment, boolean addBackToStack) {
+        FragmentManager fragmentManager = act.getFragmentManager();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment, fragment.getClass().getName());
+
+        if (addBackToStack) {
+            transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
     }
 }

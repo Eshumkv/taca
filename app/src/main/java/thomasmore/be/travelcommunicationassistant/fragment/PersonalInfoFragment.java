@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import thomasmore.be.travelcommunicationassistant.R;
 
-public class PersonalInfoFragment extends Fragment {
+public class PersonalInfoFragment extends BaseFragment {
     public PersonalInfoFragment() {
         // Empty constructor required for fragment subclasses
     }
