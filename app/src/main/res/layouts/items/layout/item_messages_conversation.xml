@@ -24,28 +24,63 @@
                 android:layout_centerVertical="true"
                 android:src="@drawable/contact"/>
 
-            <LinearLayout
-                android:orientation="vertical"
+            <RelativeLayout
                 android:layout_toRightOf="@id/contact_image"
                 android:layout_toEndOf="@id/contact_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/contact_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:text="Hello"
-                    android:layout_weight="1"/>
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingEnd="15dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="9:58"/>
 
-                <TextView
-                    android:id="@+id/contact_message"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_toLeftOf="@+id/time"
+                    android:layout_toStartOf="@+id/time"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:text="This is a message"
-                    android:layout_weight="1"/>
+                    android:layout_height="match_parent">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/contact_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="15dp"
+                        android:paddingStart="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingEnd="15dp"
+                        android:textStyle="bold"
+                        android:textSize="23sp"
+                        android:text="Alice"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/contact_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="15dp"
+                        android:paddingStart="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="This is a message"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+
+            </RelativeLayout>
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
