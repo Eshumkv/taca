@@ -61,7 +61,6 @@ public class BasicEditFragment extends BaseFragment {
             case R.id.action_save:
                 getActivity().setResult(Activity.RESULT_OK, getIntent());
                 getActivity().finish();
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -126,7 +125,7 @@ public class BasicEditFragment extends BaseFragment {
     private Room getRoomData() {
         Room room = new Room();
 
-        room.setId((Integer)getHiddenValue("Id"));
+        room.setId((Long)getHiddenValue("Id"));
         room.setName(getTextFromEdit("Name"));
         room.setPassword(getTextFromEdit("Password"));
 
@@ -140,7 +139,7 @@ public class BasicEditFragment extends BaseFragment {
     }
 
     private Object getHiddenValue(String label) {
-        View v = (View)dynamicViews.get(label);
+        View v = dynamicViews.get(label);
         return v.getTag();
     }
 }

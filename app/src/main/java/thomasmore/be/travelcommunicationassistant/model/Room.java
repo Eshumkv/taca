@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 
 public class Room implements Parcelable {
-    private int id;
+    private long id;
     private String name;
     private String password;
 
@@ -16,16 +16,16 @@ public class Room implements Parcelable {
     }
 
     public Room(Parcel in) {
-        id = in.readInt();
+        id = in.readLong();
         name = in.readString();
         password = in.readString();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -52,7 +52,7 @@ public class Room implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeLong(id);
         dest.writeString(name);
         dest.writeString(password);
     }

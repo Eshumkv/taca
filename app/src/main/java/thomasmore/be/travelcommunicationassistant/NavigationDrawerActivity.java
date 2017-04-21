@@ -188,7 +188,10 @@ public class NavigationDrawerActivity
             selectNavigationItem(fragmentClass);
         } else if (cls.equals(MessagesListFragment.class)) {
             MessagesListViewModel model = (MessagesListViewModel) value;
-            startActivity(Helper.getBackActivityIntent(this));
+
+            Intent intent = new Intent(this, BackActivity.class);
+            intent.putExtra(BackActivity.DATA_STRING, MessagesConversationFragment.class);
+            startActivity(intent);
         } else if (cls.equals(CreatedRoomsFragment.class)) {
             if (value instanceof String) {
                 Helper.changeFragment(this, new AvailableRoomsFragment(), false);
