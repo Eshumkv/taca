@@ -16,9 +16,9 @@ import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewMode
  * Created by Eshum on 11/04/2017.
  */
 
-public class ConversationsAdapterMy extends MyBaseAdapter<MessagesListViewModel> {
+public class ConversationsAdapter extends MyBaseAdapter<MessagesListViewModel> {
 
-    public ConversationsAdapterMy(Context ctx, List<MessagesListViewModel> values) {
+    public ConversationsAdapter(Context ctx, List<MessagesListViewModel> values) {
         super(ctx, values);
     }
 

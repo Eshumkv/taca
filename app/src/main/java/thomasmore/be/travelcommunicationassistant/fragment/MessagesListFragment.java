@@ -1,11 +1,8 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
-import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,10 +20,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import thomasmore.be.travelcommunicationassistant.LoginActivity;
-import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapterMy;
+import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class MessagesListFragment extends BaseFragment {
@@ -48,7 +43,7 @@ public class MessagesListFragment extends BaseFragment {
         tempList.add(new MessagesListViewModel("Bobby", "Have fun :)"));
 
         ListView list = (ListView) rootView.findViewById(R.id.conversations);
-        list.setAdapter(new ConversationsAdapterMy(getActivity(), tempList));
+        list.setAdapter(new ConversationsAdapter(getActivity(), tempList));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

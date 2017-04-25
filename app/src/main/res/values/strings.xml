@@ -54,6 +54,7 @@
 
 
     <string name="dialog_delete_room">Are you sure you wish to delete this room?</string>
+    <string name="dialog_delete_contact">Are you sure you wish to delete this contact?</string>
 
     <string name="warning_contact_text_msg">Warning! Not set to recieve text messages!</string>
     <string name="warning_wrong_password">Gave wrong password for room!</string>
