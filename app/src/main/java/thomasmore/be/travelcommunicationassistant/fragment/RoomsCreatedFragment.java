@@ -1,13 +1,9 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -19,39 +15,30 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapterMy;
 import thomasmore.be.travelcommunicationassistant.adapter.RoomsCreatedAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
-import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 import static android.app.Activity.RESULT_OK;
 
-public class CreatedRoomsFragment extends BaseFragment {
+public class RoomsCreatedFragment extends BaseFragment {
 
     int selectedColor;
     int normalColor;
     int selectedPosition = -1;
 
+    Button addButton;
     Button editButton;
     Button deleteButton;
 
-    public CreatedRoomsFragment() {
+    public RoomsCreatedFragment() {
         // Empty constructor required for fragment subclasses
     }
 
@@ -66,40 +53,54 @@ public class CreatedRoomsFragment extends BaseFragment {
         available.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onFragmentInteraction(CreatedRoomsFragment.class, "Change");
+                callback.onFragmentInteraction(RoomsCreatedFragment.class, "Change");
             }
         });
-
-        String[] rooms = new String[] {
-                "Room 1",
-                "Some test",
-                "Ivan's Room"
-        };
 
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
 
+        Room[] rooms = new Room[] {
+                new Room("Room 1", "GoodPassword", null),
+                new Room("Some Room", "IHaveAGoodPassword", null),
+                new Room("Ivan's Room", "BESTIES", null)
+        };
+
+        final ListView list = (ListView) rootView.findViewById(R.id.rooms);
+        list.setAdapter(new RoomsCreatedAdapter(getActivity(), Arrays.asList(rooms)));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LinearLayout root = (LinearLayout)view;
+                CardView card = (CardView)root.findViewById(R.id.card_view);
+                card.setCardBackgroundColor(selectedColor);
+
+                // Deselect the previous card
+                int temp = selectedPosition;
+                deselectPrevious(rootView);
+                selectedPosition = temp == position ? -1 : position;
+
+                toggleContext();
+            }
+        });
+
+        addButton = (Button) rootView.findViewById(R.id.c_add);
         editButton = (Button) rootView.findViewById(R.id.c_edit);
         deleteButton = (Button) rootView.findViewById(R.id.c_delete);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToEditScreen(new Room());
+            }
+        });
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (selectedPosition == -1) return;
-
-                deselectPrevious(getView());
-                toggleContext();
-
-                // get the room
-                Room room = new Room();
-                room.setId(2);
-                room.setName("Ivan's Room");
-                room.setPassword("Such a great password!");
-
-                Intent intent = Helper.getBackActivityIntent(getActivity());
-                intent.putExtra(Room.class.getName(), room);
-                intent.putExtra(BasicEditFragment.CLASSNAME, Room.class.getName());
-                startActivityForResult(intent, 1);
+                Room room = (Room)list.getAdapter().getItem(selectedPosition);
+                goToEditScreen(room);
             }
         });
 
@@ -126,24 +127,6 @@ public class CreatedRoomsFragment extends BaseFragment {
                         })
                         .create()
                         .show();
-            }
-        });
-
-        final ListView list = (ListView) rootView.findViewById(R.id.rooms);
-        list.setAdapter(new RoomsCreatedAdapter(getActivity(), Arrays.asList(rooms)));
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LinearLayout root = (LinearLayout)view;
-                CardView card = (CardView)root.findViewById(R.id.card_view);
-                card.setCardBackgroundColor(selectedColor);
-
-                // Deselect the previous card
-                int temp = selectedPosition;
-                deselectPrevious(rootView);
-                selectedPosition = temp == position ? -1 : position;
-
-                toggleContext();
             }
         });
 
@@ -214,5 +197,15 @@ public class CreatedRoomsFragment extends BaseFragment {
             editButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
         }
+    }
+
+    private void goToEditScreen(Room room) {
+        deselectPrevious(getView());
+        toggleContext();
+
+        Intent intent = Helper.getBackActivityIntent(getActivity());
+        intent.putExtra(Room.class.getName(), room);
+        intent.putExtra(BasicEditFragment.CLASSNAME, Room.class.getName());
+        startActivityForResult(intent, 1);
     }
 }

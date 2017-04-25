@@ -2,6 +2,7 @@ package thomasmore.be.travelcommunicationassistant.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 /**
  * Created by Eshum on 18/04/2017.
@@ -11,14 +12,29 @@ public class Room implements Parcelable {
     private long id;
     private String name;
     private String password;
+    private @Nullable String creator;
 
     public Room() {
+    }
+
+    public Room(String name, String password, String creator) {
+        this.name = name;
+        this.password = password;
+        this.creator = creator;
+    }
+
+    public Room(long id, String name, String password, String creator) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.creator = creator;
     }
 
     public Room(Parcel in) {
         id = in.readLong();
         name = in.readString();
         password = in.readString();
+        creator = in.readString();
     }
 
     public long getId() {
@@ -45,6 +61,14 @@ public class Room implements Parcelable {
         this.password = password;
     }
 
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -55,6 +79,7 @@ public class Room implements Parcelable {
         dest.writeLong(id);
         dest.writeString(name);
         dest.writeString(password);
+        dest.writeString(creator);
     }
 
     public static final Parcelable.Creator<Room> CREATOR

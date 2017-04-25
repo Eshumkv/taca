@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -30,6 +31,19 @@
             android:text="@string/c_menu_add"/>
 
         <Button
+            android:id="@+id/c_edit"
+            android:layout_width="@dimen/c_menu_button_size"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:layout_centerInParent="true"
+            android:padding="0dp"
+            android:textColor="@color/colorContextMenuText"
+            android:textSize="@dimen/context_textsize"
+            android:drawableTop="@drawable/ic_edit_white_24dp"
+            android:visibility="gone"
+            android:text="@string/c_menu_edit"/>
+
+        <Button
             android:id="@+id/c_delete"
             android:layout_width="@dimen/c_menu_button_size"
             android:layout_height="wrap_content"
@@ -47,38 +61,19 @@
             android:text="@string/c_menu_delete"/>
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/tabs"
-        android:orientation="horizontal"
+    <include
+        layout="@layout/paging"
+        android:id="@+id/paging"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        style="?buttonBarStyle"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/rectangle_paging">
-
-        <Button
-            android:id="@+id/tabs_created"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/tabs_created"/>
-
-        <Button
-            android:id="@+id/tabs_available"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="?buttonBarButtonStyle"
-            android:text="@string/tabs_available"/>
-    </LinearLayout>
+        android:layout_height="@dimen/paging_height"
+        android:layout_alignParentBottom="true" />
 
     <ListView
-        android:id="@+id/rooms"
+        android:id="@+id/contacts"
         android:layout_width="match_parent"
-        android:divider="@null"
         android:layout_height="match_parent"
         android:layout_below="@id/context_menu"
-        android:layout_above="@+id/tabs">
+        android:layout_above="@+id/paging">
     </ListView>
 
 </RelativeLayout>

@@ -19,9 +19,9 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
-import thomasmore.be.travelcommunicationassistant.fragment.AvailableRoomsFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.RoomsAvailableFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
-import thomasmore.be.travelcommunicationassistant.fragment.CreatedRoomsFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
@@ -129,7 +129,13 @@ public class NavigationDrawerActivity
 
         // If the fragment doesn't handle back press, handle it yourself.
         if (!fragment.onBackPressed()) {
-            super.onBackPressed();
+            // If it's not the home fragment, go back to the home fragment.
+            Fragment current = getFragmentManager().findFragmentById(R.id.content_frame);
+            if ( !(current instanceof HomeFragment) ) {
+                selectNavigationItem(HomeFragment.class);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -192,13 +198,13 @@ public class NavigationDrawerActivity
             Intent intent = new Intent(this, BackActivity.class);
             intent.putExtra(BackActivity.DATA_STRING, MessagesConversationFragment.class);
             startActivity(intent);
-        } else if (cls.equals(CreatedRoomsFragment.class)) {
+        } else if (cls.equals(RoomsCreatedFragment.class)) {
             if (value instanceof String) {
-                Helper.changeFragment(this, new AvailableRoomsFragment(), false);
+                Helper.changeFragment(this, new RoomsAvailableFragment(), false);
             }
-        } else if (cls.equals(AvailableRoomsFragment.class)) {
+        } else if (cls.equals(RoomsAvailableFragment.class)) {
             if (value instanceof String) {
-                Helper.changeFragment(this, new CreatedRoomsFragment(), false);
+                Helper.changeFragment(this, new RoomsCreatedFragment(), false);
             }
         }
     }

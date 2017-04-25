@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -21,10 +22,13 @@ import java.util.List;
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
+import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment
+        extends Fragment
+        implements SimpleDialogFragment.DialogListener {
 
     OnFragmentInteractionListener callback;
 
@@ -70,5 +74,14 @@ public abstract class BaseFragment extends Fragment {
 
     public boolean onTouchEvent(View v, MotionEvent event) {
         return false;
+    }
+
+
+    @Override
+    public void onDialogPositiveClick(boolean correct) {
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
     }
 }

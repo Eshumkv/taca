@@ -29,6 +29,7 @@ import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.SingleConversationAdapter;
+import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessageSingleConversationViewModel;
 
 public class MessagesConversationFragment extends BaseFragment {
@@ -96,6 +97,7 @@ public class MessagesConversationFragment extends BaseFragment {
                 textMessageInput.setVisibility(View.VISIBLE);
                 pictoMessageInput.setVisibility(View.GONE);
                 msgText.requestFocus();
+                Helper.showKeyboard(getActivity());
             }
         });
 
@@ -129,12 +131,7 @@ public class MessagesConversationFragment extends BaseFragment {
     private void hideKeyboard() {
         final EditText msgText = (EditText) getActivity().findViewById(R.id.reply);
         msgText.clearFocus();
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-
+        Helper.hideKeyboard(getActivity());
     }
 
     private View.OnFocusChangeListener replyFocusListener =  new View.OnFocusChangeListener() {

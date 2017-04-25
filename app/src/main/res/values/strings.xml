@@ -5,6 +5,9 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+
     <string name="reply">Reply</string>
     <string name="add">Add</string>
 
@@ -20,6 +23,7 @@
     <string name="nav_room_single">Room</string>
     <string name="nav_rooms_created">Created Rooms</string>
     <string name="nav_rooms_available">Available Rooms</string>
+    <string name="nav_rooms_search">Room Search</string>
     <string name="nav_pictogram">Pictograms</string>
     <string name="nav_category">Categories</string>
     <string name="nav_warded">Warded Persons</string>
@@ -45,13 +49,25 @@
     <string name="tabs_available">Available</string>
 
 
+    <string name="created_by">Created By:</string>
+    <string name="search_by">Search By</string>
+
+
     <string name="dialog_delete_room">Are you sure you wish to delete this room?</string>
 
     <string name="warning_contact_text_msg">Warning! Not set to recieve text messages!</string>
+    <string name="warning_wrong_password">Gave wrong password for room!</string>
+
+    <string name="dialog_room_password">Please give the password for room:</string>
 
     <string-array name="groups_array_all">
         <item>Everyone</item>
         <item>Tutors</item>
         <item>Warded</item>
+    </string-array>
+
+    <string-array name="searchterms_array_all">
+        <item>Name</item>
+        <item>Telephone Nr.</item>
     </string-array>
 </resources>

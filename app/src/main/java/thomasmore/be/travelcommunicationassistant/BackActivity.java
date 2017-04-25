@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -25,6 +26,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
@@ -32,7 +34,8 @@ import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewMode
 
 public class BackActivity
         extends AppCompatActivity
-        implements BaseFragment.OnFragmentInteractionListener{
+        implements BaseFragment.OnFragmentInteractionListener,
+        SimpleDialogFragment.DialogListener {
 
     public final static String DATA_STRING = "BACKACTIVITY_DATA";
 
@@ -91,5 +94,23 @@ public class BackActivity
         }
 
         return bundle;
+    }
+
+
+    @Override
+    public void onDialogPositiveClick(boolean correct) {
+        final BaseFragment fragment =
+                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+
+        fragment.onDialogPositiveClick(correct);
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        final BaseFragment fragment =
+                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+
+        fragment.onDialogNegativeClick(dialog);
     }
 }

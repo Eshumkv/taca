@@ -6,21 +6,29 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
+import android.content.res.AssetManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.ListView;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
-import thomasmore.be.travelcommunicationassistant.fragment.CreatedRoomsFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.ContactListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.PersonalInfoFragment;
-import thomasmore.be.travelcommunicationassistant.model.Room;
 
 public class Helper {
     public final static NavigationItems[] navigationItems = new NavigationItems[] {
@@ -35,7 +43,7 @@ public class Helper {
             new NavigationItems(
                     R.string.nav_rooms,
                     R.drawable.ic_group_black_24dp,
-                    CreatedRoomsFragment.class),
+                    RoomsCreatedFragment.class),
             new NavigationItems(
                     R.string.nav_pictogram,
                     R.drawable.ic_stars_black_24dp,
@@ -51,7 +59,7 @@ public class Helper {
             new NavigationItems(
                     R.string.nav_contacts,
                     R.drawable.ic_contacts_black_24dp,
-                    HomeFragment.class),
+                    ContactListFragment.class),
             new NavigationItems(
                     R.string.nav_personal,
                     R.drawable.ic_info_black_24dp,
@@ -114,5 +122,71 @@ public class Helper {
         Intent intent = new Intent(ctx, BackActivity.class);
         intent.putExtra(BackActivity.DATA_STRING, BasicEditFragment.class);
         return intent;
+    }
+
+    public static String readFromAssets(Context ctx, String file) {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            final AssetManager assets = ctx.getResources().getAssets();
+            final InputStreamReader isr =
+                    new InputStreamReader(assets.open(file));
+            br = new BufferedReader(isr);
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read from assets!");
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    Log.e("ERROR", "Could not close reader.", e);
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static List<String> readSqlFromAssets(Context ctx, String file) {
+        String full = readFromAssets(ctx, file);
+        String[] split = full.split("\n");
+        List<String> list = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < split.length; i++) {
+            if (!split[i].equals("--NST")) {
+                sb.append(split[i]);
+            } else {
+                list.add(sb.toString());
+                sb = new StringBuilder();
+            }
+        }
+        list.add(sb.toString());
+
+        return list;
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        View view = activity.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public static void showKeyboard(Activity activity) {
+        View view = activity.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, 0);
+        }
     }
 }
