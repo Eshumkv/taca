@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="thomasmore.be.travelcommunicationassistant">
 
+    <!-- Used by getExternalFilesDir(), to write to private folder. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- Needed for taking pictures. -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="thomasmore.be.travelcommunicationassistant"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
             android:name=".LoginActivity"
             android:windowSoftInputMode="adjustPan"

@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="10dp">
 
-</LinearLayout>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/context_menu"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/c_menu_height"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/rectangle"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/c_menu_change"
+            android:layout_width="@dimen/c_menu_button_size"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:layout_centerInParent="true"
+            android:padding="0dp"
+            android:textColor="@color/colorContextMenuText"
+            android:textSize="@dimen/context_textsize"
+            android:layout_marginLeft="@dimen/c_menu_leftbutton_margin"
+            android:layout_marginStart="@dimen/c_menu_leftbutton_margin"
+            android:drawableTop="@drawable/ic_photo_white_24dp"
+            android:text="@string/c_menu_change"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/context_menu"
+        android:paddingTop="10dp">
+
+    </LinearLayout>
+</RelativeLayout>

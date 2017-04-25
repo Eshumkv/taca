@@ -17,7 +17,7 @@
     <dimen name="contact_name_size">22sp</dimen>
     <dimen name="contact_name_margin">12dp</dimen>
 
-    <dimen name="contact_detail_image_size">95dp</dimen>
+    <dimen name="edit_image_size">200dp</dimen>
     <dimen name="contact_detail_name_size">43sp</dimen>
 
     <dimen name="homescreen_item_textsize">21sp</dimen>

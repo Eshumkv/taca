@@ -16,4 +16,6 @@
     <color name="cardNormal">#ffffff</color>
     <color name="cardSelected">#aaaaaa</color>
 
+    <color name="card_tutor">#eeeefe</color>
+
 </resources>

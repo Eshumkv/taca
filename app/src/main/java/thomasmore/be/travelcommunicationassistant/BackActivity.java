@@ -27,6 +27,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
@@ -91,6 +92,9 @@ public class BackActivity
         if (classname.equals(Room.class.getName())) {
             Room room = oldBundle.getParcelable(classname);
             bundle.putParcelable(Room.class.getName(), room);
+        } else if (classname.equals(Contact.class.getName())) {
+            Contact contact = oldBundle.getParcelable(classname);
+            bundle.putParcelable(Contact.class.getName(), contact);
         }
 
         return bundle;

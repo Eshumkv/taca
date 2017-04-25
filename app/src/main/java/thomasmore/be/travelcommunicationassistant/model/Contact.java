@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import thomasmore.be.travelcommunicationassistant.utils.Helper;
+
 /**
  * Created by Eshum on 18/04/2017.
  */
@@ -27,6 +29,12 @@ public class Contact implements Parcelable {
     private @Nullable ArrayList<QuickMessage> quickMessages;
 
     public Contact() {
+    }
+
+    public Contact(String name, String number, boolean tutor) {
+        this.name = name;
+        this.phonenumber = number;
+        this.type = tutor ? ContactType.Tutor : ContactType.Warded;
     }
 
     public long getId() {
@@ -146,9 +154,9 @@ public class Contact implements Parcelable {
         name = in.readString();
         phonenumber = in.readString();
         imagePath = in.readString();
-        type = ContactType.valueOf(in.readString());
-        messageType = MessageType.valueOf(in.readString());
-        language = Language.valueOf(in.readString());
+        type = Helper.parseEnum(ContactType.class, in.readString());
+        messageType = Helper.parseEnum(MessageType.class, in.readString());
+        language = Helper.parseEnum(Language.class, in.readString());
         currentRoom = in.readParcelable(Room.class.getClassLoader());
         responsibleTutor = in.readParcelable(Contact.class.getClassLoader());
         user = in.readParcelable(User.class.getClassLoader());
@@ -171,9 +179,9 @@ public class Contact implements Parcelable {
         dest.writeString(name);
         dest.writeString(phonenumber);
         dest.writeString(imagePath);
-        dest.writeString(type.name());
-        dest.writeString(messageType.name());
-        dest.writeString(language.name());
+        dest.writeString(Helper.EnumToString(type));
+        dest.writeString(Helper.EnumToString(messageType));
+        dest.writeString(Helper.EnumToString(language));
         dest.writeParcelable(currentRoom, 0);
         dest.writeParcelable(responsibleTutor, 0);
         dest.writeParcelable(user, 0);

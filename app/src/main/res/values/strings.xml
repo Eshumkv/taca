@@ -28,6 +28,7 @@
     <string name="nav_category">Categories</string>
     <string name="nav_warded">Warded Persons</string>
     <string name="nav_contacts">Contacts</string>
+    <string name="nav_contacts_single">Contact</string>
     <string name="nav_personal">Personal Info</string>
     <string name="nav_drawer_open">Open</string>
     <string name="nav_drawer_close">Close</string>
@@ -42,6 +43,7 @@
     <string name="c_menu_add">Add</string>
     <string name="c_menu_edit">Edit</string>
     <string name="c_menu_delete">Delete</string>
+    <string name="c_menu_change">Change</string>
 
     <string name="paging_prev">&lt;</string>
     <string name="paging_next">&gt;</string>
@@ -56,11 +58,20 @@
     <string name="dialog_delete_room">Are you sure you wish to delete this room?</string>
     <string name="dialog_delete_contact">Are you sure you wish to delete this contact?</string>
 
-    <string name="warning_contact_text_msg">Warning! Not set to recieve text messages!</string>
-    <string name="warning_wrong_password">Gave wrong password for room!</string>
+    <string name="dialog_edit_image_title">Picture?</string>
+
+    <string name="dialog_select_paging_title">Select page</string>
+    <string name="dialog_page">Page</string>
 
     <string name="dialog_room_password">Please give the password for room:</string>
 
+    <string name="warning_contact_text_msg">Warning! Not set to recieve text messages!</string>
+    <string name="warning_wrong_password">Gave wrong password for room!</string>
+
+    <!--
+        Following are arrays.
+        Keep the order the same in translations!
+     -->
     <string-array name="groups_array_all">
         <item>Everyone</item>
         <item>Tutors</item>
@@ -70,5 +81,10 @@
     <string-array name="searchterms_array_all">
         <item>Name</item>
         <item>Telephone Nr.</item>
+    </string-array>
+
+    <string-array name="dialog_choices_array">
+        <item>Take photo</item>
+        <item>Choose from gallery</item>
     </string-array>
 </resources>

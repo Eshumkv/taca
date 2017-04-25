@@ -203,9 +203,11 @@ public class RoomsCreatedFragment extends BaseFragment {
         deselectPrevious(getView());
         toggleContext();
 
+        String className = Room.class.getName();
+
         Intent intent = Helper.getBackActivityIntent(getActivity());
-        intent.putExtra(Room.class.getName(), room);
-        intent.putExtra(BasicEditFragment.CLASSNAME, Room.class.getName());
+        intent.putExtra(BasicEditFragment.CLASSNAME, className);
+        intent.putExtra(className, room);
         startActivityForResult(intent, 1);
     }
 }

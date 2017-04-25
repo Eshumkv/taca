@@ -6,7 +6,14 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.os.Environment;
+import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,9 +23,13 @@ import android.widget.Adapter;
 import android.widget.ListView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.BackActivity;
@@ -29,6 +40,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.PersonalInfoFragment;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
 
 public class Helper {
     public final static NavigationItems[] navigationItems = new NavigationItems[] {
@@ -188,5 +200,96 @@ public class Helper {
             InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(view, 0);
         }
+    }
+
+    public static <T extends Enum<T>> String EnumToString(T enumerationValue) {
+        if (enumerationValue == null) {
+            return null;
+        }
+
+        return enumerationValue.name();
+    }
+
+    public static <T extends Enum<T>> T parseEnum(Class<T> type, String p) {
+        return p == null ?
+                null :
+                T.valueOf(type, p);
+    }
+
+    public static <T extends Enum<T>> ArrayList<String> enumToList(Class<T> type) {
+        ArrayList<String> list = new ArrayList<>();
+
+        for (T e : type.getEnumConstants()) {
+            list.add(e.name());
+        }
+
+        return list;
+    }
+
+    public static Bitmap getImage(Context ctx, String path) {
+        File imgFile = new File(path == null ? "" : path);
+
+        try {
+            if (imgFile.exists()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                return bitmap;
+            }
+        } catch (Exception e) {
+            // Log it?
+        }
+
+        return BitmapFactory.decodeResource(ctx.getResources(), R.drawable.contact);
+    }
+
+    // Courtesy of http://stackoverflow.com/a/10703256
+    public static Bitmap resizeBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+
+        return resizedBitmap;
+    }
+
+    public static boolean hasCamera(Context ctx) {
+        PackageManager packageManager = ctx.getPackageManager();
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    public static File createImageFile(Context ctx) throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String filename = "TACA_" + timestamp;
+        File storageDir = ctx.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                filename,
+                ".jpg",
+                storageDir
+        );
+
+        return image;
+    }
+
+    public static HashMap<String, List<Contact>> getMap(List<Contact> list) {
+        HashMap<String, List<Contact>> map = new HashMap<>();
+
+        for (Contact c : list) {
+            String firstCharacter = c.getName().substring(0, 1).toUpperCase();
+            if (map.get(firstCharacter) == null) {
+                map.put(firstCharacter, new ArrayList<Contact>());
+            }
+            map.get(firstCharacter).add(c);
+        }
+
+        return map;
     }
 }
