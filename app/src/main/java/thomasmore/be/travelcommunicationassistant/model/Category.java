@@ -75,6 +75,13 @@ public class Category implements Parcelable {
         this.pictograms = pictograms;
     }
 
+    public int getLinkedPictograms() {
+        if (pictograms == null) {
+            return 0;
+        }
+        return pictograms.size();
+    }
+
     public Category(Parcel in) {
         id = in.readLong();
         majorCategory = in.readParcelable(MajorCategory.class.getClassLoader());

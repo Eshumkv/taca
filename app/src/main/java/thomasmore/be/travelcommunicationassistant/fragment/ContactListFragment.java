@@ -39,14 +39,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class ContactListFragment extends BasePagingFragment<Contact> {
 
-    int selectedColor;
-    int normalColor;
     int tutorColor;
-    int selectedPosition = -1;
-
-    Button addButton;
-    Button editButton;
-    Button deleteButton;
 
     public ContactListFragment() {
         // Empty constructor required for fragment subclasses
@@ -87,6 +80,8 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
             }
         });
 
+        setupPagingBar(rootView);
+
         final ListView list = (ListView) rootView.findViewById(R.id.contacts);
         list.setAdapter(new ContactsListAdapter(getActivity(), pagingMap.get(currentPage)));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,10 +93,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
         tutorColor = ContextCompat.getColor(getActivity(), R.color.card_tutor);
-
-        addButton = (Button) rootView.findViewById(R.id.c_add);
-        editButton = (Button) rootView.findViewById(R.id.c_edit);
-        deleteButton = (Button) rootView.findViewById(R.id.c_delete);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,8 +135,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                         .show();
             }
         });
-
-        setupPagingBar(rootView);
 
         return rootView;
     }
@@ -239,35 +228,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         toggleContext();
     }
 
-    private void deselectPrevious(View v) {
-        if (selectedPosition != -1) {
-            ListView list = (ListView) v.findViewById(R.id.contacts);
-            LinearLayout prevRoot =
-                    (LinearLayout) Helper.getViewByPosition(selectedPosition, list);
-            CardView card = (CardView) prevRoot.findViewById(R.id.card_view);
-
-            Contact contact = (Contact) list.getAdapter().getItem(selectedPosition);
-
-            if (contact.getType() == ContactType.Tutor) {
-                card.setCardBackgroundColor(tutorColor);
-            } else {
-                card.setCardBackgroundColor(normalColor);
-            }
-        }
-
-        selectedPosition = -1;
-    }
-
-    private void toggleContext() {
-        if (selectedPosition != -1) {
-            editButton.setVisibility(View.VISIBLE);
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            editButton.setVisibility(View.GONE);
-            deleteButton.setVisibility(View.GONE);
-        }
-    }
-
     private void goToEditScreen(Contact contact) {
         deselectPrevious(getView());
         toggleContext();
@@ -287,8 +247,13 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
      */
 
     @Override
-    protected void setList() {
-        final ListView list = (ListView) getActivity().findViewById(R.id.contacts);
+    protected void setListAdapter() {
+        final ListView list = getList();
         list.setAdapter(new ContactsListAdapter(getActivity(), pagingMap.get(currentPage)));
+    }
+
+    @Override
+    protected ListView getList() {
+        return (ListView) getActivity().findViewById(R.id.contacts);
     }
 }

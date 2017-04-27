@@ -3,10 +3,13 @@ package thomasmore.be.travelcommunicationassistant.fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -51,14 +55,31 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
         Helper.setTitle(getActivity(), R.string.nav_pictogram);
+
+        selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
+        normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
 
         Bundle bundle = getArguments();
         category = bundle.getParcelable(Category.class.getName());
 
         List<Pictogram> tempList = new ArrayList<>();
+        tempList.addAll(Arrays.asList(
+                new Pictogram("A Pictogram 1", "Lorum ipsum"),
+                new Pictogram("A Pictogram 2", "Lorum ipsum"),
+                new Pictogram("B Pictogram 3", "Lorum ipsum"),
+                new Pictogram("B Pictogram 4", "Lorum ipsum"),
+                new Pictogram("E Pictogram 5", "Lorum ipsum"),
+                new Pictogram("E Pictogram 6", "Lorum ipsum"),
+                new Pictogram("F Pictogram 7", "Lorum ipsum"),
+                new Pictogram("G Pictogram 2", "Lorum ipsum"),
+                new Pictogram("Y Pictogram 3", "Lorum ipsum"),
+                new Pictogram("U Pictogram 4", "Lorum ipsum"),
+                new Pictogram("Q Pictogram 5", "Lorum ipsum"),
+                new Pictogram("G Pictogram 6", "Lorum ipsum")
+        ));
 
         setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
             @Override
@@ -67,12 +88,26 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
                 return lhs.getName().compareTo(rhs.getName());
             }
         });
+        setupPagingBar(rootView);
+
+        RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
+        bar.setVisibility(View.VISIBLE);
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
         list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LinearLayout root = (LinearLayout)view;
+                CardView card = (CardView)root.findViewById(R.id.card_view);
+                card.setCardBackgroundColor(selectedColor);
+
+                // Deselect the previous card
+                int temp = selectedPosition;
+                deselectPrevious(rootView);
+                selectedPosition = temp == position ? -1 : position;
+
+                toggleContext();
             }
         });
 
@@ -101,6 +136,48 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         });
 
         breadcrumb.addView(text2);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToEditScreen(new Pictogram());
+            }
+        });
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedPosition == -1) return;
+                Pictogram pictogram = (Pictogram)list.getAdapter().getItem(selectedPosition);
+                goToEditScreen(pictogram);
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedPosition == -1) return;
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setMessage(R.string.dialog_delete_pictogram)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deselectPrevious(getView());
+                                toggleContext();
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deselectPrevious(getView());
+                                toggleContext();
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        });
 
         return rootView;
     }
@@ -155,8 +232,25 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
     }
 
     @Override
-    protected void setList() {
-        final ListView list = (ListView) getActivity().findViewById(R.id.contacts);
+    protected void setListAdapter() {
+        final ListView list = getList();
         list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));
+    }
+
+    @Override
+    protected ListView getList() {
+        return (ListView) getActivity().findViewById(R.id.list);
+    }
+
+    private void goToEditScreen(Pictogram pictogram) {
+        deselectPrevious(getView());
+        toggleContext();
+
+        String className = Pictogram.class.getName();
+
+        Intent intent = Helper.getBackActivityIntent(getActivity());
+        intent.putExtra(BasicEditFragment.CLASSNAME, className);
+        intent.putExtra(className, pictogram);
+        startActivityForResult(intent, 1);
     }
 }

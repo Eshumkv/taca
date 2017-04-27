@@ -18,6 +18,11 @@ public class Pictogram implements Parcelable {
     public Pictogram() {
     }
 
+    public Pictogram(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public long getId() {
         return id;
     }

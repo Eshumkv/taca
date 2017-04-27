@@ -57,6 +57,8 @@
 
     <string name="dialog_delete_room">Are you sure you wish to delete this room?</string>
     <string name="dialog_delete_contact">Are you sure you wish to delete this contact?</string>
+    <string name="dialog_delete_pictogram">Are you sure you wish to delete this pictogram?</string>
+    <string name="dialog_delete_category">Are you sure you wish to delete this category?</string>
 
     <string name="dialog_edit_image_title">Picture?</string>
 
