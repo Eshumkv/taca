@@ -18,6 +18,10 @@ public class MajorCategory implements Parcelable {
     public MajorCategory() {
     }
 
+    public MajorCategory(String name) {
+        this.name = name;
+    }
+
     public long getId() {
         return id;
     }

@@ -2,36 +2,20 @@ package thomasmore.be.travelcommunicationassistant;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.ListView;
 
-import java.util.Arrays;
-
-import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
-import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
-import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
-import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
-import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class BackActivity
         extends AppCompatActivity
@@ -48,9 +32,11 @@ public class BackActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            Helper.changeFragment(this, getCorrectFragment(bundle), true);
+        if (!handleSearch(getIntent())) {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                Helper.changeFragment(this, getCorrectFragment(bundle), true);
+            }
         }
     }
 
@@ -63,6 +49,29 @@ public class BackActivity
         if (!fragment.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleSearch(getIntent());
+    }
+
+    private boolean handleSearch(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            Bundle bundle = Helper.getApp(this).getSearch_extra();
+
+            // Search on pictogram
+            if (bundle.getString(MyApp.SEARCH_TERM).equals(MyApp.SEARCH_PICTOGRAM)) {
+                String query = "PICTOGRAM:" + intent.getStringExtra(SearchManager.QUERY);
+                //use the query to search your data somehow
+                Log.i("SEARCH", query);
+                Helper.changeFragment(this, new MajorCategoryListFragment(), true);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     // Fragment listener

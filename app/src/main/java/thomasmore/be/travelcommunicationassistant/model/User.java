@@ -4,15 +4,19 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import thomasmore.be.travelcommunicationassistant.utils.Helper;
+
 /**
  * Created by Eshum on 18/04/2017.
  */
 
 public class User implements Parcelable {
     private long id;
-    private Contact contact;
-    private Room room;
-    private Message message;
+    private String username;
+    private String phonenumber;
+    private String password;
+    private Language language;
+    private String imagePath;
 
     public User() {
     }
@@ -25,35 +29,53 @@ public class User implements Parcelable {
         this.id = id;
     }
 
-    public Contact getContact() {
-        return contact;
+    public String getUsername() {
+        return username;
     }
 
-    public void setContact(Contact contact) {
-        this.contact = contact;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Room getRoom() {
-        return room;
+    public String getPhonenumber() {
+        return phonenumber;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setPhonenumber(String phonenumber) {
+        this.phonenumber = phonenumber;
     }
 
-    public Message getMessage() {
-        return message;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public User(Parcel in) {
         id = in.readLong();
-        contact = in.readParcelable(Contact.class.getClassLoader());
-        room = in.readParcelable(Room.class.getClassLoader());
-        message = in.readParcelable(Message.class.getClassLoader());
+        username = in.readString();
+        phonenumber = in.readString();
+        password = in.readString();
+        imagePath = in.readString();
+        language = Helper.parseEnum(Language.class, in.readString());
     }
 
     @Override
@@ -64,9 +86,11 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeParcelable(contact, 0);
-        dest.writeParcelable(room, 0);
-        dest.writeParcelable(message, 0);
+        dest.writeString(username);
+        dest.writeString(phonenumber);
+        dest.writeString(password);
+        dest.writeString(imagePath);
+        dest.writeString(Helper.EnumToString(language));
     }
 
     public static final Creator<User> CREATOR

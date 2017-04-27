@@ -19,12 +19,15 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
+import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsAvailableFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.User;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
@@ -169,13 +172,38 @@ public class NavigationDrawerActivity
 
     private void selectNavigationItem(int position) {
         NavigationItems navItem = Helper.navigationItems[position];
-        Helper.changeFragment(this, (Fragment) navItem.getInstance(), false);
+        Fragment fragment = (Fragment) navItem.getInstance();
 
-        // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        getSupportActionBar().setTitle(navItem.getTitleId());
-        View view = findViewById(R.id.navigation_layout);
-        mDrawerLayout.closeDrawer(view);
+        if (navItem.getCls().equals(BasicEditFragment.class)) {
+            String classname = User.class.getName();
+            Bundle bundle = new Bundle();
+
+            // Get the current user.
+            User user = new User();
+            user.setUsername("Bobby");
+            user.setPhonenumber("8292929292");
+            user.setPassword("IHaveGoodPassword");
+            user.setLanguage(Language.English);
+
+            bundle.putString(BasicEditFragment.CLASSNAME, classname);
+            bundle.putParcelable(classname, user);
+
+            fragment.setArguments(bundle);
+        }
+
+        if (navItem.isBackActivity()) {
+            Intent intent = new Intent(this, BackActivity.class);
+            intent.putExtra(BackActivity.DATA_STRING, navItem.getCls());
+            startActivity(intent);
+        } else {
+            Helper.changeFragment(this, fragment, false);
+
+            // update selected item and title, then close the drawer
+            mDrawerList.setItemChecked(position, true);
+            getSupportActionBar().setTitle(navItem.getTitleId());
+            View view = findViewById(R.id.navigation_layout);
+            mDrawerLayout.closeDrawer(view);
+        }
     }
 
     // The click listener for ListView in the navigation drawer
@@ -205,6 +233,16 @@ public class NavigationDrawerActivity
         } else if (cls.equals(RoomsAvailableFragment.class)) {
             if (value instanceof String) {
                 Helper.changeFragment(this, new RoomsCreatedFragment(), false);
+            }
+        } else if (cls.equals(BasicEditFragment.class)) {
+            // We want to change the user.
+            if (value instanceof User) {
+                // TODO: update the user
+                User user = (User) value;
+                Log.i("INFO", "YAAAY " + user.getUsername());
+
+                Helper.hideKeyboard(this);
+                Helper.changeFragment(this, new HomeFragment(), false);
             }
         }
     }

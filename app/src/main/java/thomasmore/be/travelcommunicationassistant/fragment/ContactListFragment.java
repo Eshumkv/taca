@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -22,32 +21,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
-import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
-import thomasmore.be.travelcommunicationassistant.adapter.PagingAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
-import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ContactListFragment extends BaseFragment {
+public class ContactListFragment extends BasePagingFragment<Contact> {
 
     int selectedColor;
     int normalColor;
@@ -57,9 +47,6 @@ public class ContactListFragment extends BaseFragment {
     Button addButton;
     Button editButton;
     Button deleteButton;
-
-    String currentPage = "A";
-    HashMap<String, List<Contact>> pagingMap;
 
     public ContactListFragment() {
         // Empty constructor required for fragment subclasses
@@ -92,15 +79,13 @@ public class ContactListFragment extends BaseFragment {
         tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
 
-        Collections.sort(tempList, new Comparator<Contact>() {
+        setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
             @Override
             public int compare(Contact lhs, Contact rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return lhs.getName().compareTo(rhs.getName());
             }
         });
-        currentPage = tempList.get(0).getName().substring(0, 1).toUpperCase();
-        pagingMap = Helper.getMap(tempList);
 
         final ListView list = (ListView) rootView.findViewById(R.id.contacts);
         list.setAdapter(new ContactsListAdapter(getActivity(), pagingMap.get(currentPage)));
@@ -301,134 +286,8 @@ public class ContactListFragment extends BaseFragment {
      *
      */
 
-    private void setupPagingBar(View root) {
-        Button first = (Button) root.findViewById(R.id.paging_first);
-        Button previous = (Button) root.findViewById(R.id.paging_previous);
-        Button current = (Button) root.findViewById(R.id.paging_current);
-        Button next = (Button) root.findViewById(R.id.paging_next);
-        Button last = (Button) root.findViewById(R.id.paging_last);
-
-        final ArrayList<String> list = getPagingItems();
-
-        if (list.size() == 1) {
-            LinearLayout bar = (LinearLayout) root.findViewById(R.id.paging);
-            bar.setVisibility(View.GONE);
-        }
-
-        first.setText(list.get(0));
-        current.setText(currentPage);
-        last.setText(list.get(list.size()-1));
-
-        first.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                first();
-            }
-        });
-        previous.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                previous();
-            }
-        });
-        current.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                current(list);
-            }
-        });
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                next();
-            }
-        });
-        last.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                last();
-            }
-        });
-    }
-
-    private ArrayList<String> getPagingItems() {
-        ArrayList<String> tlist = new ArrayList<>();
-        Iterator it = pagingMap.entrySet().iterator();
-
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            tlist.add((String)pair.getKey());
-        }
-
-        Collections.sort(tlist);
-        return tlist;
-    }
-
-    private <T> int getIndex(List<T> list, T item) {
-        int position = 0;
-
-        for (T s : list) {
-            if (s.equals(item)) {
-                return position;
-            }
-            position++;
-        }
-
-        return -1;
-    }
-
-    private void first() {
-        ArrayList<String> list = getPagingItems();
-        currentPage = list.get(0);
-        setList();
-    }
-
-    private void previous() {
-        ArrayList<String> list = getPagingItems();
-        int position = getIndex(list, currentPage);
-
-        if (position > 0) {
-            currentPage = list.get(position-1);
-        }
-        setList();
-    }
-
-    private void current(List<String> pages) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder
-            .setTitle(R.string.dialog_select_paging_title)
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-        builder.setAdapter(new PagingAdapter(getActivity(), pages), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                currentPage = getPagingItems().get(which);
-                setList();
-            }
-        });
-        builder.create().show();
-    }
-
-    private void next() {
-        ArrayList<String> list = getPagingItems();
-        int position = getIndex(list, currentPage);
-
-        if (position != -1 && position < list.size()-1) {
-            currentPage = list.get(position+1);
-        }
-        setList();
-    }
-
-    private void last() {
-        ArrayList<String> list = getPagingItems();
-        currentPage = list.get(list.size()-1);
-        setList();
-    }
-
-    private void setList() {
+    @Override
+    protected void setList() {
         final ListView list = (ListView) getActivity().findViewById(R.id.contacts);
         list.setAdapter(new ContactsListAdapter(getActivity(), pagingMap.get(currentPage)));
     }

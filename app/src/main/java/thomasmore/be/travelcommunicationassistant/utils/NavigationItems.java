@@ -9,6 +9,7 @@ public class NavigationItems<T> {
     int titleId;
     int iconId;
     Class<T> cls;
+    Class<?> subClass;
     boolean backActivity;
 
     public NavigationItems(int titleId, int imageId, Class<T> ncls) {
@@ -18,10 +19,19 @@ public class NavigationItems<T> {
         this.backActivity = false;
     }
 
+    public NavigationItems(int titleId, int imageId, Class<T> ncls, Class<?> subClass) {
+        this(titleId, imageId, ncls, subClass, false);
+    }
+
     public NavigationItems(int titleId, int imageId, Class<T> ncls, boolean backActivity) {
+        this(titleId, imageId, ncls, null, backActivity);
+    }
+
+    public NavigationItems(int titleId, int imageId, Class<T> ncls, Class<?> subClass, boolean backActivity) {
         this.titleId = titleId;
         this.iconId = imageId;
         this.cls = ncls;
+        this.subClass = subClass;
         this.backActivity = backActivity;
     }
 
@@ -41,5 +51,9 @@ public class NavigationItems<T> {
 
     public boolean isBackActivity() {
         return backActivity;
+    }
+
+    public Class<?> getSubClass() {
+        return subClass;
     }
 }

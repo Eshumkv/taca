@@ -6,11 +6,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.renderscript.ScriptGroup;
 import android.support.v4.content.FileProvider;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,10 +34,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.EditSpinnerAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
+import thomasmore.be.travelcommunicationassistant.model.Language;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.model.User;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -84,8 +86,12 @@ public class BasicEditFragment extends BaseFragment {
                 getActivity().finish();
                 return true;
             case R.id.action_save:
-                getActivity().setResult(Activity.RESULT_OK, getIntent());
-                getActivity().finish();
+                if (!classname.equals(User.class.getName())) {
+                    getActivity().setResult(Activity.RESULT_OK, getIntent());
+                    getActivity().finish();
+                } else {
+                    callback.onFragmentInteraction(BasicEditFragment.class, getUserData());
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -94,8 +100,11 @@ public class BasicEditFragment extends BaseFragment {
 
     @Override
     public boolean onBackPressed() {
-        getActivity().finish();
-        return true;
+        if (!classname.equals(User.class.getName())) {
+            getActivity().finish();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -144,10 +153,29 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_contacts_single);
+        } else if (classname.equals(User.class.getName())) {
+            User user = bundle.getParcelable(classname);
+
+            layout.addView(getHidden("Id", user.getId()));
+            layout.addView(getImage("Image", user.getImagePath(), inflater, layout, root));
+            layout.addView(getEditText("Name", user.getUsername(), inflater, layout));
+            layout.addView(getEditText("Phone number", user.getPhonenumber(), inflater, layout));
+            layout.addView(getPasswordText("Password", user.getPassword(), inflater, layout));
+            layout.addView(getSpinner("Language", user.getLanguage(), inflater, layout));
+
+            Helper.setTitle(getActivity(), R.string.nav_personal);
         }
     }
 
     private View getEditText(String label, String defaultText, LayoutInflater inflater, ViewGroup parent) {
+        return getEditTextWithType(label, defaultText, inflater, parent, false);
+    }
+
+    private View getPasswordText(String label, String defaultText, LayoutInflater inflater, ViewGroup parent) {
+        return getEditTextWithType(label, defaultText, inflater, parent, true);
+    }
+
+    private View getEditTextWithType(String label, String defaultText, LayoutInflater inflater, ViewGroup parent, boolean isPasswordField) {
         View v = inflater.inflate(R.layout.item_edit_text, parent, false);
         TextView labelText = (TextView) v.findViewById(R.id.label);
         EditText editText = (EditText) v.findViewById(R.id.text);
@@ -155,6 +183,11 @@ public class BasicEditFragment extends BaseFragment {
         v.setTag(label);
         labelText.setText(label);
         editText.setText(defaultText);
+
+        if (isPasswordField) {
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
 
         dynamicViews.put(label, v);
 
@@ -306,6 +339,18 @@ public class BasicEditFragment extends BaseFragment {
         contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
 
         return contact;
+    }
+
+    private User getUserData() {
+        User user = new User();
+
+        user.setId((Long)getHiddenValue("Id"));
+        user.setUsername(getTextFromEdit("Name"));
+        user.setPhonenumber(getTextFromEdit("Phone number"));
+        user.setPassword(getTextFromEdit("Password"));
+        user.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
+
+        return user;
     }
 
     private String getTextFromEdit(String label) {

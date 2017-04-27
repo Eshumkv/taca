@@ -28,13 +28,18 @@
             android:text="@string/c_menu_change"/>
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/content"
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/context_menu"
-        android:paddingTop="10dp">
+        android:layout_below="@+id/context_menu">
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/content"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp">
+
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

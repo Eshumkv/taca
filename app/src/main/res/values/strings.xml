@@ -38,7 +38,7 @@
     <string name="group">Group</string>
     <string name="save">Save</string>
 
-    <string name="message_search_hint">Search conversations</string>
+    <string name="message_search_hint">Search&#8230;</string>
 
     <string name="c_menu_add">Add</string>
     <string name="c_menu_edit">Edit</string>

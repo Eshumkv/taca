@@ -12,8 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,15 +30,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.ContactListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
-import thomasmore.be.travelcommunicationassistant.fragment.PersonalInfoFragment;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.User;
 
 public class Helper {
     public final static NavigationItems[] navigationItems = new NavigationItems[] {
@@ -59,7 +59,7 @@ public class Helper {
             new NavigationItems(
                     R.string.nav_pictogram,
                     R.drawable.ic_stars_black_24dp,
-                    HomeFragment.class),
+                    MajorCategoryListFragment.class, true),
             new NavigationItems(
                     R.string.nav_category,
                     R.drawable.ic_dashboard_black_24dp,
@@ -75,8 +75,12 @@ public class Helper {
             new NavigationItems(
                     R.string.nav_personal,
                     R.drawable.ic_info_black_24dp,
-                    PersonalInfoFragment.class)
+                    BasicEditFragment.class, User.class)
     };
+
+    public static MyApp getApp(Activity activity) {
+        return (MyApp) activity.getApplication();
+    }
 
     public static <T> T NewInstanceOf(Class<T> cls) {
         try {
@@ -277,19 +281,5 @@ public class Helper {
         );
 
         return image;
-    }
-
-    public static HashMap<String, List<Contact>> getMap(List<Contact> list) {
-        HashMap<String, List<Contact>> map = new HashMap<>();
-
-        for (Contact c : list) {
-            String firstCharacter = c.getName().substring(0, 1).toUpperCase();
-            if (map.get(firstCharacter) == null) {
-                map.put(firstCharacter, new ArrayList<Contact>());
-            }
-            map.get(firstCharacter).add(c);
-        }
-
-        return map;
     }
 }
