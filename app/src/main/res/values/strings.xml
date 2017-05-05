@@ -38,6 +38,15 @@
     <string name="group">Group</string>
     <string name="save">Save</string>
 
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="majorcategory">Major Category</string>
+    <string name="category">Category</string>
+    <string name="description">Description</string>
+    <string name="phonenumber">Phone Number</string>
+    <string name="role">Role</string>
+    <string name="language">Language</string>
+
     <string name="message_search_hint">Search&#8230;</string>
 
     <string name="c_menu_add">Add</string>

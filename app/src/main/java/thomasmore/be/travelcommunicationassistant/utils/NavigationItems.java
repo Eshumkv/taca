@@ -1,16 +1,18 @@
 package thomasmore.be.travelcommunicationassistant.utils;
 
+import java.io.Serializable;
+
 /**
  * Created by Eshum on 12/04/2017.
  */
 
 
 public class NavigationItems<T> {
-    int titleId;
-    int iconId;
-    Class<T> cls;
-    Class<?> subClass;
-    boolean backActivity;
+    private int titleId;
+    private int iconId;
+    private Class<T> cls;
+    private Class<?> subClass;
+    private boolean backActivity;
 
     public NavigationItems(int titleId, int imageId, Class<T> ncls) {
         this.titleId = titleId;

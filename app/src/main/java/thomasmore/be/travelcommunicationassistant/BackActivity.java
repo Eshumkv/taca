@@ -13,7 +13,9 @@ import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
+import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
@@ -88,14 +90,19 @@ public class BackActivity
 
         if (cls.equals(BasicEditFragment.class)) {
             String classname = bundle.getString(BasicEditFragment.CLASSNAME);
-            fragment.setArguments(getBundleForFragment(classname, bundle));
+            fragment.setArguments(getBundleForBasicEdit(classname, bundle));
+        } else if (cls.equals(MajorCategoryListFragment.class)) {
+            Bundle newBundle = new Bundle();
+            newBundle.putBoolean(Helper.EXTRA_DATA, bundle.getBoolean(Helper.EXTRA_DATA));
+            fragment.setArguments(newBundle);
         }
 
         return fragment;
     }
 
-    private Bundle getBundleForFragment(String classname, Bundle oldBundle) {
+    private Bundle getBundleForBasicEdit(String classname, Bundle oldBundle) {
         Bundle bundle = new Bundle();
+
         bundle.putString(BasicEditFragment.CLASSNAME, classname);
 
         if (classname.equals(Room.class.getName())) {
@@ -104,6 +111,12 @@ public class BackActivity
         } else if (classname.equals(Contact.class.getName())) {
             Contact contact = oldBundle.getParcelable(classname);
             bundle.putParcelable(Contact.class.getName(), contact);
+        } else if (classname.equals(Category.class.getName())) {
+            Category category = oldBundle.getParcelable(classname);
+            bundle.putParcelable(Category.class.getName(), category);
+        } else if (classname.equals(Pictogram.class.getName())) {
+            Pictogram pictogram = oldBundle.getParcelable(classname);
+            bundle.putParcelable(Pictogram.class.getName(), pictogram);
         }
 
         return bundle;

@@ -39,44 +39,49 @@ import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFrag
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.User;
 
 public class Helper {
     public final static NavigationItems[] navigationItems = new NavigationItems[] {
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_home,
                     R.drawable.ic_home_black_24dp,
                     HomeFragment.class),
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_messages,
                     R.drawable.ic_message_black_24dp,
                     MessagesListFragment.class),
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_rooms,
                     R.drawable.ic_group_black_24dp,
                     RoomsCreatedFragment.class),
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_pictogram,
                     R.drawable.ic_stars_black_24dp,
-                    MajorCategoryListFragment.class, true),
-            new NavigationItems(
+                    MajorCategoryListFragment.class, Pictogram.class, true),
+            new NavigationItems<>(
                     R.string.nav_category,
                     R.drawable.ic_dashboard_black_24dp,
-                    HomeFragment.class),
-            new NavigationItems(
+                    MajorCategoryListFragment.class, Category.class, true),
+            new NavigationItems<>(
                     R.string.nav_warded,
                     R.drawable.ic_person_black_24dp,
                     HomeFragment.class),
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_contacts,
                     R.drawable.ic_contacts_black_24dp,
                     ContactListFragment.class),
-            new NavigationItems(
+            new NavigationItems<>(
                     R.string.nav_personal,
                     R.drawable.ic_info_black_24dp,
                     BasicEditFragment.class, User.class)
     };
+
+    public static final String EXTRA_DATA = "data";
+    public static final String EXTRA_DATA_BUNDLE = "databundle";
 
     public static MyApp getApp(Activity activity) {
         return (MyApp) activity.getApplication();

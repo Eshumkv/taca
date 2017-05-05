@@ -2,6 +2,7 @@ package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.MyApp;
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.CategoryAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
@@ -62,9 +64,11 @@ public class CategoryListFragment extends BaseFragment {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(Category.class.getName(), category);
 
-                PictogramSelectListFragment fragment = new PictogramSelectListFragment();
-                fragment.setArguments(bundle);
-                Helper.changeFragment(getActivity(), fragment, false);
+                Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+                intent.putExtra(Helper.EXTRA_DATA, PictogramSelectListFragment.class);
+                intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+                startActivity(intent);
+                getActivity().finish();
             }
         });
 

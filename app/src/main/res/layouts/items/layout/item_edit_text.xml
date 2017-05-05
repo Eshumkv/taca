@@ -23,6 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="EDIT YOUR TEXT"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:nextFocusUp="@id/text"
+        android:nextFocusLeft="@id/text" />
 
 </LinearLayout>

@@ -2,7 +2,9 @@ package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -19,23 +21,30 @@ import android.widget.SearchView;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.MyApp;
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class MajorCategoryListFragment extends BaseFragment {
+    private boolean isCategory = false;
 
     public MajorCategoryListFragment() {
         // Empty constructor required for fragment subclasses
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
-        Helper.setTitle(getActivity(), R.string.nav_pictogram);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            isCategory = bundle.getBoolean(Helper.EXTRA_DATA);
+        }
+
+        Helper.setTitle(getActivity(), isCategory ? R.string.nav_category : R.string.nav_pictogram);
 
         MajorCategory[] mcategories = new MajorCategory[] {
                 new MajorCategory("Noun"),
@@ -51,6 +60,15 @@ public class MajorCategoryListFragment extends BaseFragment {
 
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MajorCategory.class.getName(), category);
+
+                if (isCategory) {
+                    Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+                    intent.putExtra(Helper.EXTRA_DATA, CategorySelectListFragment.class);
+                    intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+                    startActivity(intent);
+                    getActivity().finish();
+                    return;
+                }
 
                 CategoryListFragment fragment = new CategoryListFragment();
                 fragment.setArguments(bundle);

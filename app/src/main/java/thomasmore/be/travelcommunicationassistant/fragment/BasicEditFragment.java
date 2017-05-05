@@ -34,9 +34,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import thomasmore.be.travelcommunicationassistant.R;
+import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.User;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
@@ -67,6 +69,12 @@ public class BasicEditFragment extends BaseFragment {
         Bundle bundle = getArguments();
         classname = bundle.getString(CLASSNAME);
         setupLayout(bundle, rootView, inflater);
+
+        // Hide the softinput
+        // This assumes all edit screens have at least ONE edittext!
+        final EditText text = (EditText) rootView.findViewById(R.id.text);
+        text.requestFocus();
+        text.clearFocus();
 
         return rootView;
     }
@@ -164,24 +172,44 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getSpinner("Language", user.getLanguage(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_personal);
+        } else if (classname.equals(Category.class.getName())) {
+            Category category = bundle.getParcelable(classname);
+
+            layout.addView(getHidden("Id", category.getId()));
+            layout.addView(getImage("Image", category.getImagePath(), inflater, layout, root));
+            layout.addView(getEditText("Name", category.getName(), inflater, layout));
+            layout.addView(getEditText("Major Category", category.getMajorCategory().getName(), inflater, layout));
+            layout.addView(getEditText("Description", category.getDescription(), inflater, layout));
+
+            Helper.setTitle(getActivity(), R.string.nav_category);
+        } else if (classname.equals(Pictogram.class.getName())) {
+            Pictogram pictogram = bundle.getParcelable(classname);
+
+            layout.addView(getHidden("Id", pictogram.getId()));
+            layout.addView(getImage("Image", pictogram.getImagePath(), inflater, layout, root));
+            layout.addView(getEditText("Name", pictogram.getName(), inflater, layout));
+            layout.addView(getEditText("Category", pictogram.getCategory().getName(), inflater, layout));
+            layout.addView(getEditText("Description", pictogram.getDescription(), inflater, layout));
+
+            Helper.setTitle(getActivity(), R.string.nav_pictogram);
         }
     }
 
     private View getEditText(String label, String defaultText, LayoutInflater inflater, ViewGroup parent) {
-        return getEditTextWithType(label, defaultText, inflater, parent, false);
+        return _getEditTextWithType(label, defaultText, inflater, parent, false);
     }
 
     private View getPasswordText(String label, String defaultText, LayoutInflater inflater, ViewGroup parent) {
-        return getEditTextWithType(label, defaultText, inflater, parent, true);
+        return _getEditTextWithType(label, defaultText, inflater, parent, true);
     }
 
-    private View getEditTextWithType(String label, String defaultText, LayoutInflater inflater, ViewGroup parent, boolean isPasswordField) {
+    private View _getEditTextWithType(String label, String defaultText, LayoutInflater inflater, ViewGroup parent, boolean isPasswordField) {
         View v = inflater.inflate(R.layout.item_edit_text, parent, false);
         TextView labelText = (TextView) v.findViewById(R.id.label);
         EditText editText = (EditText) v.findViewById(R.id.text);
 
         v.setTag(label);
-        labelText.setText(label);
+        labelText.setText(getResourceIdForLabel(label));
         editText.setText(defaultText);
 
         if (isPasswordField) {
@@ -192,6 +220,29 @@ public class BasicEditFragment extends BaseFragment {
         dynamicViews.put(label, v);
 
         return v;
+    }
+
+    private int getResourceIdForLabel(String label) {
+        switch (label) {
+            case "Name":
+                return R.string.name;
+            case "Password":
+                return R.string.password;
+            case "Major Category":
+                return R.string.majorcategory;
+            case "Category":
+                return R.string.category;
+            case "Description":
+                return R.string.description;
+            case "Phone number":
+                return R.string.phonenumber;
+            case "Role":
+                return R.string.role;
+            case "Language":
+                return R.string.language;
+            default:
+                return 0;
+        }
     }
 
     private View getHidden(String label, Object value) {
@@ -294,7 +345,7 @@ public class BasicEditFragment extends BaseFragment {
         Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
 
         v.setTag(label);
-        labelText.setText(label);
+        labelText.setText(getResourceIdForLabel(label));
 
         ArrayList<String> list = Helper.enumToList(enumType.getClass());
         ArrayAdapter<String> adapter  = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, list);
@@ -315,7 +366,12 @@ public class BasicEditFragment extends BaseFragment {
             intent.putExtra(classname, getRoomData());
         } else if (classname.equals(Contact.class.getName())) {
             intent.putExtra(classname, getContactData());
+        } else if (classname.equals(Category.class.getName())) {
+            intent.putExtra(classname, getCategoryData());
+        } else if (classname.equals(Pictogram.class.getName())) {
+            intent.putExtra(classname, getPictogramData());
         }
+
 
         return intent;
     }
@@ -351,6 +407,26 @@ public class BasicEditFragment extends BaseFragment {
         user.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
 
         return user;
+    }
+
+    private Category getCategoryData() {
+        Category category = new Category();
+
+        category.setId((Long)getHiddenValue("Id"));
+        category.setName(getTextFromEdit("Name"));
+        category.setDescription(getTextFromEdit("Description"));
+
+        return category;
+    }
+
+    private Pictogram getPictogramData() {
+        Pictogram pictogram = new Pictogram();
+
+        pictogram.setId((Long)getHiddenValue("Id"));
+        pictogram.setName(getTextFromEdit("Name"));
+        pictogram.setDescription(getTextFromEdit("Description"));
+
+        return pictogram;
     }
 
     private String getTextFromEdit(String label) {

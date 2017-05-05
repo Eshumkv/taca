@@ -16,10 +16,12 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsAvailableFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
@@ -82,9 +84,22 @@ public class NavigationDrawerActivity
         };
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-        selectNavigationItem(0);
 
-        handleIntent(getIntent());
+        Intent intent = getIntent();
+
+        if (intent.hasExtra(Helper.EXTRA_DATA)) {
+            Class<?> cls = (Class<?>)intent.getSerializableExtra(Helper.EXTRA_DATA);
+            Bundle bundle = intent.getBundleExtra(Helper.EXTRA_DATA_BUNDLE);
+
+            Fragment fragment = (Fragment)Helper.NewInstanceOf(cls);
+            fragment.setArguments(bundle);
+
+            Helper.changeFragment(this, fragment, false);
+        } else {
+            selectNavigationItem(0);
+        }
+
+        handleIntent(intent);
 
         frame.setOnTouchListener(this);
     }
@@ -135,7 +150,7 @@ public class NavigationDrawerActivity
             // If it's not the home fragment, go back to the home fragment.
             Fragment current = getFragmentManager().findFragmentById(R.id.content_frame);
             if ( !(current instanceof HomeFragment) ) {
-                selectNavigationItem(HomeFragment.class);
+                selectNavigationItem(getPositionForNavigationItem(HomeFragment.class));
             } else {
                 super.onBackPressed();
             }
@@ -154,24 +169,37 @@ public class NavigationDrawerActivity
         return fragment.onTouchEvent(v, event);
     }
 
-    private void selectNavigationItem(Class<?> cls)  {
+    private int getPositionForNavigationItem(NavigationItems item)  {
         int position = -1;
         for (int i = 0; i < Helper.navigationItems.length; i++) {
-            if (Helper.navigationItems[i].getCls() == cls) {
+            NavigationItems ti = Helper.navigationItems[i];
+            if (ti.getCls() == item.getCls() && ti.getTitleId() == item.getTitleId()) {
                 position = i;
                 break;
             }
         }
 
-        if (position != -1)  {
-            selectNavigationItem(position);
-        } else {
-            throw new RuntimeException("Something went REALLY wrong.");
+        return position;
+    }
+
+    private int getPositionForNavigationItem(Class<?> cls)  {
+        int position = -1;
+        for (int i = 0; i < Helper.navigationItems.length; i++) {
+            NavigationItems ti = Helper.navigationItems[i];
+            if (ti.getCls() == cls) {
+                position = i;
+                break;
+            }
         }
+
+        return position;
     }
 
     private void selectNavigationItem(int position) {
-        NavigationItems navItem = Helper.navigationItems[position];
+        selectNavigationItem(Helper.navigationItems[position]);
+    }
+
+    private void selectNavigationItem(NavigationItems navItem) {
         Fragment fragment = (Fragment) navItem.getInstance();
 
         if (navItem.getCls().equals(BasicEditFragment.class)) {
@@ -194,16 +222,21 @@ public class NavigationDrawerActivity
         if (navItem.isBackActivity()) {
             Intent intent = new Intent(this, BackActivity.class);
             intent.putExtra(BackActivity.DATA_STRING, navItem.getCls());
+
+            if (navItem.getCls().equals(MajorCategoryListFragment.class)) {
+                intent.putExtra(Helper.EXTRA_DATA, navItem.getTitleId() == R.string.nav_category);
+            }
+
             startActivity(intent);
         } else {
             Helper.changeFragment(this, fragment, false);
-
-            // update selected item and title, then close the drawer
-            mDrawerList.setItemChecked(position, true);
             getSupportActionBar().setTitle(navItem.getTitleId());
-            View view = findViewById(R.id.navigation_layout);
-            mDrawerLayout.closeDrawer(view);
         }
+
+        // update selected item and title, then close the drawer
+        mDrawerList.setItemChecked(getPositionForNavigationItem(navItem), true);
+        View view = findViewById(R.id.navigation_layout);
+        mDrawerLayout.closeDrawer(view);
     }
 
     // The click listener for ListView in the navigation drawer
@@ -218,8 +251,8 @@ public class NavigationDrawerActivity
     public void onFragmentInteraction(Class<?> cls, Object value) {
 
         if (cls.equals(HomeFragment.class)) {
-            Class<?> fragmentClass = (Class<?>) value;
-            selectNavigationItem(fragmentClass);
+            NavigationItems item = (NavigationItems) value;
+            selectNavigationItem(item);
         } else if (cls.equals(MessagesListFragment.class)) {
             MessagesListViewModel model = (MessagesListViewModel) value;
 

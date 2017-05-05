@@ -43,7 +43,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NavigationItems item = getCorrectItems().get(position);
-                callback.onFragmentInteraction(HomeFragment.class, item.getCls());
+                callback.onFragmentInteraction(HomeFragment.class, item);
             }
         });
 
@@ -77,7 +77,7 @@ public class HomeFragment extends BaseFragment {
             if (item.getTitleId() != R.string.nav_home) {
                 // If it's the last item, now "Personal info", then add an empty thing
                 if (item.getTitleId() == R.string.nav_personal) {
-                    list.add(new NavigationItems(-1, -1, null));
+                    list.add(new NavigationItems<>(-1, -1, null));
                 }
 
                 list.add(item);
