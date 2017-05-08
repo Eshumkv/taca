@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -29,19 +28,17 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
-import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ContactListFragment extends BasePagingFragment<Contact> {
+public class WardedPersonListFragment extends BasePagingFragment<Contact> {
 
-    int tutorColor;
-
-    public ContactListFragment() {
+    public WardedPersonListFragment() {
         // Empty constructor required for fragment subclasses
     }
 
@@ -50,26 +47,22 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_contact_list, container, false);
 
+        Helper.setTitle(getActivity(), R.string.nav_warded);
+
+        // TODO: Get all the warded persons
         List<Contact> tempList = new ArrayList<>();
         tempList.add(new Contact("Alice", "+7225352256", false));
         tempList.add(new Contact("Bob", "+7225352256", false));
         tempList.add(new Contact("Jan", "+7225352256", false));
-        tempList.add(new Contact("Andrey", "+7225352256", true));
         tempList.add(new Contact("Robin", "+7225352256", false));
         tempList.add(new Contact("Alexander", "+7225352256", false));
         tempList.add(new Contact("Koen", "+7225352256", false));
-        tempList.add(new Contact("Ivan", "+7225352256", true));
         tempList.add(new Contact("Zoey", "+7225352256", false));
         tempList.add(new Contact("Alice", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
 
         setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
@@ -92,7 +85,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         });
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
-        tutorColor = ContextCompat.getColor(getActivity(), R.color.card_tutor);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +108,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                 if (selectedPosition == -1) return;
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder
-                        .setMessage(R.string.dialog_delete_contact)
+                        .setMessage(R.string.dialog_delete_warded_person)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -143,30 +135,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_messages, menu);
 
-        MenuItem groupSpinner = menu.findItem(R.id.menu_group_spinner);
-        View view = MenuItemCompat.getActionView(groupSpinner);
-
-        if (view instanceof Spinner) {
-            final Spinner spinner = (Spinner) view;
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                    getActivity(),
-                    R.array.groups_array_all,
-                    android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-        }
-
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
@@ -181,6 +149,9 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case android.R.id.home:
+                getActivity().finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -232,12 +203,22 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         deselectPrevious(getView());
         toggleContext();
 
-        String className = Contact.class.getName();
+        Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+        intent.putExtra(Helper.EXTRA_DATA, WardedPersonFragment.class);
 
-        Intent intent = Helper.getBackActivityIntent(getActivity());
-        intent.putExtra(BasicEditFragment.CLASSNAME, className);
-        intent.putExtra(className, contact);
-        startActivityForResult(intent, 1);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Contact.class.getName(), contact);
+
+        intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+
+        startActivity(intent);
+        getActivity().finish();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        getActivity().finish();
+        return true;
     }
 
     /****

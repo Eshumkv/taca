@@ -39,6 +39,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFrag
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsCreatedFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.WardedPersonListFragment;
 import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
@@ -69,7 +70,7 @@ public class Helper {
             new NavigationItems<>(
                     R.string.nav_warded,
                     R.drawable.ic_person_black_24dp,
-                    HomeFragment.class),
+                    WardedPersonListFragment.class,true),
             new NavigationItems<>(
                     R.string.nav_contacts,
                     R.drawable.ic_contacts_black_24dp,
@@ -82,6 +83,8 @@ public class Helper {
 
     public static final String EXTRA_DATA = "data";
     public static final String EXTRA_DATA_BUNDLE = "databundle";
+
+    public static final String EXTRA_SEARCH_INTENT = "I really need to search";
 
     public static MyApp getApp(Activity activity) {
         return (MyApp) activity.getApplication();
@@ -106,9 +109,16 @@ public class Helper {
         transaction.commit();
     }
 
-    public static void setTitle(Activity act, int resId) {
-        ActionBar actionBar = ((AppCompatActivity)act).getSupportActionBar();
-        actionBar.setTitle(resId);
+    public static void setTitle(Activity act, int resId, Object... vars) {
+        AppCompatActivity activity = (AppCompatActivity) act;
+        String title = activity.getResources().getString(resId, vars);
+        ActionBar actionBar = activity.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        } else {
+            Log.i("ERROR", "Could not set title");
+        }
     }
 
     public static View getViewByPosition(int pos, ListView listView) {

@@ -248,6 +248,9 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
 
         String className = Pictogram.class.getName();
 
+        // TODO: REMOVE ME
+        pictogram.setCategory(category);
+
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, pictogram);

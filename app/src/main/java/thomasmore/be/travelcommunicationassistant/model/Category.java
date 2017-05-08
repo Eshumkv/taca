@@ -82,6 +82,14 @@ public class Category implements Parcelable {
         return pictograms.size();
     }
 
+    public String getFullName() {
+        String mcat = "null";
+        if (majorCategory != null) {
+            mcat = majorCategory.getName();
+        }
+        return mcat + " > " + name;
+    }
+
     public Category(Parcel in) {
         id = in.readLong();
         majorCategory = in.readParcelable(MajorCategory.class.getClassLoader());

@@ -77,7 +77,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
                 T value = list.get(0);
                 String temp = (String) type.getMethod(methodName).invoke(value);
                 currentPage = temp.substring(0, 1).toUpperCase();
-                pagingMap = getMap(list, "getName", type);
+                pagingMap = getMap(list, methodName, type);
             } catch (Exception e) {
                 resetMap();
                 e.printStackTrace();

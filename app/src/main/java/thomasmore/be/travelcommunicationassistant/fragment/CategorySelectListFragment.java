@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +37,8 @@ import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
+import static android.app.Activity.RESULT_OK;
+
 public class CategorySelectListFragment extends BasePagingFragment<Category> {
     MajorCategory majorCategory;
 
@@ -58,18 +61,18 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
 
         List<Category> tempList = new ArrayList<>();
         tempList.addAll(Arrays.asList(
-                new Category("A Pictogram 1", "Lorum ipsum"),
-                new Category("A Pictogram 2", "Lorum ipsum"),
-                new Category("B Pictogram 3", "Lorum ipsum"),
-                new Category("B Pictogram 4", "Lorum ipsum"),
-                new Category("E Pictogram 5", "Lorum ipsum"),
-                new Category("E Pictogram 6", "Lorum ipsum"),
-                new Category("F Pictogram 7", "Lorum ipsum"),
-                new Category("G Pictogram 2", "Lorum ipsum"),
-                new Category("Y Pictogram 3", "Lorum ipsum"),
-                new Category("U Pictogram 4", "Lorum ipsum"),
-                new Category("Q Pictogram 5", "Lorum ipsum"),
-                new Category("G Pictogram 6", "Lorum ipsum")
+                new Category("A Category 1", "Lorum ipsum"),
+                new Category("A Category 2", "Lorum ipsum"),
+                new Category("B Category 3", "Lorum ipsum"),
+                new Category("B Category 4", "Lorum ipsum"),
+                new Category("E Category 5", "Lorum ipsum"),
+                new Category("E Category 6", "Lorum ipsum"),
+                new Category("F Category 7", "Lorum ipsum"),
+                new Category("G Category 2", "Lorum ipsum"),
+                new Category("Y Category 3", "Lorum ipsum"),
+                new Category("U Category 4", "Lorum ipsum"),
+                new Category("Q Category 5", "Lorum ipsum"),
+                new Category("G Category 6", "Lorum ipsum")
         ));
 
         setupPagingMap(tempList, Category.class, "getName", new Comparator<Category>() {
@@ -160,6 +163,16 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Category category = data.getParcelableExtra(Category.class.getName());
+            }
+        }
     }
 
     @Override

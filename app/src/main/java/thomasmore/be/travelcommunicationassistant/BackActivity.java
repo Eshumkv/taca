@@ -12,6 +12,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.RoomSettingsFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFragment;
 import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
@@ -90,10 +91,25 @@ public class BackActivity
 
         if (cls.equals(BasicEditFragment.class)) {
             String classname = bundle.getString(BasicEditFragment.CLASSNAME);
-            fragment.setArguments(getBundleForBasicEdit(classname, bundle));
+            Bundle newBundle = getBundleForBasicEdit(classname, bundle);
+
+            if (bundle.containsKey(Helper.EXTRA_DATA)) {
+                newBundle.putBoolean(Helper.EXTRA_DATA, bundle.getBoolean(Helper.EXTRA_DATA));
+            }
+
+            fragment.setArguments(newBundle);
         } else if (cls.equals(MajorCategoryListFragment.class)) {
             Bundle newBundle = new Bundle();
             newBundle.putBoolean(Helper.EXTRA_DATA, bundle.getBoolean(Helper.EXTRA_DATA));
+
+            if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
+                newBundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, bundle.getSerializable(Helper.EXTRA_SEARCH_INTENT));
+            }
+
+            fragment.setArguments(newBundle);
+        } else if (cls.equals(RoomSettingsFragment.class)) {
+            Bundle newBundle = new Bundle();
+            newBundle.putParcelable(RoomSettingsFragment.CONTACT, bundle.getParcelable(RoomSettingsFragment.CONTACT));
             fragment.setArguments(newBundle);
         }
 

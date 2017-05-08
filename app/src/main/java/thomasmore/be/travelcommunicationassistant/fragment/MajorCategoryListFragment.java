@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,10 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
 public class MajorCategoryListFragment extends BaseFragment {
     private boolean isCategory = false;
 
+    private boolean isSearch = false;
+    private boolean isSearchMajorCat = false;
+    private Class<?> searchClass;
+
     public MajorCategoryListFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -42,6 +47,15 @@ public class MajorCategoryListFragment extends BaseFragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             isCategory = bundle.getBoolean(Helper.EXTRA_DATA);
+
+            if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
+                isSearch = true;
+                searchClass = (Class<?>) bundle.get(Helper.EXTRA_SEARCH_INTENT);
+
+                if (searchClass.equals(MajorCategory.class)) {
+                    isSearchMajorCat = true;
+                }
+            }
         }
 
         Helper.setTitle(getActivity(), isCategory ? R.string.nav_category : R.string.nav_pictogram);
@@ -58,21 +72,37 @@ public class MajorCategoryListFragment extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MajorCategory category = (MajorCategory) list.getAdapter().getItem(position);
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(MajorCategory.class.getName(), category);
+                if (isSearch && isSearchMajorCat) {
+                    Intent intent = new Intent();
+                    String classname = MajorCategory.class.getName();
+                    intent.putExtra(classname, category);
+                    intent.putExtra(BasicEditFragment.CLASSNAME, classname);
 
-                if (isCategory) {
-                    Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
-                    intent.putExtra(Helper.EXTRA_DATA, CategorySelectListFragment.class);
-                    intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
-                    startActivity(intent);
+                    getActivity().setResult(Activity.RESULT_OK, intent);
                     getActivity().finish();
-                    return;
-                }
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(MajorCategory.class.getName(), category);
 
-                CategoryListFragment fragment = new CategoryListFragment();
-                fragment.setArguments(bundle);
-                Helper.changeFragment(getActivity(), fragment, false);
+                    if (isCategory) {
+                        Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+                        intent.putExtra(Helper.EXTRA_DATA, CategorySelectListFragment.class);
+                        intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+
+                        startActivity(intent);
+                        getActivity().finish();
+                        return;
+                    }
+
+                    CategoryListFragment fragment = new CategoryListFragment();
+
+                    if (isSearch) {
+                        bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, searchClass);
+                    }
+
+                    fragment.setArguments(bundle);
+                    Helper.changeFragment(getActivity(), fragment, false);
+                }
             }
         });
 

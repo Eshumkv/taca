@@ -89,10 +89,12 @@ public class NavigationDrawerActivity
 
         if (intent.hasExtra(Helper.EXTRA_DATA)) {
             Class<?> cls = (Class<?>)intent.getSerializableExtra(Helper.EXTRA_DATA);
-            Bundle bundle = intent.getBundleExtra(Helper.EXTRA_DATA_BUNDLE);
-
             Fragment fragment = (Fragment)Helper.NewInstanceOf(cls);
-            fragment.setArguments(bundle);
+
+            if (intent.hasExtra(Helper.EXTRA_DATA_BUNDLE)) {
+                Bundle bundle = intent.getBundleExtra(Helper.EXTRA_DATA_BUNDLE);
+                fragment.setArguments(bundle);
+            }
 
             Helper.changeFragment(this, fragment, false);
         } else {

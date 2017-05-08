@@ -12,81 +12,53 @@
         android:layout_height="@dimen/c_menu_height"
         android:orientation="horizontal"
         android:layout_alignParentTop="true"
-        android:background="@drawable/rectangle"
-        android:visibility="gone">
+        android:background="@drawable/rectangle">
 
         <Button
-            android:id="@+id/c_add"
-            android:layout_width="@dimen/c_menu_button_size"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:padding="0dp"
-            android:textColor="@color/colorContextMenuText"
-            android:textSize="@dimen/context_textsize"
-            android:layout_marginLeft="@dimen/c_menu_leftbutton_margin"
-            android:layout_marginStart="@dimen/c_menu_leftbutton_margin"
-            android:drawableTop="@drawable/ic_add_white_24dp"
-            android:text="@string/c_menu_add"/>
-
-        <Button
-            android:id="@+id/c_edit"
-            android:layout_width="@dimen/c_menu_button_size"
+            android:id="@+id/c_list"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:layout_centerInParent="true"
             android:padding="0dp"
             android:textColor="@color/colorContextMenuText"
             android:textSize="@dimen/context_textsize"
-            android:drawableTop="@drawable/ic_edit_white_24dp"
-            android:visibility="gone"
-            android:text="@string/c_menu_edit"/>
-
-        <Button
-            android:id="@+id/c_delete"
-            android:layout_width="@dimen/c_menu_button_size"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:padding="0dp"
-            android:textColor="@color/colorContextMenuText"
-            android:textSize="@dimen/context_textsize"
-            android:layout_marginRight="@dimen/c_menu_leftbutton_margin"
-            android:layout_marginEnd="@dimen/c_menu_leftbutton_margin"
-            android:drawableTop="@drawable/ic_delete_white_24dp"
-            android:visibility="gone"
-            android:text="@string/c_menu_delete"/>
+            android:drawableTop="@drawable/ic_list_white_24dp"
+            android:text="@string/c_menu_list"/>
     </RelativeLayout>
 
-    <include
-        layout="@layout/paging"
-        android:id="@+id/paging"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/paging_height"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone" />
-
     <LinearLayout
-        android:id="@+id/breadcrumblayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/context_menu"
-        android:visibility="gone">
+        android:layout_below="@+id/context_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/breadcrumb"
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:src="@drawable/contact"/>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="15dp"
+                android:paddingStart="15dp"
+                android:paddingRight="15dp"
+                android:paddingEnd="15dp"
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:text="Alice"/>
         </LinearLayout>
 
         <View
@@ -95,15 +67,46 @@
             android:layout_marginBottom="10dp"
             android:background="#aabaaa"/>
 
-    </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/list"
-        android:divider="@null"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/breadcrumblayout"
-        android:layout_above="@+id/paging">
-    </ListView>
+            <Button
+                android:id="@+id/pictogram"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/warded_person_pictogram"/>
+
+            <Button
+                android:id="@+id/room"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/warded_person_room"/>
+
+            <Button
+                android:id="@+id/contacts"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/warded_person_contacts"/>
+
+            <Button
+                android:id="@+id/quickmessages"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/warded_person_qmessage"/>
+
+            <Button
+                android:id="@+id/info"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/warded_person_info"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

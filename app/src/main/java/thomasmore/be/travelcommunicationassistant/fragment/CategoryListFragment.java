@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +32,10 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class CategoryListFragment extends BaseFragment {
 
+    private boolean isSearch = false;
+    private boolean isSearchCat = false;
+    private Class<?> searchClass;
+
     public CategoryListFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -44,6 +49,16 @@ public class CategoryListFragment extends BaseFragment {
 
         Bundle bundle = getArguments();
         final MajorCategory majorCategory = bundle.getParcelable(MajorCategory.class.getName());
+
+        if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
+            isSearch = true;
+            searchClass = (Class<?>) bundle.get(Helper.EXTRA_SEARCH_INTENT);
+
+            if (searchClass.equals(Category.class)) {
+                isSearchCat = true;
+            }
+        }
+
         final Category[] categories = new Category[] {
                 new Category("Category 1", "HERE'S THE DESCRIPTION!"),
                 new Category("Category 2", "DESCRIPTION TIME"),
@@ -61,14 +76,29 @@ public class CategoryListFragment extends BaseFragment {
                 Category category = (Category) list.getAdapter().getItem(position);
                 category.setMajorCategory(majorCategory);
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(Category.class.getName(), category);
+                if (isSearch && isSearchCat) {
+                    Intent intent = new Intent();
+                    String classname = Category.class.getName();
+                    intent.putExtra(classname, category);
+                    intent.putExtra(BasicEditFragment.CLASSNAME, classname);
 
-                Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
-                intent.putExtra(Helper.EXTRA_DATA, PictogramSelectListFragment.class);
-                intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
-                startActivity(intent);
-                getActivity().finish();
+                    getActivity().setResult(Activity.RESULT_OK, intent);
+                    getActivity().finish();
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(Category.class.getName(), category);
+
+                    Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+                    intent.putExtra(Helper.EXTRA_DATA, PictogramSelectListFragment.class);
+                    intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+
+                    if (isSearch) {
+                        intent.putExtra(Helper.EXTRA_SEARCH_INTENT, searchClass);
+                    }
+
+                    startActivity(intent);
+                    getActivity().finish();
+                }
             }
         });
 

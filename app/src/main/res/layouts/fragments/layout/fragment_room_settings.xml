@@ -1,52 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:id="@+id/context_menu"
+    <LinearLayout
+        android:id="@+id/content"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/c_menu_height"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/rectangle"
-        android:visibility="gone">
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp">
 
-        <Button
-            android:id="@+id/c_menu_change"
-            android:layout_width="@dimen/c_menu_button_size"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:layout_centerInParent="true"
-            android:padding="0dp"
-            android:textColor="@color/colorContextMenuText"
-            android:textSize="@dimen/context_textsize"
-            android:layout_marginLeft="@dimen/c_menu_leftbutton_margin"
-            android:layout_marginStart="@dimen/c_menu_leftbutton_margin"
-            android:drawableTop="@drawable/ic_photo_white_24dp"
-            android:text="@string/c_menu_change"/>
-    </RelativeLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/context_menu">
-
+        <!-- Dummy item to receive focus first. -->
         <LinearLayout
-            android:id="@+id/content"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp">
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
 
-            <!-- Dummy item to receive focus first. -->
-            <LinearLayout
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="0dp"
-                android:layout_height="0dp" />
+        <include
+            android:id="@+id/edit_text"
+            layout="@layout/item_edit_spinner" />
 
-        </LinearLayout>
-    </ScrollView>
-</RelativeLayout>
+        <include
+            android:id="@+id/edit_search"
+            layout="@layout/item_edit_search" />
+
+    </LinearLayout>
+</ScrollView>

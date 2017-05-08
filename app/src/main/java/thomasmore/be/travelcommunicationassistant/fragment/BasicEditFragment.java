@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.renderscript.ScriptGroup;
 import android.support.v4.content.FileProvider;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,14 +32,18 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
+import thomasmore.be.travelcommunicationassistant.model.MessageType;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.User;
@@ -51,11 +57,14 @@ public class BasicEditFragment extends BaseFragment {
 
     private final static int REQUEST_GALLERY = 1;
     private final static int REQUEST_PHOTO = 2;
+    private final static int REQUEST_SEARCHBUTTON = 101;
 
     private String imagePath = null;
 
     private String classname;
     private HashMap<String, View> dynamicViews = new HashMap<>();
+
+    private boolean isIt = false;
 
     public BasicEditFragment() {
         // Empty constructor required for fragment subclasses
@@ -137,6 +146,26 @@ public class BasicEditFragment extends BaseFragment {
 
             ImageView imageView = (ImageView) getActivity().findViewById(R.id.image);
             imageView.setImageBitmap(Helper.getImage(getActivity(), imagePath));
+        } else if (requestCode == REQUEST_SEARCHBUTTON && resultCode == RESULT_OK) {
+            String classname = data.getStringExtra(CLASSNAME);
+
+            if (classname.equals(MajorCategory.class.getName())) {
+                MajorCategory majorCategory = data.getParcelableExtra(classname);
+
+                View v = dynamicViews.get("Major Category");
+                v.setTag(majorCategory);
+
+                EditText editText = (EditText) v.findViewById(R.id.text);
+                editText.setText(majorCategory.getName());
+            } else if (classname.equals(Category.class.getName())) {
+                Category category = data.getParcelableExtra(classname);
+
+                View v = dynamicViews.get("Category");
+                v.setTag(category);
+
+                EditText editText = (EditText) v.findViewById(R.id.text);
+                editText.setText(category.getFullName());
+            }
         }
     }
 
@@ -154,13 +183,35 @@ public class BasicEditFragment extends BaseFragment {
         } else if (classname.equals(Contact.class.getName())) {
             Contact contact = bundle.getParcelable(classname);
 
+            isIt = bundle.containsKey(Helper.EXTRA_DATA);
+
             layout.addView(getHidden("Id", contact.getId()));
             layout.addView(getImage("Image", contact.getImagePath(), inflater, layout, root));
             layout.addView(getEditText("Name", contact.getName(), inflater, layout));
             layout.addView(getEditText("Phone number", contact.getPhonenumber(), inflater, layout));
-            layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
 
-            Helper.setTitle(getActivity(), R.string.nav_contacts_single);
+            if (isIt) {
+                // TODO: REMOVE THIS PLEASE
+                if (contact.getLanguage() == null) {
+                    contact.setLanguage(Language.English);
+                }
+
+                // TODO: REMOVE THIS TOO
+                if (contact.getMessageType() == null) {
+                    contact.setMessageType(MessageType.Pictogram);
+                }
+
+                layout.addView(getSpinner("Language", contact.getLanguage(), inflater, layout));
+                layout.addView(getSpinner("Type of message", contact.getMessageType(), inflater, layout));
+            } else {
+                layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
+            }
+
+            if (isIt) {
+                Helper.setTitle(getActivity(), R.string.nav_personal);
+            } else {
+                Helper.setTitle(getActivity(), R.string.nav_contacts_single);
+            }
         } else if (classname.equals(User.class.getName())) {
             User user = bundle.getParcelable(classname);
 
@@ -178,7 +229,13 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getHidden("Id", category.getId()));
             layout.addView(getImage("Image", category.getImagePath(), inflater, layout, root));
             layout.addView(getEditText("Name", category.getName(), inflater, layout));
-            layout.addView(getEditText("Major Category", category.getMajorCategory().getName(), inflater, layout));
+            layout.addView(getSearchOption(
+                    "Major Category",
+                    category.getMajorCategory(),
+                    MajorCategory.class,
+                    "getName",
+                    MajorCategoryListFragment.class,
+                    inflater, layout));
             layout.addView(getEditText("Description", category.getDescription(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_category);
@@ -188,7 +245,13 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getHidden("Id", pictogram.getId()));
             layout.addView(getImage("Image", pictogram.getImagePath(), inflater, layout, root));
             layout.addView(getEditText("Name", pictogram.getName(), inflater, layout));
-            layout.addView(getEditText("Category", pictogram.getCategory().getName(), inflater, layout));
+            layout.addView(getSearchOption(
+                    "Category",
+                    pictogram.getCategory(),
+                    Category.class,
+                    "getFullName",
+                    MajorCategoryListFragment.class,
+                    inflater, layout));
             layout.addView(getEditText("Description", pictogram.getDescription(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_pictogram);
@@ -240,6 +303,8 @@ public class BasicEditFragment extends BaseFragment {
                 return R.string.role;
             case "Language":
                 return R.string.language;
+            case "Type of message":
+                return R.string.message_type;
             default:
                 return 0;
         }
@@ -358,6 +423,44 @@ public class BasicEditFragment extends BaseFragment {
         return v;
     }
 
+    private <T> View getSearchOption(
+            String label,
+            T value,
+            final Class<T> type,
+            String methodName,
+            final Class<?> fragmentType,
+            LayoutInflater inflater,
+            ViewGroup parent) {
+        View v = inflater.inflate(R.layout.item_edit_search, parent, false);
+        TextView labelText = (TextView) v.findViewById(R.id.label);
+        EditText editText = (EditText) v.findViewById(R.id.text);
+        String defaultText = "";
+
+        try {
+            defaultText = (String) type.getMethod(methodName).invoke(value);
+        } catch (Exception e) {}
+
+        labelText.setText(getResourceIdForLabel(label));
+        editText.setText(defaultText);
+
+        ImageButton searchButton = (ImageButton) v.findViewById(R.id.search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+                intent.putExtra(BackActivity.DATA_STRING, fragmentType);
+                intent.putExtra(Helper.EXTRA_SEARCH_INTENT, type);
+                startActivityForResult(intent, REQUEST_SEARCHBUTTON);
+            }
+        });
+
+        v.setTag(value);
+
+        dynamicViews.put(label, v);
+
+        return v;
+    }
+
     private Intent getIntent() {
         Intent intent = new Intent();
         intent.putExtra(CLASSNAME, classname);
@@ -392,7 +495,13 @@ public class BasicEditFragment extends BaseFragment {
         contact.setId((Long)getHiddenValue("Id"));
         contact.setName(getTextFromEdit("Name"));
         contact.setPhonenumber(getTextFromEdit("Phone number"));
-        contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
+
+        if (isIt) {
+            contact.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
+            contact.setMessageType(MessageType.valueOf(getStringFromSpinner("Type of message")));
+        } else {
+            contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
+        }
 
         return contact;
     }
@@ -414,6 +523,7 @@ public class BasicEditFragment extends BaseFragment {
 
         category.setId((Long)getHiddenValue("Id"));
         category.setName(getTextFromEdit("Name"));
+        category.setMajorCategory((MajorCategory)getValueFromSearch("Major Category"));
         category.setDescription(getTextFromEdit("Description"));
 
         return category;
@@ -444,5 +554,10 @@ public class BasicEditFragment extends BaseFragment {
         LinearLayout layout = (LinearLayout)dynamicViews.get(label);
         Spinner spinner = (Spinner) layout.findViewById(R.id.spinner);
         return (String)spinner.getSelectedItem();
+    }
+
+    private <T> T getValueFromSearch(String label) {
+        View v = dynamicViews.get(label);
+        return (T) v.getTag();
     }
 }

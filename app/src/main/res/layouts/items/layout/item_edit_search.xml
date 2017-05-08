@@ -15,16 +15,30 @@
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="LABEL"
-        android:layout_weight="1" />
+        android:text="LABEL" />
 
-    <EditText
-        android:id="@+id/text"
+    <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="EDIT YOUR TEXT"
-        android:layout_weight="1"
-        android:nextFocusUp="@id/text"
-        android:nextFocusLeft="@id/text" />
+        android:layout_height="wrap_content">
 
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_search_black_24dp"/>
+
+        <EditText
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EDIT YOUR TEXT"
+            android:layout_toLeftOf="@+id/search"
+            android:layout_toStartOf="@+id/search"
+            android:inputType="none"
+            android:focusable="false"/>
+
+    </RelativeLayout>
 </LinearLayout>
