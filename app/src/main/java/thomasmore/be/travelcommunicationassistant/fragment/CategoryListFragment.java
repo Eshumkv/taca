@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -47,7 +48,7 @@ public class CategoryListFragment extends BaseFragment {
 
         Helper.setTitle(getActivity(), R.string.nav_pictogram);
 
-        Bundle bundle = getArguments();
+        final Bundle bundle = getArguments();
         final MajorCategory majorCategory = bundle.getParcelable(MajorCategory.class.getName());
 
         if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
@@ -85,19 +86,26 @@ public class CategoryListFragment extends BaseFragment {
                     getActivity().setResult(Activity.RESULT_OK, intent);
                     getActivity().finish();
                 } else {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(Category.class.getName(), category);
-
-                    Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
-                    intent.putExtra(Helper.EXTRA_DATA, PictogramSelectListFragment.class);
-                    intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
 
                     if (isSearch) {
-                        intent.putExtra(Helper.EXTRA_SEARCH_INTENT, searchClass);
-                    }
+                        BaseFragment fragment = new PictogramListFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, searchClass);
+                        bundle.putSerializable(Helper.EXTRA_DATA, PictogramListFragment.class);
+                        bundle.putParcelable(Category.class.getName(), category);
 
-                    startActivity(intent);
-                    getActivity().finish();
+                        fragment.setArguments(bundle);
+                        Helper.changeFragment(getActivity(), fragment, false);
+                    } else {
+                        Intent intent = new Intent(getActivity(), NavigationDrawerActivity.class);
+                        Bundle bundle = new Bundle();
+
+                        bundle.putParcelable(Category.class.getName(), category);
+                        intent.putExtra(Helper.EXTRA_DATA_BUNDLE, bundle);
+                        intent.putExtra(Helper.EXTRA_DATA, PictogramSelectListFragment.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
                 }
             }
         });
@@ -110,7 +118,9 @@ public class CategoryListFragment extends BaseFragment {
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Helper.changeFragment(getActivity(), new MajorCategoryListFragment(), false);
+                BaseFragment fragment = new MajorCategoryListFragment();
+                fragment.setArguments(bundle);
+                Helper.changeFragment(getActivity(), fragment, false);
             }
         });
 

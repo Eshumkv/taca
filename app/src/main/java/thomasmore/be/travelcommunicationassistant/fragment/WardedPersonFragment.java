@@ -32,6 +32,8 @@ public class WardedPersonFragment extends BaseFragment {
 
     private final static int REQUEST_EDIT_INFO = 1;
     private final static int REQUEST_ROOMSETTINGS = 2;
+    private final static int REQUEST_CONTACTLIST = 3;
+    private final static int REQUEST_QUICKMESSAGE = 4;
 
     public WardedPersonFragment() {
         // Empty constructor required for fragment subclasses
@@ -73,6 +75,28 @@ public class WardedPersonFragment extends BaseFragment {
                 intent.putExtra(BackActivity.DATA_STRING, RoomSettingsFragment.class);
                 intent.putExtra(RoomSettingsFragment.CONTACT, contact);
                 startActivityForResult(intent, REQUEST_ROOMSETTINGS);
+            }
+        });
+
+        contactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+
+                intent.putExtra(BackActivity.DATA_STRING, ContactListFragment.class);
+                intent.putExtra(ContactListFragment.EXTRA_CONTACTS_FOR, contact);
+                startActivityForResult(intent, REQUEST_CONTACTLIST);
+            }
+        });
+
+        qmessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+
+                intent.putExtra(BackActivity.DATA_STRING, QuickMessageListFragment.class);
+                intent.putExtra(Contact.class.getName(), contact);
+                startActivityForResult(intent, REQUEST_QUICKMESSAGE);
             }
         });
 

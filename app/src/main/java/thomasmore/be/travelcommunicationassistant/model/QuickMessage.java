@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Eshum on 18/04/2017.
@@ -17,6 +18,27 @@ public class QuickMessage implements Parcelable {
 
     public QuickMessage() {
     }
+
+    public QuickMessage(ArrayList<Pictogram> picts) {
+        this.message = picts;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public ArrayList<Pictogram> getMessage() {
+        return message;
+    }
+
+    public void setMessage(ArrayList<Pictogram> message) {
+        this.message = message;
+    }
+
 
     public QuickMessage(Parcel in) {
         id = in.readLong();

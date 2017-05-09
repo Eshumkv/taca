@@ -40,4 +40,6 @@
     <dimen name="paging_height">50dp</dimen>
 
     <dimen name="message_reply_icons_size">40dp</dimen>
+
+    <dimen name="quick_message_list_icon_size">75dp</dimen>
 </resources>

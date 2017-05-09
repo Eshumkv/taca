@@ -93,13 +93,17 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
         pagingMap.put(currentPage, new ArrayList<T>());
     }
 
+    protected void setupContextMenu(View root) {
+        addButton = (Button) root.findViewById(R.id.c_add);
+        editButton = (Button) root.findViewById(R.id.c_edit);
+        deleteButton = (Button) root.findViewById(R.id.c_delete);
+    }
+
     protected void setupPagingBar(View root) {
         LinearLayout bar = (LinearLayout) root.findViewById(R.id.paging);
         bar.setVisibility(View.VISIBLE);
 
-        addButton = (Button) root.findViewById(R.id.c_add);
-        editButton = (Button) root.findViewById(R.id.c_edit);
-        deleteButton = (Button) root.findViewById(R.id.c_delete);
+        setupContextMenu(root);
 
         Button first = (Button) root.findViewById(R.id.paging_first);
         Button previous = (Button) root.findViewById(R.id.paging_previous);

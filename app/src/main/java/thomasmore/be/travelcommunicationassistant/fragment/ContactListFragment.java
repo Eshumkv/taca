@@ -40,8 +40,13 @@ import static android.app.Activity.RESULT_OK;
 
 public class ContactListFragment extends BasePagingFragment<Contact> {
 
+    public final static String EXTRA_CONTACTS_FOR = "ContactsForASpecificPerson";
+
     int tutorColor;
+
     private boolean isSearch = false;
+    private boolean isContactsForPerson = false;
+    private Contact contactsFor;
 
     public ContactListFragment() {
         // Empty constructor required for fragment subclasses
@@ -55,14 +60,26 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         Helper.setTitle(getActivity(), R.string.nav_contacts);
 
         Bundle bundle = getArguments();
-        if (bundle != null && bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
-            Class<?> cls = (Class<?>) bundle.get(Helper.EXTRA_SEARCH_INTENT);
+        if (bundle != null) {
+            if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
+                Class<?> cls = (Class<?>) bundle.get(Helper.EXTRA_SEARCH_INTENT);
 
-            // Only if we're searching for a contact.
-            // Otherwise, no idea what to do with it!
-            if (Contact.class.equals(cls)) {
-                isSearch = true;
+                // Only if we're searching for a contact.
+                // Otherwise, no idea what to do with it!
+                if (Contact.class.equals(cls)) {
+                    isSearch = true;
+                }
             }
+
+            if (bundle.containsKey(EXTRA_CONTACTS_FOR)) {
+                isContactsForPerson = true;
+                contactsFor = bundle.getParcelable(EXTRA_CONTACTS_FOR);
+            }
+        }
+
+        if (isContactsForPerson) {
+            Helper.setTitle(getActivity(), R.string.warded_contact_list_title, contactsFor.getName());
+            // Get the contacts for this person!!
         }
 
         List<Contact> tempList = new ArrayList<>();
@@ -207,6 +224,12 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case android.R.id.home:
+                if (isContactsForPerson) {
+                    getActivity().finish();
+                    return true;
+                }
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -232,13 +255,18 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Contact contact = data.getParcelableExtra(Contact.class.getName());
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Contact contact = data.getParcelableExtra(Contact.class.getName());
 
-                Log.i("Info", contact.getType().name());
-            }
+            Log.i("Info", contact.getType().name());
+            // TODO: Save the contact
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        getActivity().finish();
+        return true;
     }
 
     private void onListItemClick(AdapterView<?> parent, View view, int position, long id) {
