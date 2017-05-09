@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -296,5 +297,14 @@ public class Helper {
         );
 
         return image;
+    }
+
+    public static void toast(Activity act, String text) {
+        Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void toast(Activity act, int resId, Object... vars) {
+        String text = act.getResources().getString(resId, vars);
+        Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
     }
 }

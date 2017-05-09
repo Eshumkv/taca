@@ -10,6 +10,7 @@ import android.util.Log;
 
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.ContactListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomSettingsFragment;
@@ -98,19 +99,8 @@ public class BackActivity
             }
 
             fragment.setArguments(newBundle);
-        } else if (cls.equals(MajorCategoryListFragment.class)) {
-            Bundle newBundle = new Bundle();
-            newBundle.putBoolean(Helper.EXTRA_DATA, bundle.getBoolean(Helper.EXTRA_DATA));
-
-            if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
-                newBundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, bundle.getSerializable(Helper.EXTRA_SEARCH_INTENT));
-            }
-
-            fragment.setArguments(newBundle);
-        } else if (cls.equals(RoomSettingsFragment.class)) {
-            Bundle newBundle = new Bundle();
-            newBundle.putParcelable(RoomSettingsFragment.CONTACT, bundle.getParcelable(RoomSettingsFragment.CONTACT));
-            fragment.setArguments(newBundle);
+        } else {
+            fragment.setArguments(bundle);
         }
 
         return fragment;

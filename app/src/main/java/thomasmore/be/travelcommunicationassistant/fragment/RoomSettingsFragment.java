@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
@@ -36,6 +37,10 @@ import static android.app.Activity.RESULT_OK;
 public class RoomSettingsFragment extends BaseFragment {
 
     public final static String CONTACT = "ExtraContactData";
+    private final static int REQUEST_SEARCHBUTTON = 101;
+
+    private Spinner currentRoomSpinner;
+    private EditText tutorEdit;
 
     private Contact contact;
 
@@ -62,10 +67,10 @@ public class RoomSettingsFragment extends BaseFragment {
         LinearLayout editSearch = (LinearLayout) rootView.findViewById(R.id.edit_search);
 
         TextView currentRoomLabel = (TextView) editText.findViewById(R.id.label);
-        Spinner currentRoomSpinner = (Spinner) editText.findViewById(R.id.spinner);
+        currentRoomSpinner = (Spinner) editText.findViewById(R.id.spinner);
 
         TextView tutorLabel = (TextView) editSearch.findViewById(R.id.label);
-        EditText tutorEdit = (EditText) editSearch.findViewById(R.id.text);
+        tutorEdit = (EditText) editSearch.findViewById(R.id.text);
         ImageButton searchButton = (ImageButton) editSearch.findViewById(R.id.search);
 
         // ------- Current room
@@ -88,7 +93,10 @@ public class RoomSettingsFragment extends BaseFragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO", "Search, ya motha'ucker");
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+                intent.putExtra(BackActivity.DATA_STRING, ContactListFragment.class);
+                intent.putExtra(Helper.EXTRA_SEARCH_INTENT, Contact.class);
+                startActivityForResult(intent, REQUEST_SEARCHBUTTON);
             }
         });
 
@@ -126,8 +134,11 @@ public class RoomSettingsFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            Contact contact = data.getParcelableExtra(Contact.class.getName());
+        if (requestCode == REQUEST_SEARCHBUTTON && resultCode == RESULT_OK) {
+            Contact responsible_tutor = data.getParcelableExtra(Contact.class.getName());
+
+            contact.setResponsibleTutor(responsible_tutor);
+            tutorEdit.setText(responsible_tutor.getName());
         }
     }
 }

@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +41,7 @@ import static android.app.Activity.RESULT_OK;
 public class ContactListFragment extends BasePagingFragment<Contact> {
 
     int tutorColor;
+    private boolean isSearch = false;
 
     public ContactListFragment() {
         // Empty constructor required for fragment subclasses
@@ -49,6 +51,19 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_contact_list, container, false);
+
+        Helper.setTitle(getActivity(), R.string.nav_contacts);
+
+        Bundle bundle = getArguments();
+        if (bundle != null && bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
+            Class<?> cls = (Class<?>) bundle.get(Helper.EXTRA_SEARCH_INTENT);
+
+            // Only if we're searching for a contact.
+            // Otherwise, no idea what to do with it!
+            if (Contact.class.equals(cls)) {
+                isSearch = true;
+            }
+        }
 
         List<Contact> tempList = new ArrayList<>();
         tempList.add(new Contact("Alice", "+7225352256", false));
@@ -87,9 +102,20 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                onListItemClick(parent, view, position, id);
+                if (isSearch) {
+                    Contact contact = (Contact) list.getAdapter().getItem(position);
+                    Intent intent = new Intent();
+                    String classname = Contact.class.getName();
+                    intent.putExtra(classname, contact);
+
+                    getActivity().setResult(Activity.RESULT_OK, intent);
+                    getActivity().finish();
+                } else {
+                    onListItemClick(parent, view, position, id);
+                }
             }
         });
+
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
         tutorColor = ContextCompat.getColor(getActivity(), R.color.card_tutor);

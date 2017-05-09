@@ -90,6 +90,9 @@
     <string name="warded_person_qmessage">Quick messages</string>
     <string name="warded_person_info">Edit personal information</string>
 
+    <string name="toast_room_settings_saved">Room settings saved</string>
+    <string name="toast_warded_info_saved">Information saved</string>
+
     <!--
         Following are arrays.
         Keep the order the same in translations!

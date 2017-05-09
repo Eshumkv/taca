@@ -204,6 +204,11 @@ public class BasicEditFragment extends BaseFragment {
                 layout.addView(getSpinner("Language", contact.getLanguage(), inflater, layout));
                 layout.addView(getSpinner("Type of message", contact.getMessageType(), inflater, layout));
             } else {
+                // TODO: REMOVE THIS TOO
+                if (contact.getType() == null) {
+                    contact.setType(ContactType.Warded);
+                }
+
                 layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
             }
 

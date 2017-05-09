@@ -30,6 +30,9 @@ import static android.app.Activity.RESULT_OK;
 
 public class WardedPersonFragment extends BaseFragment {
 
+    private final static int REQUEST_EDIT_INFO = 1;
+    private final static int REQUEST_ROOMSETTINGS = 2;
+
     public WardedPersonFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -69,7 +72,7 @@ public class WardedPersonFragment extends BaseFragment {
 
                 intent.putExtra(BackActivity.DATA_STRING, RoomSettingsFragment.class);
                 intent.putExtra(RoomSettingsFragment.CONTACT, contact);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, REQUEST_ROOMSETTINGS);
             }
         });
 
@@ -82,7 +85,7 @@ public class WardedPersonFragment extends BaseFragment {
                 intent.putExtra(BasicEditFragment.CLASSNAME, className);
                 intent.putExtra(className, contact);
                 intent.putExtra(Helper.EXTRA_DATA, true);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, REQUEST_EDIT_INFO);
             }
         });
 
@@ -113,12 +116,12 @@ public class WardedPersonFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Contact contact = data.getParcelableExtra(Contact.class.getName());
+        if (requestCode == REQUEST_EDIT_INFO && resultCode == RESULT_OK) {
+            Contact contact = data.getParcelableExtra(Contact.class.getName());
 
-                Log.i("Info", contact.getLanguage().toString() + "");
-            }
+            Helper.toast(getActivity(), R.string.toast_warded_info_saved);
+        } else if (requestCode == REQUEST_ROOMSETTINGS && resultCode == RESULT_OK) {
+            Helper.toast(getActivity(), R.string.toast_room_settings_saved);
         }
     }
 
