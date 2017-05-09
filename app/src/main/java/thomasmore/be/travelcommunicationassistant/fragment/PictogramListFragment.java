@@ -32,13 +32,19 @@ import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.PictogramAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Category;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
-    Category category;
+    private Category category;
+
+    private boolean isPictogramSettingsList = false;
+    private Contact warded;
+
+    private List<Pictogram> selectedPictograms;
 
     public PictogramListFragment() {
         // Empty constructor required for fragment subclasses
@@ -53,9 +59,15 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
+        selectedPictograms = new ArrayList<>();
 
         final Bundle bundle = getArguments();
         category = bundle.getParcelable(Category.class.getName());
+
+        if (bundle.containsKey(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS)) {
+            isPictogramSettingsList = true;
+            warded = bundle.getParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS);
+        }
 
         List<Pictogram> tempList = new ArrayList<>();
         tempList.addAll(Arrays.asList(
@@ -90,11 +102,25 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Pictogram p = (Pictogram) list.getAdapter().getItem(position);
-                Intent intent = new Intent();
-                intent.putExtra(Pictogram.class.getName(), p);
-                getActivity().setResult(Activity.RESULT_OK, intent);
-                getActivity().finish();
+                Pictogram p = (Pictogram) getList().getAdapter().getItem(position);
+
+                if (isPictogramSettingsList) {
+                    LinearLayout root = (LinearLayout)view;
+                    CardView card = (CardView)root.findViewById(R.id.card_view);
+
+                    if (selectedPictograms.contains(p)) {
+                        selectedPictograms.remove(p);
+                        card.setCardBackgroundColor(normalColor);
+                    } else {
+                        selectedPictograms.add(p);
+                        card.setCardBackgroundColor(selectedColor);
+                    }
+                } else {
+                    Intent intent = new Intent();
+                    intent.putExtra(Pictogram.class.getName(), p);
+                    getActivity().setResult(Activity.RESULT_OK, intent);
+                    getActivity().finish();
+                }
             }
         });
 
@@ -173,15 +199,19 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_simple_search, menu);
+        if (isPictogramSettingsList) {
+            inflater.inflate(R.menu.menu_simple_save, menu);
+        } else {
+            inflater.inflate(R.menu.menu_simple_search, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getActivity().getComponentName()));
+            // Associate searchable configuration with the SearchView
+            SearchManager searchManager =
+                    (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView =
+                    (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(getActivity().getComponentName()));
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -190,13 +220,20 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
-                getActivity().finish();
+                if (isPictogramSettingsList) {
+                    getFragmentManager().popBackStack();
+                } else {
+                    getActivity().finish();
+                }
                 return true;
             case R.id.action_search:
                 MyApp app = Helper.getApp(getActivity());
                 Bundle bundle = new Bundle();
                 bundle.putString(MyApp.SEARCH_TERM, MyApp.SEARCH_PICTOGRAM);
                 app.setSearch_extra(bundle);
+                return true;
+            case R.id.action_save:
+                // TODO: pass a list of pictograms
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -210,6 +247,11 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     }
 
     private void goBack() {
+        if (isPictogramSettingsList) {
+            getFragmentManager().popBackStack();
+            return;
+        }
+
         MajorCategory cat = category.getMajorCategory();
 
         Bundle bundle = new Bundle();
@@ -219,17 +261,6 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         CategoryListFragment fragment = new CategoryListFragment();
         fragment.setArguments(bundle);
         Helper.changeFragment(getActivity(), fragment, false);
-    }
-
-    @Override
-    protected void setListAdapter() {
-        final ListView list = getList();
-        list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));
-    }
-
-    @Override
-    protected ListView getList() {
-        return (ListView) getActivity().findViewById(R.id.list);
     }
 
     private void goToEditScreen(Pictogram pictogram) {
@@ -245,5 +276,23 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, pictogram);
         startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void setListAdapter() {
+        final ListView list = getList();
+        List<Pictogram> picts = pagingMap.get(currentPage);
+        list.setAdapter(new PictogramAdapter(getActivity(), picts,
+                selectedPictograms, selectedColor, normalColor));
+    }
+
+    @Override
+    protected ListView getList() {
+        return (ListView) getActivity().findViewById(R.id.list);
+    }
+
+    private class SelectedItem {
+        Pictogram pictograms;
+        View view;
     }
 }

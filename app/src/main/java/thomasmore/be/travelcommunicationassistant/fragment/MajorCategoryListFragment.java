@@ -15,8 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
@@ -34,6 +37,9 @@ public class MajorCategoryListFragment extends BaseFragment {
     private boolean isSearch = false;
     private boolean isSearchMajorCat = false;
     private Class<?> searchClass;
+
+    private boolean isPictogramSettingsList = false;
+    private Contact warded;
 
     public MajorCategoryListFragment() {
         // Empty constructor required for fragment subclasses
@@ -55,6 +61,11 @@ public class MajorCategoryListFragment extends BaseFragment {
                 if (searchClass.equals(MajorCategory.class)) {
                     isSearchMajorCat = true;
                 }
+            }
+
+            if (bundle.containsKey(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS)) {
+                isPictogramSettingsList = true;
+                warded = bundle.getParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS);
             }
         }
 
@@ -100,11 +111,29 @@ public class MajorCategoryListFragment extends BaseFragment {
                         bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, searchClass);
                     }
 
+                    if (isPictogramSettingsList) {
+                        bundle.putParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS, warded);
+                    }
+
                     fragment.setArguments(bundle);
                     Helper.changeFragment(getActivity(), fragment, false);
                 }
             }
         });
+
+        // We are at the Pictogram Settings screen of a warded person.
+        if (isPictogramSettingsList) {
+            RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
+            bar.setVisibility(View.VISIBLE);
+
+            Button addButton = (Button) bar.findViewById(R.id.c_add);
+            addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Helper.toast(getActivity(), "I hear ya");
+                }
+            });
+        }
 
         return rootView;
     }

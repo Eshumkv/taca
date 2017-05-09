@@ -30,10 +30,13 @@ import static android.app.Activity.RESULT_OK;
 
 public class WardedPersonFragment extends BaseFragment {
 
+    public final static String EXTRA_PICTOGRAM_SETTINGS = "PictogramSettingsNeedsThis";
+
     private final static int REQUEST_EDIT_INFO = 1;
     private final static int REQUEST_ROOMSETTINGS = 2;
     private final static int REQUEST_CONTACTLIST = 3;
     private final static int REQUEST_QUICKMESSAGE = 4;
+    private final static int REQUEST_PICTOGRAMSETTINGS = 5;
 
     public WardedPersonFragment() {
         // Empty constructor required for fragment subclasses
@@ -66,6 +69,18 @@ public class WardedPersonFragment extends BaseFragment {
         Button contactButton = (Button) rootView.findViewById(R.id.contacts);
         Button qmessageButton = (Button) rootView.findViewById(R.id.quickmessages);
         Button infoButton = (Button) rootView.findViewById(R.id.info);
+
+        pictogramButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+
+                intent.putExtra(BackActivity.DATA_STRING, MajorCategoryListFragment.class);
+
+                intent.putExtra(EXTRA_PICTOGRAM_SETTINGS, contact);
+                startActivityForResult(intent, REQUEST_PICTOGRAMSETTINGS);
+            }
+        });
 
         roomButton.setOnClickListener(new View.OnClickListener() {
             @Override

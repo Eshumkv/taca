@@ -33,6 +33,8 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
     protected String currentPage = "A";
     protected HashMap<String, List<T>> pagingMap;
 
+    private Button currentButton;
+
     public BasePagingFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -107,7 +109,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
 
         Button first = (Button) root.findViewById(R.id.paging_first);
         Button previous = (Button) root.findViewById(R.id.paging_previous);
-        Button current = (Button) root.findViewById(R.id.paging_current);
+        currentButton = (Button) root.findViewById(R.id.paging_current);
         Button next = (Button) root.findViewById(R.id.paging_next);
         Button last = (Button) root.findViewById(R.id.paging_last);
 
@@ -118,7 +120,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
         }
 
         first.setText(list.get(0));
-        current.setText(currentPage);
+        currentButton.setText(currentPage);
         last.setText(list.get(list.size()-1));
 
         first.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +135,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
                 previous();
             }
         });
-        current.setOnClickListener(new View.OnClickListener() {
+        currentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 current(list);
@@ -182,6 +184,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
     protected void first() {
         ArrayList<String> list = getPagingItems();
         currentPage = list.get(0);
+        currentButton.setText(currentPage);
         deselectPrevious(getView());
         setListAdapter();
     }
@@ -193,6 +196,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
         if (position > 0) {
             currentPage = list.get(position-1);
         }
+        currentButton.setText(currentPage);
         deselectPrevious(getView());
         setListAdapter();
     }
@@ -210,6 +214,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 currentPage = getPagingItems().get(which);
+                currentButton.setText(currentPage);
                 deselectPrevious(getView());
                 setListAdapter();
             }
@@ -224,6 +229,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
         if (position != -1 && position < list.size()-1) {
             currentPage = list.get(position+1);
         }
+        currentButton.setText(currentPage);
         deselectPrevious(getView());
         setListAdapter();
     }
@@ -231,6 +237,7 @@ public abstract class BasePagingFragment<T> extends BaseFragment {
     protected void last() {
         ArrayList<String> list = getPagingItems();
         currentPage = list.get(list.size()-1);
+        currentButton.setText(currentPage);
         deselectPrevious(getView());
         setListAdapter();
     }
