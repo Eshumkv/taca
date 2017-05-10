@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -326,12 +328,14 @@ public class BasicEditFragment extends BaseFragment {
 
         //imageView.setImageBitmap(Helper.getImage(getActivity(), path));
 
-        if (path.equals("NONE")) {
+        Uri uri = Uri.parse(path);
+        imageView.setImageURI(uri);
+
+        Drawable bm = imageView.getDrawable();
+        if (bm == null) {
             imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.contact));
-        } else {
-            Uri uri = Uri.parse(path);
-            imageView.setImageURI(uri);
         }
+
         imageView.setTag(path);
 
         RelativeLayout contextMenu = (RelativeLayout) root.findViewById(R.id.context_menu);
