@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -247,18 +251,30 @@ public class Helper {
     }
 
     public static Bitmap getImage(Context ctx, String path) {
-        File imgFile = new File(path == null ? "" : path);
+        ctx = ctx.getApplicationContext();
+        Bitmap temp = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.contact);
 
-        try {
-            if (imgFile.exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                return bitmap;
-            }
-        } catch (Exception e) {
-            // Log it?
+        if (path.equals("NONE")) {
+            return temp;
         }
 
-        return BitmapFactory.decodeResource(ctx.getResources(), R.drawable.contact);
+        // Load image from file
+        try {
+            File imgFile = new File(path == null ? "" : path);
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        } catch (Exception e) {
+            // It didn't work,
+            // Load image from contentprovider
+            try {
+                InputStream is = ctx.getContentResolver().openInputStream(Uri.parse(path));
+                Bitmap bitmap = Helper.resizeBitmap(BitmapFactory.decodeStream(is), 500, 500);
+                is.close();
+                return bitmap;
+            } catch (Exception ie) {}
+        }
+
+        // Still didn't work, give temp
+        return temp;
     }
 
     // Courtesy of http://stackoverflow.com/a/10703256
@@ -279,6 +295,23 @@ public class Helper {
         bm.recycle();
 
         return resizedBitmap;
+    }
+
+    // Courtesy of: http://stackoverflow.com/a/3414749
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        context = context.getApplicationContext();
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public static boolean hasCamera(Context ctx) {

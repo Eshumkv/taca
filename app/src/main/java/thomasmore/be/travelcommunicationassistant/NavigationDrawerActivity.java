@@ -29,7 +29,9 @@ import thomasmore.be.travelcommunicationassistant.fragment.HomeFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesConversationFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MessagesListFragment;
 import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.Settings;
 import thomasmore.be.travelcommunicationassistant.model.User;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
@@ -208,12 +210,8 @@ public class NavigationDrawerActivity
             String classname = User.class.getName();
             Bundle bundle = new Bundle();
 
-            // Get the current user.
-            User user = new User();
-            user.setUsername("Bobby");
-            user.setPhonenumber("8292929292");
-            user.setPassword("IHaveGoodPassword");
-            user.setLanguage(Language.English);
+            Database db = Database.getInstance(this);
+            User user = db.getSettings().getLoggedInUser(this);
 
             bundle.putString(BasicEditFragment.CLASSNAME, classname);
             bundle.putParcelable(classname, user);
@@ -272,9 +270,16 @@ public class NavigationDrawerActivity
         } else if (cls.equals(BasicEditFragment.class)) {
             // We want to change the user.
             if (value instanceof User) {
-                // TODO: update the user
                 User user = (User) value;
-                Log.i("INFO", "YAAAY " + user.getUsername());
+
+                try {
+                    Database db = Database.getInstance(this);
+                    db.genericUpdate(User.class, user);
+
+                    Helper.toast(this, R.string.toast_user_information_saved);
+                } catch (Exception e) {
+                    Helper.toast(this, R.string.toast_user_information_not_saved);
+                }
 
                 Helper.hideKeyboard(this);
                 Helper.changeFragment(this, new HomeFragment(), false);

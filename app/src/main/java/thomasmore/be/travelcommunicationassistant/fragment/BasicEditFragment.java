@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -130,22 +131,14 @@ public class BasicEditFragment extends BaseFragment {
         // Pick an image
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            Log.i("INFO", uri.toString());
 
             ImageView imageView = (ImageView) getActivity().findViewById(R.id.image);
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                        getActivity().getContentResolver(), uri);
-                imageView.setImageBitmap(Helper.resizeBitmap(bitmap, 500, 500));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            imageView.setImageURI(uri);
+            imageView.setTag(uri.toString());
         } else if (requestCode == REQUEST_PHOTO && resultCode == RESULT_OK) {
-            Log.i("INFO", imagePath);
-
             ImageView imageView = (ImageView) getActivity().findViewById(R.id.image);
             imageView.setImageBitmap(Helper.getImage(getActivity(), imagePath));
+            imageView.setTag(imagePath);
         } else if (requestCode == REQUEST_SEARCHBUTTON && resultCode == RESULT_OK) {
             String classname = data.getStringExtra(CLASSNAME);
 
@@ -330,7 +323,15 @@ public class BasicEditFragment extends BaseFragment {
         ImageView imageView = (ImageView) v.findViewById(R.id.image);
 
         v.setTag(label);
-        imageView.setImageBitmap(Helper.getImage(getActivity(), path));
+
+        //imageView.setImageBitmap(Helper.getImage(getActivity(), path));
+
+        if (path.equals("NONE")) {
+            imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.contact));
+        } else {
+            Uri uri = Uri.parse(path);
+            imageView.setImageURI(uri);
+        }
         imageView.setTag(path);
 
         RelativeLayout contextMenu = (RelativeLayout) root.findViewById(R.id.context_menu);
@@ -519,6 +520,7 @@ public class BasicEditFragment extends BaseFragment {
         user.setPhonenumber(getTextFromEdit("Phone number"));
         user.setPassword(getTextFromEdit("Password"));
         user.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
+        user.setImagePath(getPathFromImage());
 
         return user;
     }
@@ -564,5 +566,10 @@ public class BasicEditFragment extends BaseFragment {
     private <T> T getValueFromSearch(String label) {
         View v = dynamicViews.get(label);
         return (T) v.getTag();
+    }
+
+    private String getPathFromImage() {
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.image);
+        return imageView.getTag().toString();
     }
 }

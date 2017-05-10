@@ -3,16 +3,24 @@ package thomasmore.be.travelcommunicationassistant.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Set;
+
+import thomasmore.be.travelcommunicationassistant.model.BaseModel;
+import thomasmore.be.travelcommunicationassistant.model.Language;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.model.Settings;
+import thomasmore.be.travelcommunicationassistant.model.User;
 
 public class Database extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tacadb";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 9;
 
     public static final String CONTACT = "Contact";
     public static final String CONTACTLIST = "ContactList";
@@ -22,7 +30,6 @@ public class Database extends SQLiteOpenHelper {
     public static final String WARDEDPICTOGRAM = "WardedPictogram";
     public static final String QUICKMESSAGE = "QuickMessage";
     public static final String QUICKMESSAGEMESSAGE = "QMMessage";
-    public static final String USER = "User";
     public static final String ROOM = "Room";
     public static final String MESSAGE = "Message";
     public static final String CONVERSATION = "Conversation";
@@ -34,12 +41,14 @@ public class Database extends SQLiteOpenHelper {
     private Database(Context ctx) {
         super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
 
-        this.context = ctx;
+        this.context = ctx.getApplicationContext();
     }
 
     public synchronized static Database getInstance(Context ctx) {
-        if (instance == null)
-            instance = new Database(ctx);
+        if (instance == null) {
+            instance = new Database(ctx.getApplicationContext());
+        }
+
         return instance;
     }
 
@@ -58,6 +67,8 @@ public class Database extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e("SQL", "Could not create database.", e);
         }
+
+        insertAllTestData(db);
     }
 
     /**
@@ -82,12 +93,14 @@ public class Database extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        reset();
+        reset(db);
     }
 
     public void reset() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        reset(this.getWritableDatabase());
+    }
 
+    public void reset(SQLiteDatabase db) {
         // Drop all tables
         try {
             for (String query : Helper.readSqlFromAssets(this.context, "tacadb_drop.sql")) {
@@ -100,6 +113,43 @@ public class Database extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
     }
+
+    /****
+     *
+     * QUERY METHODS
+     *
+     */
+    public ArrayList<User> getAllUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User useless = new User();
+
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                null,                                   // Where
+                null,                                   // Where-params
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<User> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                User obj = useless.get(cursor);
+
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
 
     /****
      *
@@ -116,6 +166,20 @@ public class Database extends SQLiteOpenHelper {
             values.put("id", room.getId());
             values.put("name", room.getName());
             values.put("password", room.getPassword());
+        } else if (obj instanceof User) {
+            User user = (User) obj;
+
+            values.put(User.ID, user.getId());
+            values.put(User.USERNAME, user.getUsername());
+            values.put(User.PHONENUMBER, user.getPhonenumber());
+            values.put(User.PASSWORD, user.getPassword());
+            values.put(User.LANGUAGE, user.getLanguage().ordinal());
+            values.put(User.IMAGEPATH, user.getImagePath());
+        } else if (obj instanceof Settings) {
+            Settings settings = (Settings) obj;
+
+            values.put(Settings.ID, settings.getId());
+            values.put(Settings.USERID, settings.getUserId());
         }
 
         return values;
@@ -124,35 +188,32 @@ public class Database extends SQLiteOpenHelper {
     private <T> long getId(T obj) {
         if (obj instanceof Room) {
             return ((Room)obj).getId();
+        } else if (obj instanceof User) {
+            return ((User)obj).getId();
         }
 
         throw new RuntimeException("Could not get id for given object!");
     }
 
-    private <T> String getTable(T obj) {
-        if (obj instanceof Room) {
-            return ROOM;
-        }
-
-        throw new RuntimeException("Could not find table name for given object!");
-    }
-
-    public <T> long genericInsert(T obj) {
+    public <T extends BaseModel> long genericInsert(Class<T> type, T obj) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = getContentValues(obj);
 
+        T useless = Helper.NewInstanceOf(type);
+
         values.remove("id");
-        long id = db.insert(getTable(obj), null, values);
+        long id = db.insert(useless.getTable(), null, values);
         db.close();
 
         return id;
     }
 
-    private <T> boolean genericUpdate(T obj) {
+    public <T extends BaseModel> boolean genericUpdate(Class<T> type, T obj) {
         SQLiteDatabase db = this.getWritableDatabase();
+        T useless = Helper.NewInstanceOf(type);
 
         int numrows = db.update(
-                getTable(obj),
+                useless.getTable(),
                 getContentValues(obj),
                 "id = ?",
                 new String[] { String.valueOf(getId(obj)) }
@@ -172,5 +233,78 @@ public class Database extends SQLiteOpenHelper {
         db.close();
 
         return numrows > 0;
+    }
+
+    public <T extends BaseModel> T get(Class<T> type, long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        T obj = Helper.NewInstanceOf(type);
+
+        Cursor cursor = db.query(
+                obj.getTable(),                           // Table
+                obj.getColumns(),
+                "id = ?",                               // Where
+                new String[] { String.valueOf(id) },    // Where-params
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        if (cursor.moveToFirst()) {
+            obj = obj.get(cursor);
+        }
+
+        cursor.close();
+        db.close();
+
+        return obj;
+    }
+
+    public Settings getSettings() {
+        return get(Settings.class, 1);
+    }
+
+    private void insertAllTestData(SQLiteDatabase db) {
+
+        //================================
+        //      USERS
+        //================================
+        ArrayList<User> users = getUsers();
+        for (User user : users) {
+            ContentValues values = getContentValues(user);
+
+            values.remove("id");
+            user.setId(db.insert(user.getTable(), null, values));
+        }
+
+        //================================
+        //      SETTINGS
+        //================================
+        Settings settings = new Settings();
+        settings.setId(1);
+        settings.setUserId(users.get(0).getId());
+        db.insert(settings.getTable(), null, getContentValues(settings));
+    }
+
+    private ArrayList<User> getUsers() {
+        ArrayList<User> list = new ArrayList<>();
+
+        User u = new User();
+        u.setUsername("Ivan");
+        u.setPassword("test");
+        u.setPhonenumber("+7999856235");
+        u.setLanguage(Language.English);
+        u.setImagePath("NONE");
+        list.add(u);
+
+        u = new User();
+        u.setUsername("Anna");
+        u.setPassword("test");
+        u.setPhonenumber("+7999856235");
+        u.setLanguage(Language.Russian);
+        u.setImagePath("NONE");
+        list.add(u);
+
+        return list;
     }
 }

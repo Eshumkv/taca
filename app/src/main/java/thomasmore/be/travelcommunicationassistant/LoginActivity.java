@@ -14,6 +14,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.model.Settings;
+import thomasmore.be.travelcommunicationassistant.model.User;
 import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
@@ -23,6 +25,13 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // TODO: Remove and actually log in the user :)
+        Database db = Database.getInstance(this);
+        db.reset();
+
+        List<User> users = db.getAllUsers();
+        Helper.toast(this, users.get(0).getUsername());
 
         final Button loginButton = (Button) findViewById(R.id.button_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -48,8 +57,5 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        // TODO: Remove
-        Database.getInstance(this).reset();
     }
 }

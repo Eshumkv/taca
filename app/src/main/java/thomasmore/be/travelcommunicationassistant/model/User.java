@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -10,7 +11,7 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
  * Created by Eshum on 18/04/2017.
  */
 
-public class User implements Parcelable {
+public class User extends BaseModel implements Parcelable {
     private long id;
     private String username;
     private String phonenumber;
@@ -104,4 +105,39 @@ public class User implements Parcelable {
         }
     };
 
+    // DATABASE HELPER THINGS
+    public static final String ID = "id";
+    public static final String USERNAME = "username";
+    public static final String PHONENUMBER = "phonenumber";
+    public static final String PASSWORD = "password";
+    public static final String LANGUAGE = "language";
+    public static final String IMAGEPATH = "imagePath";
+
+    public String getTable() {
+        return "User";
+    }
+
+    public String[] getColumns() {
+        return new String[] {
+            ID,
+            USERNAME,
+            PHONENUMBER,
+            PASSWORD,
+            LANGUAGE,
+            IMAGEPATH
+        };
+    }
+
+    public User get(Cursor cursor) {
+        User obj = new User();
+
+        obj.setId(cursor.getLong(0));
+        obj.setUsername(cursor.getString(1));
+        obj.setPhonenumber(cursor.getString(2));
+        obj.setPassword(cursor.getString(3));
+        obj.setLanguage(Language.values()[cursor.getInt(4)]);
+        obj.setImagePath(cursor.getString(5));
+
+        return obj;
+    }
 }

@@ -101,6 +101,9 @@
     <string name="toast_room_settings_saved">Room settings saved</string>
     <string name="toast_warded_info_saved">Information saved</string>
 
+    <string name="toast_user_information_saved">User info saved</string>
+    <string name="toast_user_information_not_saved">User info NOT saved</string>
+
     <!--
         Following are arrays.
         Keep the order the same in translations!
