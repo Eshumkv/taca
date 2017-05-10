@@ -43,6 +43,8 @@ public class CategoryListFragment extends BaseFragment {
     private boolean isPictogramSettingsList = false;
     private Contact warded;
 
+    private Bundle cachedBundle;
+
     public CategoryListFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -52,7 +54,7 @@ public class CategoryListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
-        Helper.setTitle(getActivity(), R.string.nav_pictogram);
+        int title = R.string.nav_pictogram;
 
         final Bundle bundle = getArguments();
         final MajorCategory majorCategory = bundle.getParcelable(MajorCategory.class.getName());
@@ -70,6 +72,14 @@ public class CategoryListFragment extends BaseFragment {
             isPictogramSettingsList = true;
             warded = bundle.getParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS);
         }
+
+        if (bundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+            title = R.string.add_pictogram_title;
+        }
+
+        cachedBundle = bundle;
+
+        Helper.setTitle(getActivity(), title);
 
         final Category[] categories = new Category[] {
                 new Category("Category 1", "HERE'S THE DESCRIPTION!"),
@@ -97,16 +107,21 @@ public class CategoryListFragment extends BaseFragment {
                     getActivity().setResult(Activity.RESULT_OK, intent);
                     getActivity().finish();
                 } else {
-
                     if (isSearch || isPictogramSettingsList) {
                         BaseFragment fragment = new PictogramListFragment();
                         Bundle bundle = new Bundle();
+
                         bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, searchClass);
                         bundle.putSerializable(Helper.EXTRA_DATA, PictogramListFragment.class);
                         bundle.putParcelable(Category.class.getName(), category);
 
                         if (isPictogramSettingsList) {
                             bundle.putParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS, warded);
+                        }
+
+                        if (cachedBundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+                            bundle.putBoolean(Helper.EXTRA_MULTIPLE,
+                                    cachedBundle.getBoolean(Helper.EXTRA_MULTIPLE));
                         }
 
                         fragment.setArguments(bundle);
@@ -133,9 +148,7 @@ public class CategoryListFragment extends BaseFragment {
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BaseFragment fragment = new MajorCategoryListFragment();
-                fragment.setArguments(bundle);
-                Helper.changeFragment(getActivity(), fragment, false);
+                goBack();
             }
         });
 
@@ -145,6 +158,8 @@ public class CategoryListFragment extends BaseFragment {
         if (isPictogramSettingsList) {
             RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
             bar.setVisibility(View.VISIBLE);
+
+            Helper.setTitle(getActivity(), R.string.warded_pictograms_title, warded.getName());
 
             Button addButton = (Button) bar.findViewById(R.id.c_add);
             addButton.setOnClickListener(new View.OnClickListener() {
@@ -160,15 +175,19 @@ public class CategoryListFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_simple_search, menu);
+        if (isPictogramSettingsList) {
+            inflater.inflate(R.menu.menu_simple_back, menu);
+        } else {
+            inflater.inflate(R.menu.menu_simple_search, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getActivity().getComponentName()));
+            // Associate searchable configuration with the SearchView
+            SearchManager searchManager =
+                    (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView =
+                    (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(getActivity().getComponentName()));
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -192,7 +211,13 @@ public class CategoryListFragment extends BaseFragment {
 
     @Override
     public boolean onBackPressed() {
-        Helper.changeFragment(getActivity(), new MajorCategoryListFragment(), false);
+        goBack();
         return true;
+    }
+
+    private void goBack() {
+        BaseFragment fragment = new MajorCategoryListFragment();
+        fragment.setArguments(cachedBundle);
+        Helper.changeFragment(getActivity(), fragment, false);
     }
 }

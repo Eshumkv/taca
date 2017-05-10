@@ -29,6 +29,7 @@ import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class MajorCategoryListFragment extends BaseFragment {
@@ -41,6 +42,8 @@ public class MajorCategoryListFragment extends BaseFragment {
     private boolean isPictogramSettingsList = false;
     private Contact warded;
 
+    private Bundle cachedBundle;
+
     public MajorCategoryListFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -50,9 +53,15 @@ public class MajorCategoryListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
+        int title = R.string.nav_pictogram;
+
         Bundle bundle = getArguments();
         if (bundle != null) {
             isCategory = bundle.getBoolean(Helper.EXTRA_DATA);
+
+            if (isCategory) {
+                title = R.string.nav_category;
+            }
 
             if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
                 isSearch = true;
@@ -67,9 +76,14 @@ public class MajorCategoryListFragment extends BaseFragment {
                 isPictogramSettingsList = true;
                 warded = bundle.getParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS);
             }
-        }
 
-        Helper.setTitle(getActivity(), isCategory ? R.string.nav_category : R.string.nav_pictogram);
+            if (bundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+                title = R.string.add_pictogram_title;
+            }
+        }
+        cachedBundle = bundle;
+
+        Helper.setTitle(getActivity(), title);
 
         MajorCategory[] mcategories = new MajorCategory[] {
                 new MajorCategory("Noun"),
@@ -115,6 +129,11 @@ public class MajorCategoryListFragment extends BaseFragment {
                         bundle.putParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS, warded);
                     }
 
+                    if (cachedBundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+                            bundle.putBoolean(Helper.EXTRA_MULTIPLE,
+                                    cachedBundle.getBoolean(Helper.EXTRA_MULTIPLE));
+                    }
+
                     fragment.setArguments(bundle);
                     Helper.changeFragment(getActivity(), fragment, false);
                 }
@@ -125,6 +144,8 @@ public class MajorCategoryListFragment extends BaseFragment {
         if (isPictogramSettingsList) {
             RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
             bar.setVisibility(View.VISIBLE);
+
+            Helper.setTitle(getActivity(), R.string.warded_pictograms_title, warded.getName());
 
             Button addButton = (Button) bar.findViewById(R.id.c_add);
             addButton.setOnClickListener(new View.OnClickListener() {
@@ -140,15 +161,19 @@ public class MajorCategoryListFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_simple_search, menu);
+        if (isPictogramSettingsList) {
+            inflater.inflate(R.menu.menu_simple_back, menu);
+        } else {
+            inflater.inflate(R.menu.menu_simple_search, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getActivity().getComponentName()));
+            // Associate searchable configuration with the SearchView
+            SearchManager searchManager =
+                    (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView =
+                    (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(getActivity().getComponentName()));
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }

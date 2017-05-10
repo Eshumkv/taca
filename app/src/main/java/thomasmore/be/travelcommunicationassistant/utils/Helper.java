@@ -84,8 +84,8 @@ public class Helper {
 
     public static final String EXTRA_DATA = "data";
     public static final String EXTRA_DATA_BUNDLE = "databundle";
-
     public static final String EXTRA_SEARCH_INTENT = "I really need to search";
+    public static final String EXTRA_MULTIPLE = "Excuse me, I need multiple of these.";
 
     public static MyApp getApp(Activity activity) {
         return (MyApp) activity.getApplication();

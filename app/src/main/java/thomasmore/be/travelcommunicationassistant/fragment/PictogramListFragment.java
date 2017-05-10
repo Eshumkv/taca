@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.PictogramAdapter;
@@ -39,12 +40,18 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
+    private final static int REQUEST_ADDPICTOGRAM = 1;
+
     private Category category;
 
     private boolean isPictogramSettingsList = false;
     private Contact warded;
 
+    private boolean selectMultiple = false;
+
     private List<Pictogram> selectedPictograms;
+
+    private Bundle cachedBundle;
 
     public PictogramListFragment() {
         // Empty constructor required for fragment subclasses
@@ -55,7 +62,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
-        Helper.setTitle(getActivity(), R.string.nav_pictogram);
+        int title = R.string.nav_pictogram;
 
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
@@ -67,6 +74,17 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         if (bundle.containsKey(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS)) {
             isPictogramSettingsList = true;
             warded = bundle.getParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS);
+            Helper.setTitle(getActivity(), R.string.warded_pictograms_title, warded.getName());
+        }
+
+        if (bundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+            selectMultiple = bundle.getBoolean(Helper.EXTRA_MULTIPLE);
+            title = R.string.add_pictogram_title;
+        }
+        cachedBundle = bundle;
+
+        if (warded == null) {
+            Helper.setTitle(getActivity(), title);
         }
 
         List<Pictogram> tempList = new ArrayList<>();
@@ -104,7 +122,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Pictogram p = (Pictogram) getList().getAdapter().getItem(position);
 
-                if (isPictogramSettingsList) {
+                if (isPictogramSettingsList || selectMultiple) {
                     LinearLayout root = (LinearLayout)view;
                     CardView card = (CardView)root.findViewById(R.id.card_view);
 
@@ -115,6 +133,8 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
                         selectedPictograms.add(p);
                         card.setCardBackgroundColor(selectedColor);
                     }
+
+                    toggleContext();
                 } else {
                     Intent intent = new Intent();
                     intent.putExtra(Pictogram.class.getName(), p);
@@ -155,7 +175,15 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Pictogram());
+                if (isPictogramSettingsList) {
+                    Intent intent = new Intent(getActivity(), BackActivity.class);
+                    intent.putExtra(BackActivity.DATA_STRING, MajorCategoryListFragment.class);
+                    intent.putExtra(Helper.EXTRA_SEARCH_INTENT, Pictogram.class);
+                    intent.putExtra(Helper.EXTRA_MULTIPLE, true);
+                    startActivityForResult(intent, REQUEST_ADDPICTOGRAM);
+                } else {
+                    goToEditScreen(new Pictogram());
+                }
             }
         });
 
@@ -171,13 +199,27 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedPosition == -1) return;
+                if (selectedPictograms.size() == 0) return;
+
+                int message = R.string.dialog_delete_pictogram;
+
+                if (selectedPictograms.size() > 1) {
+                    message = R.string.dialog_delete_pictograms;
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder
-                        .setMessage(R.string.dialog_delete_pictogram)
+                        .setMessage(message)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                // TODO: delete it
+                                if (isPictogramSettingsList) {
+                                    // Do it
+                                } else {
+                                    // Do the other thing
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
                             }
@@ -199,7 +241,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (isPictogramSettingsList) {
+        if (isPictogramSettingsList || selectMultiple) {
             inflater.inflate(R.menu.menu_simple_save, menu);
         } else {
             inflater.inflate(R.menu.menu_simple_search, menu);
@@ -220,11 +262,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
-                if (isPictogramSettingsList) {
-                    getFragmentManager().popBackStack();
-                } else {
-                    getActivity().finish();
-                }
+                getActivity().finish();
                 return true;
             case R.id.action_search:
                 MyApp app = Helper.getApp(getActivity());
@@ -247,14 +285,25 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     }
 
     private void goBack() {
+        Bundle bundle = new Bundle();
+
+        if (cachedBundle.containsKey(Helper.EXTRA_MULTIPLE)) {
+            bundle.putBoolean(Helper.EXTRA_MULTIPLE, cachedBundle.getBoolean(Helper.EXTRA_MULTIPLE));
+        }
+
         if (isPictogramSettingsList) {
-            getFragmentManager().popBackStack();
+            bundle.putParcelable(MajorCategory.class.getName(), category.getMajorCategory());
+
+            CategoryListFragment fragment = new CategoryListFragment();
+
+            bundle.putParcelable(WardedPersonFragment.EXTRA_PICTOGRAM_SETTINGS, warded);
+            fragment.setArguments(bundle);
+            Helper.changeFragment(getActivity(), fragment, false);
             return;
         }
 
         MajorCategory cat = category.getMajorCategory();
 
-        Bundle bundle = new Bundle();
         bundle.putParcelable(MajorCategory.class.getName(), cat);
         bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, Pictogram.class);
 
@@ -282,6 +331,13 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     protected void setListAdapter() {
         final ListView list = getList();
         List<Pictogram> picts = pagingMap.get(currentPage);
+
+        // If we can't select multiple, across different pages,
+        // clear the list when we move to a new page.
+        if (!selectMultiple) {
+            selectedPictograms.clear();
+        }
+
         list.setAdapter(new PictogramAdapter(getActivity(), picts,
                 selectedPictograms, selectedColor, normalColor));
     }
@@ -291,8 +347,16 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         return (ListView) getActivity().findViewById(R.id.list);
     }
 
-    private class SelectedItem {
-        Pictogram pictograms;
-        View view;
+    @Override
+    protected void toggleContext() {
+        super.toggleContext();
+
+        if (isPictogramSettingsList) {
+            if (selectedPictograms.size() > 0) {
+                deleteButton.setVisibility(View.VISIBLE);
+            } else {
+                deleteButton.setVisibility(View.GONE);
+            }
+        }
     }
 }

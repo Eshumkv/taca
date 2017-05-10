@@ -33,6 +33,8 @@
     <string name="nav_drawer_open">Open</string>
     <string name="nav_drawer_close">Close</string>
 
+    <string name="add_pictogram_title">Add Pictogram</string>
+
     <string name="logout">Logout</string>
     <string name="search">Search</string>
     <string name="group">Group</string>
@@ -53,6 +55,7 @@
     <string name="warded_room_settings_title">%1$s - Room settings</string>
     <string name="warded_contact_list_title">%1$s - Contacts</string>
     <string name="warded_quick_message_list_title">%1$s - Quick Messages</string>
+    <string name="warded_pictograms_title">%1$s - Pictograms</string>
 
     <string name="message_search_hint">Search&#8230;</string>
 
@@ -75,6 +78,7 @@
     <string name="dialog_delete_contact">Are you sure you wish to delete this contact?</string>
     <string name="dialog_delete_warded_person">Are you sure you wish to delete this warded person?</string>
     <string name="dialog_delete_pictogram">Are you sure you wish to delete this pictogram?</string>
+    <string name="dialog_delete_pictograms">Are you sure you wish to delete these pictograms?</string>
     <string name="dialog_delete_category">Are you sure you wish to delete this category?</string>
     <string name="dialog_delete_qmessage">Are you sure you wish to delete this quick message?</string>
 

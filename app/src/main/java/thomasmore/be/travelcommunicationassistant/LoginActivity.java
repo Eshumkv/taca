@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -34,6 +37,17 @@ public class LoginActivity extends AppCompatActivity {
         final EditText loginText = (EditText) findViewById(R.id.login);
         loginText.requestFocus();
         loginText.clearFocus();
+
+        final EditText passwordText = (EditText) findViewById(R.id.password);
+
+        passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    Log.i("Info", "Enter pressed");
+                }
+                return false;
+            }
+        });
 
         // TODO: Remove
         Database.getInstance(this).reset();
