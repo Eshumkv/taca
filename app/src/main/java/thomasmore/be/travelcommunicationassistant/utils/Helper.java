@@ -340,4 +340,12 @@ public class Helper {
         String text = act.getResources().getString(resId, vars);
         Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
     }
+
+    public static byte parcelableBool(boolean bool) {
+        return (byte) (bool ? 1 : 0);
+    }
+
+    public static boolean getParcelableBool(byte b) {
+        return b != 0;
+    }
 }

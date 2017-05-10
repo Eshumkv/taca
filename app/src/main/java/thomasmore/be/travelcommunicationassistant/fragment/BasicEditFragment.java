@@ -50,6 +50,7 @@ import thomasmore.be.travelcommunicationassistant.model.MessageType;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.User;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -492,9 +493,14 @@ public class BasicEditFragment extends BaseFragment {
     private Room getRoomData() {
         Room room = new Room();
 
+        Database db = Database.getInstance(getActivity());
+        long userid = db.getSettings().getLoggedInUser(getActivity()).getId();
+
         room.setId((Long)getHiddenValue("Id"));
+        room.setUserId(userid);
         room.setName(getTextFromEdit("Name"));
         room.setPassword(getTextFromEdit("Password"));
+        room.setAvailableRoom(false);
 
         return room;
     }
@@ -505,6 +511,7 @@ public class BasicEditFragment extends BaseFragment {
         contact.setId((Long)getHiddenValue("Id"));
         contact.setName(getTextFromEdit("Name"));
         contact.setPhonenumber(getTextFromEdit("Phone number"));
+        contact.setImagePath(getPathFromImage());
 
         if (isIt) {
             contact.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
@@ -536,6 +543,7 @@ public class BasicEditFragment extends BaseFragment {
         category.setName(getTextFromEdit("Name"));
         category.setMajorCategory((MajorCategory)getValueFromSearch("Major Category"));
         category.setDescription(getTextFromEdit("Description"));
+        category.setImagePath(getPathFromImage());
 
         return category;
     }
@@ -546,6 +554,7 @@ public class BasicEditFragment extends BaseFragment {
         pictogram.setId((Long)getHiddenValue("Id"));
         pictogram.setName(getTextFromEdit("Name"));
         pictogram.setDescription(getTextFromEdit("Description"));
+        pictogram.setImagePath(getPathFromImage());
 
         return pictogram;
     }

@@ -1,7 +1,10 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+
+import java.util.Set;
 
 import thomasmore.be.travelcommunicationassistant.utils.Database;
 
@@ -9,7 +12,7 @@ import thomasmore.be.travelcommunicationassistant.utils.Database;
  * Created by Eshum on 10/05/2017.
  */
 
-public class Settings extends BaseModel {
+public class Settings extends BaseModel<Settings> {
     private long id;
     private long userId;
 
@@ -56,5 +59,14 @@ public class Settings extends BaseModel {
         obj.setUserId(cursor.getLong(1));
 
         return obj;
+    }
+
+    public ContentValues getContentValues(Settings settings) {
+        ContentValues values = new ContentValues();
+
+        values.put(ID, settings.getId());
+        values.put(USERID, settings.getUserId());
+
+        return values;
     }
 }

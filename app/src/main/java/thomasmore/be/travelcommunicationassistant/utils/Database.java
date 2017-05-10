@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import thomasmore.be.travelcommunicationassistant.model.BaseModel;
@@ -20,7 +21,7 @@ import thomasmore.be.travelcommunicationassistant.model.User;
 public class Database extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tacadb";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     public static final String CONTACT = "Contact";
     public static final String CONTACTLIST = "ContactList";
@@ -30,7 +31,6 @@ public class Database extends SQLiteOpenHelper {
     public static final String WARDEDPICTOGRAM = "WardedPictogram";
     public static final String QUICKMESSAGE = "QuickMessage";
     public static final String QUICKMESSAGEMESSAGE = "QMMessage";
-    public static final String ROOM = "Room";
     public static final String MESSAGE = "Message";
     public static final String CONVERSATION = "Conversation";
 
@@ -119,9 +119,9 @@ public class Database extends SQLiteOpenHelper {
      * QUERY METHODS
      *
      */
-    public ArrayList<User> getAllUsers() {
+    public <T extends BaseModel> ArrayList<T> getAll(Class<T> type) {
         SQLiteDatabase db = this.getReadableDatabase();
-        User useless = new User();
+        T useless = Helper.NewInstanceOf(type);
 
         Cursor cursor = db.query(
                 useless.getTable(),                        // Table
@@ -134,11 +134,11 @@ public class Database extends SQLiteOpenHelper {
                 null                                    // Dunno
         );
 
-        ArrayList<User> list = new ArrayList<>();
+        ArrayList<T> list = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
             do {
-                User obj = useless.get(cursor);
+                T obj = (T)useless.get(cursor);
 
                 list.add(obj);
             } while (cursor.moveToNext());
@@ -150,39 +150,37 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
+    public List<Room> getAllRooms(long userId, boolean isAvailableRooms) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Room useless = new Room();
 
-    /****
-     *
-     * HELPER METHODS
-     *
-     */
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                where(Room.USERID, Room.ISAVAILABLEROOM), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(userId),
+                        String.valueOf(isAvailableRooms ? 1 : 0)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                asc(Room.NAME),                                   // Sorting
+                null                                    // Dunno
+        );
 
-    private <T> ContentValues getContentValues(T obj) {
-        ContentValues values = new ContentValues();
+        ArrayList<Room> list = new ArrayList<>();
 
-        if (obj instanceof Room) {
-            Room room = (Room) obj;
-
-            values.put("id", room.getId());
-            values.put("name", room.getName());
-            values.put("password", room.getPassword());
-        } else if (obj instanceof User) {
-            User user = (User) obj;
-
-            values.put(User.ID, user.getId());
-            values.put(User.USERNAME, user.getUsername());
-            values.put(User.PHONENUMBER, user.getPhonenumber());
-            values.put(User.PASSWORD, user.getPassword());
-            values.put(User.LANGUAGE, user.getLanguage().ordinal());
-            values.put(User.IMAGEPATH, user.getImagePath());
-        } else if (obj instanceof Settings) {
-            Settings settings = (Settings) obj;
-
-            values.put(Settings.ID, settings.getId());
-            values.put(Settings.USERID, settings.getUserId());
+        if (cursor.moveToFirst()) {
+            do {
+                Room obj = useless.get(cursor);
+                list.add(obj);
+            } while (cursor.moveToNext());
         }
 
-        return values;
+        cursor.close();
+        db.close();
+
+        return list;
     }
 
     private <T> long getId(T obj) {
@@ -197,12 +195,10 @@ public class Database extends SQLiteOpenHelper {
 
     public <T extends BaseModel> long genericInsert(Class<T> type, T obj) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = getContentValues(obj);
-
-        T useless = Helper.NewInstanceOf(type);
+        ContentValues values = obj.getContentValues(obj);
 
         values.remove("id");
-        long id = db.insert(useless.getTable(), null, values);
+        long id = db.insert(obj.getTable(), null, values);
         db.close();
 
         return id;
@@ -210,11 +206,10 @@ public class Database extends SQLiteOpenHelper {
 
     public <T extends BaseModel> boolean genericUpdate(Class<T> type, T obj) {
         SQLiteDatabase db = this.getWritableDatabase();
-        T useless = Helper.NewInstanceOf(type);
 
         int numrows = db.update(
-                useless.getTable(),
-                getContentValues(obj),
+                obj.getTable(),
+                obj.getContentValues(obj),
                 "id = ?",
                 new String[] { String.valueOf(getId(obj)) }
         );
@@ -223,11 +218,12 @@ public class Database extends SQLiteOpenHelper {
         return numrows > 0;
     }
 
-    private boolean genericDelete(String table, long id) {
+    public <T extends BaseModel> boolean genericDelete(Class<T> type, long id) {
         SQLiteDatabase db = this.getWritableDatabase();
+        T useless = Helper.NewInstanceOf(type);
 
         int numrows = db.delete(
-                table,
+                useless.getTable(),
                 "id = ?",
                 new String[] { String.valueOf(id) });
         db.close();
@@ -251,7 +247,7 @@ public class Database extends SQLiteOpenHelper {
         );
 
         if (cursor.moveToFirst()) {
-            obj = obj.get(cursor);
+            obj = (T)obj.get(cursor);
         }
 
         cursor.close();
@@ -264,6 +260,42 @@ public class Database extends SQLiteOpenHelper {
         return get(Settings.class, 1);
     }
 
+
+    /****
+     *
+     * HELPER METHODS
+     *
+     */
+    private String where(String... columns) {
+        StringBuilder sb = new StringBuilder();
+
+        if (columns.length == 0) {
+            return null;
+        }
+
+        if (columns.length == 1) {
+            return columns[0] + " = ?";
+        }
+
+        String and = " AND ";
+
+        for (String column : columns) {
+            sb.append(column).append(" = ?").append(and);
+        }
+
+        sb.delete(sb.length() - and.length(), sb.length());
+
+        return sb.toString();
+    }
+
+    private String desc(String column) {
+        return column + " DESC";
+    }
+
+    private String asc(String column) {
+        return column + " ASC";
+    }
+
     private void insertAllTestData(SQLiteDatabase db) {
 
         //================================
@@ -271,10 +303,21 @@ public class Database extends SQLiteOpenHelper {
         //================================
         ArrayList<User> users = getUsers();
         for (User user : users) {
-            ContentValues values = getContentValues(user);
+            ContentValues values = user.getContentValues(user);
 
             values.remove("id");
             user.setId(db.insert(user.getTable(), null, values));
+        }
+
+        //================================
+        //      ROOMS
+        //================================
+        ArrayList<Room> rooms = getRooms();
+        for (Room room : rooms) {
+            ContentValues values = room.getContentValues(room);
+
+            values.remove("id");
+            db.insert(room.getTable(), null, values);
         }
 
         //================================
@@ -283,7 +326,7 @@ public class Database extends SQLiteOpenHelper {
         Settings settings = new Settings();
         settings.setId(1);
         settings.setUserId(users.get(0).getId());
-        db.insert(settings.getTable(), null, getContentValues(settings));
+        db.insert(settings.getTable(), null, settings.getContentValues(settings));
     }
 
     private ArrayList<User> getUsers() {
@@ -304,6 +347,35 @@ public class Database extends SQLiteOpenHelper {
         u.setLanguage(Language.Russian);
         u.setImagePath("NONE");
         list.add(u);
+
+        return list;
+    }
+
+    private ArrayList<Room> getRooms() {
+        ArrayList<Room> list = new ArrayList<>();
+
+        Room room = new Room();
+        room.setName("Test room 1");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(false);
+        list.add(room);
+
+        room = new Room();
+        room.setName("Anna's room");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(false);
+        list.add(room);
+
+        room = new Room();
+        room.setName("Gorki");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Mia");
+        room.setCreaterPhonenumber("123456789");
+        list.add(room);
 
         return list;
     }

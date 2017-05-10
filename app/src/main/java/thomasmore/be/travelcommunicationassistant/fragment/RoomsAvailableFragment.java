@@ -21,11 +21,13 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.RoomsWithCreatorAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -61,13 +63,12 @@ public class RoomsAvailableFragment extends BaseFragment {
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
 
-        Room[] rooms = new Room[] {
-                new Room("Ivan's room", "GoodPassword", "Anton"),
-                new Room("Test room", "IHaveAGoodPassword", "Elena")
-        };
+        Database db = Database.getInstance(getActivity());
+        long id = db.getSettings().getUserId();
+        List<Room> rooms = db.getAllRooms(id, true);
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
-        list.setAdapter(new RoomsWithCreatorAdapter(getActivity(), Arrays.asList(rooms), R.layout.item_rooms_available));
+        list.setAdapter(new RoomsWithCreatorAdapter(getActivity(), rooms, R.layout.item_rooms_available));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,8 +105,19 @@ public class RoomsAvailableFragment extends BaseFragment {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Room room = (Room)list.getAdapter().getItem(selectedPosition);
+
+                                Database db = Database.getInstance(getActivity());
+                                if (db.genericDelete(Room.class, room.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -129,9 +141,22 @@ public class RoomsAvailableFragment extends BaseFragment {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 Bundle extra = data.getBundleExtra("extra");
-                ArrayList<Room> rooms = extra.getParcelableArrayList(Room.class.getName());
+                List<Room> rooms = extra.getParcelableArrayList(Room.class.getName());
+                Database db = Database.getInstance(getActivity());
+                long userId = db.getSettings().getLoggedInUser(getActivity()).getId();
 
-                Log.i("Info", rooms.size() + "");
+                for (Room room : rooms) {
+                    room.setAvailableRoom(true);
+                    room.setUserId(userId);
+                    db.genericInsert(Room.class, room);
+                }
+
+                Helper.toast(getActivity(), R.string.toast_saved);
+
+                rooms = db.getAllRooms(userId, true);
+
+                final ListView list = (ListView) getActivity().findViewById(R.id.rooms);
+                list.setAdapter(new RoomsWithCreatorAdapter(getActivity(), rooms, R.layout.item_rooms_available));
             }
         }
     }
@@ -166,6 +191,17 @@ public class RoomsAvailableFragment extends BaseFragment {
                 return false;
         }
         return true;
+    }
+
+    protected void setListAdapter() {
+        Database db = Database.getInstance(getActivity());
+        long id = db.getSettings().getUserId();
+        List<Room> rooms = db.getAllRooms(id, true);
+        getList().setAdapter(new RoomsWithCreatorAdapter(getActivity(), rooms, R.layout.item_rooms_available));
+    }
+
+    protected ListView getList() {
+        return (ListView) getActivity().findViewById(R.id.rooms);
     }
 
     private void deselectPrevious(View v) {

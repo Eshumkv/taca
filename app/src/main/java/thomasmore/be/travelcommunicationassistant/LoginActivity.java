@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         Database db = Database.getInstance(this);
         db.reset();
 
-        List<User> users = db.getAllUsers();
+        List<User> users = db.getAll(User.class);
         Helper.toast(this, users.get(0).getUsername());
 
         final Button loginButton = (Button) findViewById(R.id.button_login);

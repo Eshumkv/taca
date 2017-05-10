@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import thomasmore.be.travelcommunicationassistant.R;
@@ -72,11 +74,8 @@ public class RoomsSearchFragment
             }
         });
 
-
-        Room[] rooms = new Room[] {
-                new Room(0, "Ivan's room", "test", "Anton"),
-                new Room(1, "Test room", "test", "Elena")
-        };
+        // Empty list to start with
+        Room[] rooms = new Room[] {};
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
         final RoomsWithCreatorAdapter roomAdapter =
@@ -89,7 +88,7 @@ public class RoomsSearchFragment
                 CheckBox checkbox = (CheckBox)root.findViewById(R.id.checked);
                 checkbox.setChecked(!checkbox.isChecked());
 
-                Room room = (Room)roomAdapter.getItem(position);
+                Room room = (Room)list.getAdapter().getItem(position);
                 if (checkbox.isChecked()) {
                     roomsMap.put(room.getId(), room);
                 } else {
@@ -99,9 +98,21 @@ public class RoomsSearchFragment
         });
 
 
-        final EditText nofocus = (EditText) rootView.findViewById(R.id.search);
-        nofocus.requestFocus();
-        nofocus.clearFocus();
+        final EditText searchText = (EditText) rootView.findViewById(R.id.search);
+        searchText.requestFocus();
+        searchText.clearFocus();
+
+        final Button searchButton = (Button) rootView.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = searchText.getText().toString().trim();
+                if (text.equals("")) return;
+                List<Room> rooms = search(text, searchOnName);
+                list.setAdapter(new RoomsWithCreatorAdapter(getActivity(), rooms, R.layout.item_rooms_search));
+                Helper.hideKeyboard(getActivity());
+            }
+        });
 
         return rootView;
     }
@@ -131,6 +142,26 @@ public class RoomsSearchFragment
     public boolean onBackPressed() {
         getActivity().finish();
         return true;
+    }
+
+    private List<Room> search(String searchText, boolean searchOnName) {
+        ArrayList<Room> list = new ArrayList<>();
+        List<Room> toSearch = getFakeServerRooms();
+
+        for (Room room : toSearch) {
+            if (searchOnName) {
+                if (room.getCreator().toLowerCase().contains(searchText.toLowerCase())) {
+                    list.add(room);
+                }
+            } else {
+                if (room.getCreaterPhonenumber().toLowerCase().contains(searchText.toLowerCase())) {
+                    list.add(room);
+                }
+            }
+        }
+
+
+        return list;
     }
 
     private void returnToPrevious() {
@@ -193,5 +224,71 @@ public class RoomsSearchFragment
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
         counter = 0;
+    }
+
+    private List<Room> getFakeServerRooms() {
+        ArrayList<Room> rooms = new ArrayList<>();
+
+        Room room = new Room();
+        room.setId(2);
+        room.setName("Gorki");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Mia");
+        room.setCreaterPhonenumber("123456789");
+        rooms.add(room);
+
+        room = new Room();
+        room.setId(3);
+        room.setName("Table room");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("John");
+        room.setCreaterPhonenumber("99999999");
+        rooms.add(room);
+
+        room = new Room();
+        room.setId(4);
+        room.setName("Have fun");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Elena");
+        room.setCreaterPhonenumber("123456789");
+        rooms.add(room);
+
+        room = new Room();
+        room.setId(5);
+        room.setName("Family Room!");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Alexander");
+        room.setCreaterPhonenumber("123456789");
+        rooms.add(room);
+
+        room = new Room();
+        room.setId(6);
+        room.setName("Room for you");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Dmitry");
+        room.setCreaterPhonenumber("123456789");
+        rooms.add(room);
+
+        room = new Room();
+        room.setId(7);
+        room.setName("Gorki 2");
+        room.setPassword("test");
+        room.setUserId(1);
+        room.setAvailableRoom(true);
+        room.setCreator("Mia");
+        room.setCreaterPhonenumber("123456789");
+        rooms.add(room);
+
+        return rooms;
     }
 }

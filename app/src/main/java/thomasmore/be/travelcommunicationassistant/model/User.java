@@ -1,5 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,7 +12,7 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
  * Created by Eshum on 18/04/2017.
  */
 
-public class User extends BaseModel implements Parcelable {
+public class User extends BaseModel<User> implements Parcelable {
     private long id;
     private String username;
     private String phonenumber;
@@ -139,5 +140,18 @@ public class User extends BaseModel implements Parcelable {
         obj.setImagePath(cursor.getString(5));
 
         return obj;
+    }
+
+    public ContentValues getContentValues(User user) {
+        ContentValues values = new ContentValues();
+
+        values.put(User.ID, user.getId());
+        values.put(User.USERNAME, user.getUsername());
+        values.put(User.PHONENUMBER, user.getPhonenumber());
+        values.put(User.PASSWORD, user.getPassword());
+        values.put(User.LANGUAGE, user.getLanguage().ordinal());
+        values.put(User.IMAGEPATH, user.getImagePath());
+
+        return values;
     }
 }

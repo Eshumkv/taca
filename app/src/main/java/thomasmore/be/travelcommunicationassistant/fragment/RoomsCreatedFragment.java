@@ -19,16 +19,20 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import java.util.Arrays;
+import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.RoomsCreatedAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.model.User;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
 
 public class RoomsCreatedFragment extends BaseFragment {
+
+    private final static int REQUEST_EDIT = 1;
 
     int selectedColor;
     int normalColor;
@@ -60,14 +64,12 @@ public class RoomsCreatedFragment extends BaseFragment {
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
         normalColor = ContextCompat.getColor(getActivity(), R.color.cardNormal);
 
-        Room[] rooms = new Room[] {
-                new Room("Room 1", "GoodPassword", null),
-                new Room("Some Room", "IHaveAGoodPassword", null),
-                new Room("Ivan's Room", "BESTIES", null)
-        };
+        Database db = Database.getInstance(getActivity());
+        long id = db.getSettings().getUserId();
+        List<Room> rooms = db.getAllRooms(id, false);
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
-        list.setAdapter(new RoomsCreatedAdapter(getActivity(), Arrays.asList(rooms)));
+        list.setAdapter(new RoomsCreatedAdapter(getActivity(), rooms));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -114,8 +116,19 @@ public class RoomsCreatedFragment extends BaseFragment {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Room room = (Room)list.getAdapter().getItem(selectedPosition);
+
+                                Database db = Database.getInstance(getActivity());
+                                if (db.genericDelete(Room.class, room.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -135,13 +148,28 @@ public class RoomsCreatedFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
+            Room room = data.getParcelableExtra(Room.class.getName());
+            Database db = Database.getInstance(getActivity());
+            User user = db.getSettings().getLoggedInUser(getActivity());
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Room room = data.getParcelableExtra(Room.class.getName());
+            room.setAvailableRoom(false);
+            room.setCreator(user.getUsername());
+            room.setCreaterPhonenumber(user.getPhonenumber());
 
-                Log.i("Info", room.getName());
+            if (db.genericUpdate(Room.class, room)) {
+                Helper.toast(getActivity(), R.string.toast_saved);
+            } else {
+                long id = db.genericInsert(Room.class, room);
+
+                if (id != 0) {
+                    Helper.toast(getActivity(), R.string.toast_saved);
+                } else {
+                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                }
             }
+
+            setListAdapter();
         }
     }
 
@@ -177,6 +205,17 @@ public class RoomsCreatedFragment extends BaseFragment {
         return true;
     }
 
+    protected void setListAdapter() {
+        Database db = Database.getInstance(getActivity());
+        long id = db.getSettings().getUserId();
+        List<Room> rooms = db.getAllRooms(id, false);
+        getList().setAdapter(new RoomsCreatedAdapter(getActivity(), rooms));
+    }
+
+    protected ListView getList() {
+        return (ListView) getActivity().findViewById(R.id.rooms);
+    }
+
     private void deselectPrevious(View v) {
         if (selectedPosition != -1) {
             ListView list = (ListView) v.findViewById(R.id.rooms);
@@ -208,6 +247,6 @@ public class RoomsCreatedFragment extends BaseFragment {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, room);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 }

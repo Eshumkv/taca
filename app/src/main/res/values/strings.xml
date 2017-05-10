@@ -101,8 +101,11 @@
     <string name="toast_room_settings_saved">Room settings saved</string>
     <string name="toast_warded_info_saved">Information saved</string>
 
-    <string name="toast_user_information_saved">User info saved</string>
-    <string name="toast_user_information_not_saved">User info NOT saved</string>
+    <string name="toast_saved">Saved</string>
+    <string name="toast_not_saved">NOT saved</string>
+
+    <string name="toast_deleted">Successfully deleted</string>
+    <string name="toast_not_deleted">NOT deleted</string>
 
     <!--
         Following are arrays.

@@ -75,8 +75,6 @@ public class RoomSettingsFragment extends BaseFragment {
 
         // ------- Current room
         Room[] rooms = new Room[] {
-                new Room("Ivan's room", "GoodPassword", "Anton"),
-                new Room("Test room", "IHaveAGoodPassword", "Elena")
         };
 
         currentRoomLabel.setText(R.string.current_room);

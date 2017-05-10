@@ -77,7 +77,11 @@ CREATE TABLE "Room" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "name" TEXT  NOT NULL ,
     "password" TEXT  NOT NULL ,
-    "creator" TEXT
+    "userId" INTEGER NULL,
+    "creator" TEXT,
+    "isAvailableRoom" INTEGER NOT NULL,
+    "creatorPhonenumber" TEXT,
+    FOREIGN KEY ("userId") REFERENCES "User"("id")
 );
 --NST
 CREATE TABLE "Message" (

@@ -276,9 +276,9 @@ public class NavigationDrawerActivity
                     Database db = Database.getInstance(this);
                     db.genericUpdate(User.class, user);
 
-                    Helper.toast(this, R.string.toast_user_information_saved);
+                    Helper.toast(this, R.string.toast_saved);
                 } catch (Exception e) {
-                    Helper.toast(this, R.string.toast_user_information_not_saved);
+                    Helper.toast(this, R.string.toast_not_saved);
                 }
 
                 Helper.hideKeyboard(this);
