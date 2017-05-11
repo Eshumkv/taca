@@ -22,6 +22,7 @@
             android:id="@+id/id"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:textColor="@color/textColor"
             android:visibility="gone" />
 
         <TextView
@@ -29,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="15dp"
+            android:textColor="@color/textColor"
             android:text="FORGET ME NOT" />
 
     </android.support.v7.widget.CardView>

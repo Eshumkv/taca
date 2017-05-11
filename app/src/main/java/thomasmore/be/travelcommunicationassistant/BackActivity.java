@@ -1,10 +1,10 @@
 package thomasmore.be.travelcommunicationassistant;
 
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -47,7 +47,7 @@ public class BackActivity
     @Override
     public void onBackPressed() {
         final BaseFragment fragment =
-                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+                (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
         // If the fragment doesn't handle back press, handle it yourself.
         if (!fragment.onBackPressed()) {
@@ -132,7 +132,7 @@ public class BackActivity
     @Override
     public void onDialogPositiveClick(boolean correct) {
         final BaseFragment fragment =
-                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+                (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
         fragment.onDialogPositiveClick(correct);
 
@@ -141,7 +141,7 @@ public class BackActivity
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
         final BaseFragment fragment =
-                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+                (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
         fragment.onDialogNegativeClick(dialog);
     }

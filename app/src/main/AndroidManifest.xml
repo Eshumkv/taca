@@ -38,7 +38,6 @@
         </activity>
         <activity
             android:name=".NavigationDrawerActivity"
-            android:theme="@style/Theme.AppCompat.Light"
             android:label="@string/nav_home">
 
             <intent-filter>
@@ -51,7 +50,6 @@
         </activity>
         <activity
             android:name=".BackActivity"
-            android:theme="@style/Theme.AppCompat.Light"
             android:label="Probably change this">
 
             <intent-filter>

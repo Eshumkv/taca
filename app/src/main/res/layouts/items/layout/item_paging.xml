@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dialog_page"
+            android:textColor="@color/textColor"
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp" />
 
@@ -24,6 +25,7 @@
             android:id="@+id/page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
             android:text="AAA"/>
 
     </LinearLayout>

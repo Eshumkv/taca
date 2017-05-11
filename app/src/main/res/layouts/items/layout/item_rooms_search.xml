@@ -41,6 +41,7 @@
                     android:id="@+id/id"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:textColor="@color/textColor"
                     android:visibility="gone" />
 
                 <TextView
@@ -54,6 +55,7 @@
                     android:paddingEnd="15dp"
                     android:paddingRight="15dp"
                     android:textStyle="bold"
+                    android:textColor="@color/textColor"
                     android:text="FORGET ME NOT" />
 
                 <LinearLayout
@@ -69,6 +71,7 @@
                         android:paddingBottom="15dp"
                         android:paddingEnd="5dp"
                         android:paddingRight="5dp"
+                        android:textColor="@color/textColor"
                         android:text="@string/created_by" />
 
                     <TextView
@@ -80,6 +83,7 @@
                         android:paddingBottom="15dp"
                         android:paddingEnd="15dp"
                         android:paddingRight="15dp"
+                        android:textColor="@color/textColor"
                         android:text="Ivan" />
                 </LinearLayout>
             </LinearLayout>

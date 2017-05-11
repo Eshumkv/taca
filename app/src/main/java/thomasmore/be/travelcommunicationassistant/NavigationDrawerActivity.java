@@ -1,9 +1,9 @@
 package thomasmore.be.travelcommunicationassistant;
 
-import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -147,12 +147,12 @@ public class NavigationDrawerActivity
     @Override
     public void onBackPressed() {
         final BaseFragment fragment =
-                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+                (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
         // If the fragment doesn't handle back press, handle it yourself.
         if (!fragment.onBackPressed()) {
             // If it's not the home fragment, go back to the home fragment.
-            Fragment current = getFragmentManager().findFragmentById(R.id.content_frame);
+            Fragment current = getSupportFragmentManager().findFragmentById(R.id.content_frame);
             if ( !(current instanceof HomeFragment) ) {
                 selectNavigationItem(getPositionForNavigationItem(HomeFragment.class));
             } else {
@@ -168,7 +168,7 @@ public class NavigationDrawerActivity
 
     public boolean onTouch(View v, MotionEvent event) {
         final BaseFragment fragment =
-                (BaseFragment) getFragmentManager().findFragmentById(R.id.content_frame);
+                (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
         return fragment.onTouchEvent(v, event);
     }

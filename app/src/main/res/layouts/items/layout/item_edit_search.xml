@@ -15,6 +15,7 @@
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/textColor"
         android:text="LABEL" />
 
     <RelativeLayout
@@ -37,6 +38,7 @@
             android:text="EDIT YOUR TEXT"
             android:layout_toLeftOf="@+id/search"
             android:layout_toStartOf="@+id/search"
+            android:textColor="@color/textColor"
             android:inputType="none"
             android:focusable="false"/>
 

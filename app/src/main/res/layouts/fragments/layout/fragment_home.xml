@@ -13,7 +13,6 @@
         android:numColumns="3"
         android:verticalSpacing="@dimen/homescreen_grid_vspacing"
         android:horizontalSpacing="@dimen/homescreen_grid_hspacing"
-        android:layout_centerVertical="true"
-        android:layout_below="@+id/toolbar">
+        android:layout_centerVertical="true">
     </GridView>
 </RelativeLayout>

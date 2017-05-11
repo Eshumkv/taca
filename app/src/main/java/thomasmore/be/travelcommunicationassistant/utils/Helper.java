@@ -1,9 +1,6 @@
 package thomasmore.be.travelcommunicationassistant.utils;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +12,9 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -102,7 +102,11 @@ public class Helper {
     }
 
     public static void changeFragment(Activity act, Fragment fragment, boolean addBackToStack) {
-        FragmentManager fragmentManager = act.getFragmentManager();
+        changeFragment(((AppCompatActivity)act), fragment, addBackToStack);
+    }
+
+    public static void changeFragment(AppCompatActivity act, Fragment fragment, boolean addBackToStack) {
+        FragmentManager fragmentManager = act.getSupportFragmentManager();
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content_frame, fragment, fragment.getClass().getName());

@@ -25,7 +25,7 @@
     <dimen name="edit_image_size">200dp</dimen>
     <dimen name="contact_detail_name_size">43sp</dimen>
 
-    <dimen name="homescreen_item_textsize">21sp</dimen>
+    <dimen name="homescreen_item_textsize">18sp</dimen>
     <dimen name="homescreen_item_imagesize">60dp</dimen>
     <dimen name="homescreen_grid_vspacing">50dp</dimen>
     <dimen name="homescreen_grid_hspacing">15dp</dimen>
