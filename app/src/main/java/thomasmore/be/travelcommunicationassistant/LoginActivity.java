@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         db.reset();
 
         List<User> users = db.getAll(User.class);
-        Helper.toast(this, users.get(0).getUsername());
+        //Helper.toast(this, users.get(0).getUsername());
 
         final Button loginButton = (Button) findViewById(R.id.button_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
