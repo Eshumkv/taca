@@ -205,6 +205,7 @@ public class RoomsSearchFragment
 
             i++;
         }
+
         return true;
     }
 

@@ -254,7 +254,7 @@ public class Helper {
         ctx = ctx.getApplicationContext();
         Bitmap temp = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.contact);
 
-        if (path.equals("NONE")) {
+        if (path == null || path.equals("NONE")) {
             return temp;
         }
 

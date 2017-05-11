@@ -44,6 +44,8 @@ import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
+import static android.app.Activity.RESULT_OK;
+
 public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
 
     Category category;

@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,6 +39,8 @@ import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
+import static android.app.Activity.RESULT_OK;
+
 public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
     private final static int REQUEST_ADDPICTOGRAM = 1;
@@ -49,7 +52,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
     private boolean selectMultiple = false;
 
-    private List<Pictogram> selectedPictograms;
+    private ArrayList<Pictogram> selectedPictograms;
 
     private Bundle cachedBundle;
 
@@ -113,7 +116,12 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         setupPagingBar(rootView);
 
         RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
-        bar.setVisibility(View.VISIBLE);
+
+        if (selectMultiple) {
+            bar.setVisibility(View.GONE);
+        } else {
+            bar.setVisibility(View.VISIBLE);
+        }
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
         list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));
@@ -271,10 +279,29 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
                 app.setSearch_extra(bundle);
                 return true;
             case R.id.action_save:
-                // TODO: pass a list of pictograms
+                Intent intent = new Intent();
+                Bundle extra = new Bundle();
+
+                extra.putParcelableArrayList(Pictogram.class.getName(), selectedPictograms);
+                intent.putExtra("extra", extra);
+
+                getActivity().setResult(Activity.RESULT_OK, intent);
+                getActivity().finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_ADDPICTOGRAM && resultCode == RESULT_OK) {
+            Bundle extra = data.getBundleExtra("extra");
+            List<Pictogram> pictograms = extra.getParcelableArrayList(Pictogram.class.getName());
+
+            Log.i("INFO", pictograms.size() + "");
+            Helper.toast(getActivity(), R.string.toast_saved);
         }
     }
 

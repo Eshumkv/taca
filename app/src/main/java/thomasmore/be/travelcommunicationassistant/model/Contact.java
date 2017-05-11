@@ -1,5 +1,7 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,7 +15,7 @@ import thomasmore.be.travelcommunicationassistant.utils.Helper;
  * Created by Eshum on 18/04/2017.
  */
 
-public class Contact implements Parcelable {
+public class Contact extends BaseModel<Contact> implements Parcelable {
     private long id;
     private String name;
     private String phonenumber;
@@ -205,4 +207,47 @@ public class Contact implements Parcelable {
         }
     };
 
+
+    // DATABASE HELPER THINGS
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String PHONENUMBER = "phonenumber";
+    public static final String IMAGEPATH = "imagePath";
+    public static final String MESSAGETYPE = "messageType";
+    public static final String LANGUAGE = "language";
+    public static final String CURRENTROOMID = "currentRoomId";
+    public static final String RESPONSIBLETUTORID = "responsibleTutorId";
+    public static final String USERID = "userId";
+    public static final String TYPE = "type";
+
+    public String getTable() {
+        return "Contact";
+    }
+
+    public String[] getColumns() {
+        return new String[] {
+                ID,
+                NAME,
+                PHONENUMBER,
+                IMAGEPATH,
+                MESSAGETYPE,
+                LANGUAGE,
+                CURRENTROOMID,
+                RESPONSIBLETUTORID,
+                USERID,
+                TYPE
+        };
+    }
+
+    public Contact get(Cursor cursor) {
+        Contact obj = new Contact();
+
+        return obj;
+    }
+
+    public ContentValues getContentValues(Contact contact) {
+        ContentValues values = new ContentValues();
+
+        return values;
+    }
 }

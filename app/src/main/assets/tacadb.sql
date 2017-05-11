@@ -5,10 +5,13 @@ CREATE TABLE "Contact" (
     "imagePath" TEXT  NULL ,
     "messageType" INTEGER  NULL ,
     "language" INTEGER  NULL ,
-    "roomSettingsId" INTEGER  NULL ,
+    "currentRoomId" INTEGER  NULL ,
+    "responsibleTutorId" INTEGER  NULL ,
     "userId" INTEGER  NOT NULL ,
     "type" INTEGER  NOT NULL ,
-    FOREIGN KEY ("userId") REFERENCES "User"("id")
+    FOREIGN KEY ("userId") REFERENCES "User"("id"),
+    FOREIGN KEY ("responsibleTutorId") REFERENCES "Contact" ("id"),
+    FOREIGN KEY ("currentRoomId") REFERENCES "Room"("id")
 );
 --NST
 CREATE TABLE "ContactList" (

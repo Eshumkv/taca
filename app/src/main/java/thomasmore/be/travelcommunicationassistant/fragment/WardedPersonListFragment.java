@@ -32,11 +32,14 @@ import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
 
 public class WardedPersonListFragment extends BasePagingFragment<Contact> {
+
+    public static final int REQUEST_ADD_CONTACT = 1;
 
     public WardedPersonListFragment() {
         // Empty constructor required for fragment subclasses
@@ -60,10 +63,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         tempList.add(new Contact("Zoey", "+7225352256", false));
         tempList.add(new Contact("Alice", "+7225352256", false));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
+        tempList.add(new Contact("Dmitry", "+799995545", false));
 
         setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
             @Override
@@ -89,7 +89,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Contact());
+                goToEditContactScreen(new Contact());
             }
         });
 
@@ -177,12 +177,10 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Contact contact = data.getParcelableExtra(Contact.class.getName());
+        if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
+            Contact contact = data.getParcelableExtra(Contact.class.getName());
 
-                Log.i("Info", contact.getType().name());
-            }
+            Log.i("Info", contact.getType().name());
         }
     }
 
@@ -213,6 +211,20 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
 
         startActivity(intent);
         getActivity().finish();
+    }
+
+    private void goToEditContactScreen(Contact contact) {
+        deselectPrevious(getView());
+        toggleContext();
+
+        String className = Contact.class.getName();
+
+        contact.setType(ContactType.Warded);
+
+        Intent intent = Helper.getBackActivityIntent(getActivity());
+        intent.putExtra(BasicEditFragment.CLASSNAME, className);
+        intent.putExtra(className, contact);
+        startActivityForResult(intent, REQUEST_ADD_CONTACT);
     }
 
     @Override

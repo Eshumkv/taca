@@ -21,18 +21,7 @@ import thomasmore.be.travelcommunicationassistant.model.User;
 public class Database extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tacadb";
-    private static final int DATABASE_VERSION = 10;
-
-    public static final String CONTACT = "Contact";
-    public static final String CONTACTLIST = "ContactList";
-    public static final String PICTOGRAM = "Pictogram";
-    public static final String CATEGORY = "Category";
-    public static final String MAJORCATEGORY = "MajorCategory";
-    public static final String WARDEDPICTOGRAM = "WardedPictogram";
-    public static final String QUICKMESSAGE = "QuickMessage";
-    public static final String QUICKMESSAGEMESSAGE = "QMMessage";
-    public static final String MESSAGE = "Message";
-    public static final String CONVERSATION = "Conversation";
+    private static final int DATABASE_VERSION = 11;
 
     private static Database instance;
 

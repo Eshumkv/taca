@@ -25,7 +25,7 @@ public abstract class MyBaseAdapter<T> extends BaseAdapter {
 
     public MyBaseAdapter(Context ctx, List<T> values) {
         this.values = new ArrayList<>(values);
-        this.context = ctx;
+        this.context = ctx.getApplicationContext();
     }
 
     /**

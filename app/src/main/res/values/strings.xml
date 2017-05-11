@@ -10,6 +10,7 @@
 
     <string name="reply">Reply</string>
     <string name="add">Add</string>
+    <string name="me">Me</string>
 
     <string name="activity_main_role">Role</string>
     <string name="activity_main_role_tutor">Tutor</string>
@@ -28,6 +29,7 @@
     <string name="nav_category">Categories</string>
     <string name="nav_warded">Warded Persons</string>
     <string name="nav_contacts">Contacts</string>
+    <string name="nav_contact_search">Contact Search</string>
     <string name="nav_contacts_single">Contact</string>
     <string name="nav_personal">Personal Info</string>
     <string name="nav_drawer_open">Open</string>

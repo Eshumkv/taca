@@ -68,7 +68,7 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
         List<QuickMessage> tempList = new ArrayList<>();
         tempList.addAll(Arrays.asList(
                 new QuickMessage(picts),
-                new QuickMessage(picts)
+                new QuickMessage(picts),
         ));
 
         setupContextMenu(rootView);
@@ -97,9 +97,7 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                QuickMessage qm = new QuickMessage();
-                qm.setMessage(new ArrayList<Pictogram>());
-                goToEditScreen(qm);
+                goToEditScreen(new QuickMessage());
             }
         });
 

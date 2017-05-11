@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
@@ -41,6 +42,9 @@ import static android.app.Activity.RESULT_OK;
 public class ContactListFragment extends BasePagingFragment<Contact> {
 
     public final static String EXTRA_CONTACTS_FOR = "ContactsForASpecificPerson";
+
+    private final static int REQUEST_SEARCH = 1;
+    private final static int REQUEST_EDIT = 2;
 
     int tutorColor;
 
@@ -95,14 +99,6 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         tempList.add(new Contact("Alice", "+7225352256", false));
         tempList.add(new Contact("Dilbert", "+7225352256", true));
         tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
 
         setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
             @Override
@@ -140,7 +136,16 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Contact());
+                if (isContactsForPerson) {
+                    deselectPrevious(getView());
+                    toggleContext();
+
+                    Intent intent = new Intent(getActivity(), BackActivity.class);
+                    intent.putExtra(BackActivity.DATA_STRING, ContactSearchFragment.class);
+                    startActivityForResult(intent, REQUEST_SEARCH);
+                } else {
+                    goToEditScreen(new Contact());
+                }
             }
         });
 
@@ -255,11 +260,17 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
             Contact contact = data.getParcelableExtra(Contact.class.getName());
 
             Log.i("Info", contact.getType().name());
             // TODO: Save the contact
+        } else if (requestCode == REQUEST_SEARCH && resultCode == RESULT_OK) {
+            Bundle extra = data.getBundleExtra("extra");
+            List<Contact> contacts = extra.getParcelableArrayList(Contact.class.getName());
+
+            Log.i("Info", contacts.size() + "");
+            // TODO: Save the contacts
         }
     }
 
@@ -291,7 +302,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, contact);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 
     /****

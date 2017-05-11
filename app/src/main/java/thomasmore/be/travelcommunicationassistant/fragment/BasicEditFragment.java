@@ -329,7 +329,7 @@ public class BasicEditFragment extends BaseFragment {
 
         //imageView.setImageBitmap(Helper.getImage(getActivity(), path));
 
-        Uri uri = Uri.parse(path);
+        Uri uri = Uri.parse(path == null ? "" : path);
         imageView.setImageURI(uri);
 
         Drawable bm = imageView.getDrawable();
@@ -583,6 +583,7 @@ public class BasicEditFragment extends BaseFragment {
 
     private String getPathFromImage() {
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.image);
-        return imageView.getTag().toString();
+        String path = (String)imageView.getTag();
+        return path == null ? "" : path;
     }
 }

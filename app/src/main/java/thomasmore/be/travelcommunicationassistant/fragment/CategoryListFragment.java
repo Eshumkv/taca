@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +24,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.List;
 
+import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
@@ -32,9 +35,14 @@ import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
+import static android.app.Activity.RESULT_OK;
+
 public class CategoryListFragment extends BaseFragment {
+
+    private final static int REQUEST_ADDPICTOGRAM = 1;
 
     private boolean isSearch = false;
     private boolean isSearchCat = false;
@@ -165,7 +173,11 @@ public class CategoryListFragment extends BaseFragment {
             addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Helper.toast(getActivity(), "I hear ya");
+                Intent intent = new Intent(getActivity(), BackActivity.class);
+                intent.putExtra(BackActivity.DATA_STRING, MajorCategoryListFragment.class);
+                intent.putExtra(Helper.EXTRA_SEARCH_INTENT, Pictogram.class);
+                intent.putExtra(Helper.EXTRA_MULTIPLE, true);
+                startActivityForResult(intent, REQUEST_ADDPICTOGRAM);
                 }
             });
         }
@@ -213,6 +225,18 @@ public class CategoryListFragment extends BaseFragment {
     public boolean onBackPressed() {
         goBack();
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_ADDPICTOGRAM && resultCode == RESULT_OK) {
+            Bundle extra = data.getBundleExtra("extra");
+            List<Pictogram> pictograms = extra.getParcelableArrayList(Pictogram.class.getName());
+
+            Log.i("INFO", pictograms.size() + "");
+            Helper.toast(getActivity(), R.string.toast_saved);
+        }
     }
 
     private void goBack() {
