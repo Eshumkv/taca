@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,6 +71,8 @@ public class BasicEditFragment extends BaseFragment {
 
     private boolean isIt = false;
 
+    private EditText lastAddedEditText;
+
     public BasicEditFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -88,6 +91,10 @@ public class BasicEditFragment extends BaseFragment {
         final EditText text = (EditText) rootView.findViewById(R.id.text);
         text.requestFocus();
         text.clearFocus();
+
+        // Set the last edittext as the done button.
+        lastAddedEditText.setSingleLine();
+        lastAddedEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         return rootView;
     }
@@ -282,6 +289,7 @@ public class BasicEditFragment extends BaseFragment {
         }
 
         dynamicViews.put(label, v);
+        lastAddedEditText = editText;
 
         return v;
     }
@@ -339,11 +347,7 @@ public class BasicEditFragment extends BaseFragment {
 
         imageView.setTag(path);
 
-        RelativeLayout contextMenu = (RelativeLayout) root.findViewById(R.id.context_menu);
-        contextMenu.setVisibility(View.VISIBLE);
-
-        Button changeButton = (Button) contextMenu.findViewById(R.id.c_menu_change);
-        changeButton.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener changeImage = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Has a camera? Ask what to do.
@@ -367,7 +371,14 @@ public class BasicEditFragment extends BaseFragment {
                     goToGallery();
                 }
             }
-        });
+        };
+
+        RelativeLayout contextMenu = (RelativeLayout) root.findViewById(R.id.context_menu);
+        contextMenu.setVisibility(View.VISIBLE);
+
+        Button changeButton = (Button) contextMenu.findViewById(R.id.c_menu_change);
+        changeButton.setOnClickListener(changeImage);
+        imageView.setOnClickListener(changeImage);
 
         dynamicViews.put(label, v);
 

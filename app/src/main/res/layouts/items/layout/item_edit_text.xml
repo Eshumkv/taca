@@ -25,6 +25,8 @@
         android:layout_height="wrap_content"
         android:text="EDIT YOUR TEXT"
         android:textColor="@color/textColor"
+        android:inputType="text"
+        android:imeOptions="actionNext"
         android:layout_weight="1"
         android:nextFocusUp="@id/text"
         android:nextFocusLeft="@id/text" />
