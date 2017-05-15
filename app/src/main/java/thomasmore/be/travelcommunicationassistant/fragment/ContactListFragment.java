@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.BackActivity;
+import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
@@ -231,7 +232,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         switch(item.getItemId()) {
             case android.R.id.home:
                 if (isContactsForPerson) {
-                    getActivity().finish();
+                    onBackPressed();
                     return true;
                 }
                 return false;
@@ -276,7 +277,14 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
 
     @Override
     public boolean onBackPressed() {
-        getActivity().finish();
+        Activity activity = getActivity();
+
+        if (activity instanceof NavigationDrawerActivity) {
+            Helper.changeFragment(activity, new HomeFragment(), false);
+        } else {
+            getActivity().finish();
+        }
+
         return true;
     }
 
