@@ -89,7 +89,9 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditContactScreen(new Contact());
+                Contact contact = new Contact();
+                contact.setType(ContactType.Warded);
+                goToEditContactScreen(contact);
             }
         });
 
@@ -224,6 +226,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, contact);
+        intent.putExtra(BasicEditFragment.EXTRA_IS_ADD_WARDED_PERSON, true);
         startActivityForResult(intent, REQUEST_ADD_CONTACT);
     }
 

@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import thomasmore.be.travelcommunicationassistant.adapter.NavigationAdapter;
 import thomasmore.be.travelcommunicationassistant.fragment.BasicEditFragment;
+import thomasmore.be.travelcommunicationassistant.fragment.ContactListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.MajorCategoryListFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.RoomsAvailableFragment;
 import thomasmore.be.travelcommunicationassistant.fragment.BaseFragment;

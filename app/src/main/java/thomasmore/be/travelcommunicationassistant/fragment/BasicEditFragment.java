@@ -58,6 +58,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class BasicEditFragment extends BaseFragment {
 
+    public final static String EXTRA_IS_ADD_WARDED_PERSON = "WeNeedToAddAWardedPerson,Please";
+
     public final static String CLASSNAME = "ClassNameForBasicEdit";
 
     private final static int REQUEST_GALLERY = 1;
@@ -70,6 +72,7 @@ public class BasicEditFragment extends BaseFragment {
     private HashMap<String, View> dynamicViews = new HashMap<>();
 
     private boolean isIt = false;
+    private boolean isAddWarded = false;
 
     private EditText lastAddedEditText;
 
@@ -187,6 +190,7 @@ public class BasicEditFragment extends BaseFragment {
             Contact contact = bundle.getParcelable(classname);
 
             isIt = bundle.containsKey(Helper.EXTRA_DATA);
+            isAddWarded = bundle.containsKey(EXTRA_IS_ADD_WARDED_PERSON);
 
             layout.addView(getHidden("Id", contact.getId()));
             layout.addView(getImage("Image", contact.getImagePath(), inflater, layout, root));
@@ -212,7 +216,11 @@ public class BasicEditFragment extends BaseFragment {
                     contact.setType(ContactType.Warded);
                 }
 
-                layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
+                // If we add a warded person, don't ask to set the role.
+                // The role is clearly a warded person.
+                if (!isAddWarded) {
+                    layout.addView(getSpinner("Role", contact.getType(), inflater, layout));
+                }
             }
 
             if (isIt) {
@@ -531,7 +539,11 @@ public class BasicEditFragment extends BaseFragment {
             contact.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
             contact.setMessageType(MessageType.valueOf(getStringFromSpinner("Type of message")));
         } else {
-            contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
+            if (isAddWarded) {
+                contact.setType(ContactType.Warded);
+            } else {
+                contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
+            }
         }
 
         return contact;

@@ -92,7 +92,8 @@ public class BackActivity
 
         if (cls.equals(BasicEditFragment.class)) {
             String classname = bundle.getString(BasicEditFragment.CLASSNAME);
-            Bundle newBundle = getBundleForBasicEdit(classname, bundle);
+            Bundle newBundle = bundle;
+            newBundle.putAll(getBundleForBasicEdit(classname, bundle));
 
             if (bundle.containsKey(Helper.EXTRA_DATA)) {
                 newBundle.putBoolean(Helper.EXTRA_DATA, bundle.getBoolean(Helper.EXTRA_DATA));
