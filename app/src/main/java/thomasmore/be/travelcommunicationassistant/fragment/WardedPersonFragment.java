@@ -2,29 +2,21 @@ package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import thomasmore.be.travelcommunicationassistant.BackActivity;
-import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
-import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
-import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -64,13 +56,13 @@ public class WardedPersonFragment extends BaseFragment {
         name.setText(contact.getName());
         image.setImageBitmap(Helper.getImage(getActivity(), contact.getImagePath()));
 
-        Button pictogramButton = (Button) rootView.findViewById(R.id.pictogram);
-        Button roomButton = (Button) rootView.findViewById(R.id.room);
-        Button contactButton = (Button) rootView.findViewById(R.id.contacts);
-        Button qmessageButton = (Button) rootView.findViewById(R.id.quickmessages);
-        Button infoButton = (Button) rootView.findViewById(R.id.info);
+        final LinearLayout pictogramButton = (LinearLayout) rootView.findViewById(R.id.pictogram);
+        final LinearLayout roomButton = (LinearLayout) rootView.findViewById(R.id.room);
+        final LinearLayout contactsButton = (LinearLayout) rootView.findViewById(R.id.contacts);
+        final LinearLayout qmessageButton = (LinearLayout) rootView.findViewById(R.id.qmessage);
+        final LinearLayout infoButton = (LinearLayout) rootView.findViewById(R.id.info);
 
-        pictogramButton.setOnClickListener(new View.OnClickListener() {
+        setDetailsOfButton(pictogramButton, R.string.warded_person_pictogram, R.drawable.ic_stars_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -82,7 +74,7 @@ public class WardedPersonFragment extends BaseFragment {
             }
         });
 
-        roomButton.setOnClickListener(new View.OnClickListener() {
+        setDetailsOfButton(roomButton, R.string.warded_person_room, R.drawable.ic_group_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -93,7 +85,7 @@ public class WardedPersonFragment extends BaseFragment {
             }
         });
 
-        contactButton.setOnClickListener(new View.OnClickListener() {
+        setDetailsOfButton(contactsButton, R.string.warded_person_contacts, R.drawable.ic_contacts_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -104,7 +96,7 @@ public class WardedPersonFragment extends BaseFragment {
             }
         });
 
-        qmessageButton.setOnClickListener(new View.OnClickListener() {
+        setDetailsOfButton(qmessageButton, R.string.warded_person_qmessage, R.drawable.ic_textsms_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -115,7 +107,7 @@ public class WardedPersonFragment extends BaseFragment {
             }
         });
 
-        infoButton.setOnClickListener(new View.OnClickListener() {
+        setDetailsOfButton(infoButton, R.string.warded_person_info, R.drawable.ic_info_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String className = Contact.class.getName();
@@ -169,5 +161,20 @@ public class WardedPersonFragment extends BaseFragment {
         intent.putExtra(BackActivity.DATA_STRING, WardedPersonListFragment.class);
         startActivity(intent);
         getActivity().finish();
+    }
+
+    private void setDetailsOfButton(View v, int text, int image, View.OnClickListener cl) {
+        final TextView textView = (TextView) v.findViewById(R.id.text);
+        final ImageView imageView = (ImageView) v.findViewById(R.id.image);
+
+        int width = Helper.dp(getActivity(), 95);
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        v.setOnClickListener(cl);
+        v.setLayoutParams(new LinearLayout.LayoutParams(width, height));
+
+        textView.setText(text);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
+        imageView.setImageResource(image);
     }
 }

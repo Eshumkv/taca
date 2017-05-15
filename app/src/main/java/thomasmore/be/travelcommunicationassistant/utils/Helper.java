@@ -352,4 +352,9 @@ public class Helper {
     public static boolean getParcelableBool(byte b) {
         return b != 0;
     }
+
+    public static int dp(Context ctx, int dp) {
+        final float scale = ctx.getApplicationContext().getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
 }

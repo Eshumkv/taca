@@ -101,7 +101,7 @@
     <string name="warded_person_room">Room settings</string>
     <string name="warded_person_contacts">Contact list</string>
     <string name="warded_person_qmessage">Quick messages</string>
-    <string name="warded_person_info">Edit personal information</string>
+    <string name="warded_person_info">Warded info</string>
 
     <string name="toast_room_settings_saved">Room settings saved</string>
     <string name="toast_warded_info_saved">Information saved</string>
