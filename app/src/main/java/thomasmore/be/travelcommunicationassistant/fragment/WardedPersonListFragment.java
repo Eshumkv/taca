@@ -91,7 +91,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
             public void onClick(View v) {
                 Contact contact = new Contact();
                 contact.setType(ContactType.Warded);
-                goToEditContactScreen(contact);
+                goToEditContactScreen(contact, true);
             }
         });
 
@@ -215,7 +215,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         getActivity().finish();
     }
 
-    private void goToEditContactScreen(Contact contact) {
+    private void goToEditContactScreen(Contact contact, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
 
@@ -227,6 +227,11 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, contact);
         intent.putExtra(BasicEditFragment.EXTRA_IS_ADD_WARDED_PERSON, true);
+
+        if (isnew) {
+            intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
+        }
+
         startActivityForResult(intent, REQUEST_ADD_CONTACT);
     }
 

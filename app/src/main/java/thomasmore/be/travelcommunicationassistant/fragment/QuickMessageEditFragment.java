@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +51,8 @@ public class QuickMessageEditFragment extends BaseFragment {
     private Button backspaceButton;
     private LinearLayout list;
 
+    private ArrayList<View> viewList;
+
     private LayoutInflater inflater;
 
     public QuickMessageEditFragment() {
@@ -65,6 +68,7 @@ public class QuickMessageEditFragment extends BaseFragment {
         Bundle bundle = getArguments();
         qmessage = bundle.getParcelable(QuickMessage.class.getName());
         selectedPositions = new ArrayList<>(qmessage.getMessage().size());
+        viewList = new ArrayList<>();
         list = (LinearLayout) rootView.findViewById(R.id.list);
 
         addButton = (Button) rootView.findViewById(R.id.c_add);
@@ -72,6 +76,15 @@ public class QuickMessageEditFragment extends BaseFragment {
         backspaceButton = (Button) rootView.findViewById(R.id.c_delete);
 
         selectedColor = ContextCompat.getColor(getActivity(), R.color.cardSelected);
+
+        Helper.setTitle(getActivity(), R.string.quick_message_edit_title);
+
+        View empty = rootView.findViewById(R.id.empty_text);
+        if (qmessage.getMessage().size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+        }
 
         for (int i = 0; i < qmessage.getMessage().size(); i++) {
             Pictogram p = qmessage.getMessage().get(i);
@@ -106,6 +119,14 @@ public class QuickMessageEditFragment extends BaseFragment {
                 }
 
                 selectedPositions.clear();
+
+                // Go through the items, and reset the positions
+                for (int i = 0; i < viewList.size(); i++) {
+                    View view = viewList.get(i);
+                    SelectedItem item = (SelectedItem) view.getTag();
+                    item.pos = i;
+                }
+
                 toggleContext();
             }
         });
@@ -151,7 +172,6 @@ public class QuickMessageEditFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("INFO", "Here I am!");
         if (requestCode == REQUEST_NEW_PICTOGRAM && resultCode == RESULT_OK) {
             Pictogram pictogram = data.getParcelableExtra(Pictogram.class.getName());
             addPictogram(pictogram);
@@ -184,6 +204,8 @@ public class QuickMessageEditFragment extends BaseFragment {
             }
         });
 
+        viewList.add(v);
+
         return v;
     }
 
@@ -203,11 +225,39 @@ public class QuickMessageEditFragment extends BaseFragment {
         int position = qmessage.getMessage().size();
         qmessage.getMessage().add(p);
         list.addView(getPictogramLayout(p, position));
+
+        View empty = getActivity().findViewById(R.id.empty_text);
+        if (qmessage.getMessage().size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+        }
     }
 
     private void removePictogram(int position) {
         qmessage.getMessage().remove(position);
         list.removeViewAt(position);
+
+        int index = -1;
+        for (int i = 0; i < viewList.size(); i++) {
+            View v = viewList.get(i);
+            SelectedItem item = (SelectedItem) v.getTag();
+            if (item.pos == position) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            viewList.remove(index);
+        }
+
+        View empty = getActivity().findViewById(R.id.empty_text);
+        if (qmessage.getMessage().size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+        }
     }
 
     private class SelectedItem {

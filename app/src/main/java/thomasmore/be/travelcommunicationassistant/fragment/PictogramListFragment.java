@@ -161,6 +161,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
             @Override
             public void onClick(View v) {
                 BaseFragment fragment = new MajorCategoryListFragment();
+                bundle.putSerializable(Helper.EXTRA_SEARCH_INTENT, Pictogram.class);
                 fragment.setArguments(bundle);
                 Helper.changeFragment(getActivity(), fragment, false);
             }
@@ -249,8 +250,10 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (isPictogramSettingsList || selectMultiple) {
+        if (isPictogramSettingsList) {
             inflater.inflate(R.menu.menu_simple_save, menu);
+        } else if (selectMultiple) {
+            inflater.inflate(R.menu.menu_simple_add, menu);
         } else {
             inflater.inflate(R.menu.menu_simple_search, menu);
 

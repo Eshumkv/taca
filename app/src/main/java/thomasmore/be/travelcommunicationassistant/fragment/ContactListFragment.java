@@ -145,7 +145,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                     intent.putExtra(BackActivity.DATA_STRING, ContactSearchFragment.class);
                     startActivityForResult(intent, REQUEST_SEARCH);
                 } else {
-                    goToEditScreen(new Contact());
+                    goToEditScreen(new Contact(), true);
                 }
             }
         });
@@ -155,7 +155,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
             public void onClick(View v) {
                 if (selectedPosition == -1) return;
                 Contact contact = (Contact)list.getAdapter().getItem(selectedPosition);
-                goToEditScreen(contact);
+                goToEditScreen(contact, false);
             }
         });
 
@@ -301,7 +301,7 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         toggleContext();
     }
 
-    private void goToEditScreen(Contact contact) {
+    private void goToEditScreen(Contact contact, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
 
@@ -310,6 +310,11 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, contact);
+
+        if (isnew) {
+            intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
+        }
+
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

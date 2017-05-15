@@ -119,7 +119,7 @@ public class RoomsSearchFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_simple_save, menu);
+        inflater.inflate(R.menu.menu_simple_add, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
     }

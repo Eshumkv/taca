@@ -68,4 +68,14 @@
         android:layout_below="@id/context_menu">
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/context_menu"
+        android:text="@string/empty_qmessage"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone" />
+
 </RelativeLayout>

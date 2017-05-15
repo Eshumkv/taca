@@ -123,7 +123,7 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Category());
+                goToEditScreen(new Category(), true);
             }
         });
 
@@ -132,7 +132,7 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
             public void onClick(View v) {
                 if (selectedPosition == -1) return;
                 Category category = (Category)list.getAdapter().getItem(selectedPosition);
-                goToEditScreen(category);
+                goToEditScreen(category, false);
             }
         });
 
@@ -232,7 +232,7 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
         return (ListView) getActivity().findViewById(R.id.list);
     }
 
-    private void goToEditScreen(Category category) {
+    private void goToEditScreen(Category category, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
 
@@ -244,6 +244,11 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, category);
+
+        if (isnew) {
+            intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
+        }
+
         startActivityForResult(intent, 1);
     }
 }

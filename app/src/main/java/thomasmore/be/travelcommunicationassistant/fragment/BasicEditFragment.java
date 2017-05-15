@@ -59,6 +59,7 @@ import static android.app.Activity.RESULT_OK;
 public class BasicEditFragment extends BaseFragment {
 
     public final static String EXTRA_IS_ADD_WARDED_PERSON = "WeNeedToAddAWardedPerson,Please";
+    public final static String EXTRA_ADD_INSTEAD_OF_SAVE = "NoNeedForSaveWeAdd";
 
     public final static String CLASSNAME = "ClassNameForBasicEdit";
 
@@ -73,6 +74,7 @@ public class BasicEditFragment extends BaseFragment {
 
     private boolean isIt = false;
     private boolean isAddWarded = false;
+    private boolean addButtonInsteadOfSave = false;
 
     private EditText lastAddedEditText;
 
@@ -86,6 +88,9 @@ public class BasicEditFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_basic_edit, container, false);
 
         Bundle bundle = getArguments();
+
+        addButtonInsteadOfSave = bundle.containsKey(EXTRA_ADD_INSTEAD_OF_SAVE);
+
         classname = bundle.getString(CLASSNAME);
         setupLayout(bundle, rootView, inflater);
 
@@ -104,7 +109,11 @@ public class BasicEditFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_simple_save, menu);
+        if (addButtonInsteadOfSave) {
+            inflater.inflate(R.menu.menu_simple_add, menu);
+        } else {
+            inflater.inflate(R.menu.menu_simple_save, menu);
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }

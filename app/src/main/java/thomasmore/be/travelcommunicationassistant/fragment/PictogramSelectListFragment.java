@@ -142,7 +142,7 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Pictogram());
+                goToEditScreen(new Pictogram(), true);
             }
         });
 
@@ -151,7 +151,7 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
             public void onClick(View v) {
                 if (selectedPosition == -1) return;
                 Pictogram pictogram = (Pictogram)list.getAdapter().getItem(selectedPosition);
-                goToEditScreen(pictogram);
+                goToEditScreen(pictogram, false);
             }
         });
 
@@ -244,7 +244,7 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         return (ListView) getActivity().findViewById(R.id.list);
     }
 
-    private void goToEditScreen(Pictogram pictogram) {
+    private void goToEditScreen(Pictogram pictogram, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
 
@@ -256,6 +256,11 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, pictogram);
+
+        if (isnew) {
+            intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
+        }
+
         startActivityForResult(intent, 1);
     }
 }

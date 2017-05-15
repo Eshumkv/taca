@@ -93,7 +93,7 @@ public class RoomsCreatedFragment extends BaseFragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditScreen(new Room());
+                goToEditScreen(new Room(), true);
             }
         });
 
@@ -102,7 +102,7 @@ public class RoomsCreatedFragment extends BaseFragment {
             public void onClick(View v) {
                 if (selectedPosition == -1) return;
                 Room room = (Room)list.getAdapter().getItem(selectedPosition);
-                goToEditScreen(room);
+                goToEditScreen(room, false);
             }
         });
 
@@ -238,7 +238,7 @@ public class RoomsCreatedFragment extends BaseFragment {
         }
     }
 
-    private void goToEditScreen(Room room) {
+    private void goToEditScreen(Room room, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
 
@@ -247,6 +247,11 @@ public class RoomsCreatedFragment extends BaseFragment {
         Intent intent = Helper.getBackActivityIntent(getActivity());
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, room);
+
+        if (isnew) {
+            intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
+        }
+
         startActivityForResult(intent, REQUEST_EDIT);
     }
 }

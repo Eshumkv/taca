@@ -174,7 +174,7 @@ public class MajorCategoryListFragment extends BaseFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (isPictogramSettingsList) {
-            inflater.inflate(R.menu.menu_simple_back, menu);
+            inflater.inflate(R.menu.menu_simple_save, menu);
         } else {
             inflater.inflate(R.menu.menu_simple_search, menu);
 
@@ -201,6 +201,9 @@ public class MajorCategoryListFragment extends BaseFragment {
                 Bundle bundle = new Bundle();
                 bundle.putString(MyApp.SEARCH_TERM, MyApp.SEARCH_PICTOGRAM);
                 app.setSearch_extra(bundle);
+                return true;
+            case R.id.action_save:
+                getActivity().finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

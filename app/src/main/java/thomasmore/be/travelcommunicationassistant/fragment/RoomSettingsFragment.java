@@ -86,9 +86,7 @@ public class RoomSettingsFragment extends BaseFragment {
         currentRoomSpinner.setSelection(0);
 
         // --------- Responsible tutor
-        tutorLabel.setText(R.string.responsible_tutor);
-        tutorEdit.setText(contact.getResponsibleTutor().getName());
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -96,7 +94,12 @@ public class RoomSettingsFragment extends BaseFragment {
                 intent.putExtra(Helper.EXTRA_SEARCH_INTENT, Contact.class);
                 startActivityForResult(intent, REQUEST_SEARCHBUTTON);
             }
-        });
+        };
+
+        tutorLabel.setText(R.string.responsible_tutor);
+        tutorEdit.setText(contact.getResponsibleTutor().getName());
+        tutorEdit.setOnClickListener(clickListener);
+        searchButton.setOnClickListener(clickListener);
 
         return rootView;
     }
