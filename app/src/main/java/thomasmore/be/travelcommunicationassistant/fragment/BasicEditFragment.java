@@ -458,15 +458,7 @@ public class BasicEditFragment extends BaseFragment {
         EditText editText = (EditText) v.findViewById(R.id.text);
         String defaultText = "";
 
-        try {
-            defaultText = (String) type.getMethod(methodName).invoke(value);
-        } catch (Exception e) {}
-
-        labelText.setText(getResourceIdForLabel(label));
-        editText.setText(defaultText);
-
-        ImageButton searchButton = (ImageButton) v.findViewById(R.id.search);
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener searchAction = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
@@ -474,7 +466,18 @@ public class BasicEditFragment extends BaseFragment {
                 intent.putExtra(Helper.EXTRA_SEARCH_INTENT, type);
                 startActivityForResult(intent, REQUEST_SEARCHBUTTON);
             }
-        });
+        };
+
+        try {
+            defaultText = (String) type.getMethod(methodName).invoke(value);
+        } catch (Exception e) {}
+
+        labelText.setText(getResourceIdForLabel(label));
+        editText.setText(defaultText);
+        editText.setOnClickListener(searchAction);
+
+        ImageButton searchButton = (ImageButton) v.findViewById(R.id.search);
+        searchButton.setOnClickListener(searchAction);
 
         v.setTag(value);
 
