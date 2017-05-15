@@ -237,6 +237,7 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getHidden("Id", category.getId()));
             layout.addView(getImage("Image", category.getImagePath(), inflater, layout, root));
             layout.addView(getEditText("Name", category.getName(), inflater, layout));
+            layout.addView(getEditText("Description", category.getDescription(), inflater, layout));
             layout.addView(getSearchOption(
                     "Major Category",
                     category.getMajorCategory(),
@@ -244,7 +245,6 @@ public class BasicEditFragment extends BaseFragment {
                     "getName",
                     MajorCategoryListFragment.class,
                     inflater, layout));
-            layout.addView(getEditText("Description", category.getDescription(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_category);
         } else if (classname.equals(Pictogram.class.getName())) {
@@ -253,6 +253,7 @@ public class BasicEditFragment extends BaseFragment {
             layout.addView(getHidden("Id", pictogram.getId()));
             layout.addView(getImage("Image", pictogram.getImagePath(), inflater, layout, root));
             layout.addView(getEditText("Name", pictogram.getName(), inflater, layout));
+            layout.addView(getEditText("Description", pictogram.getDescription(), inflater, layout));
             layout.addView(getSearchOption(
                     "Category",
                     pictogram.getCategory(),
@@ -260,7 +261,6 @@ public class BasicEditFragment extends BaseFragment {
                     "getFullName",
                     MajorCategoryListFragment.class,
                     inflater, layout));
-            layout.addView(getEditText("Description", pictogram.getDescription(), inflater, layout));
 
             Helper.setTitle(getActivity(), R.string.nav_pictogram);
         }
