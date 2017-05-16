@@ -1,6 +1,8 @@
 package thomasmore.be.travelcommunicationassistant.fragment;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import thomasmore.be.travelcommunicationassistant.BackActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -30,6 +33,8 @@ public class WardedPersonFragment extends BaseFragment {
     private final static int REQUEST_QUICKMESSAGE = 4;
     private final static int REQUEST_PICTOGRAMSETTINGS = 5;
 
+    private Contact warded;
+
     public WardedPersonFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -40,7 +45,7 @@ public class WardedPersonFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_warded_person, container, false);
 
         Bundle bundle = getArguments();
-        final Contact contact = bundle.getParcelable(Contact.class.getName());
+        warded = bundle.getParcelable(Contact.class.getName());
 
         Button listButton = (Button) rootView.findViewById(R.id.c_list);
         listButton.setOnClickListener(new View.OnClickListener() {
@@ -50,11 +55,7 @@ public class WardedPersonFragment extends BaseFragment {
             }
         });
 
-        ImageView image = (ImageView) rootView.findViewById(R.id.image);
-        TextView name = (TextView) rootView.findViewById(R.id.name);
-
-        name.setText(contact.getName());
-        image.setImageBitmap(Helper.getImage(getActivity(), contact.getImagePath()));
+        setDetails(rootView);
 
         final LinearLayout pictogramButton = (LinearLayout) rootView.findViewById(R.id.pictogram);
         final LinearLayout roomButton = (LinearLayout) rootView.findViewById(R.id.room);
@@ -69,7 +70,7 @@ public class WardedPersonFragment extends BaseFragment {
 
                 intent.putExtra(BackActivity.DATA_STRING, MajorCategoryListFragment.class);
 
-                intent.putExtra(EXTRA_PICTOGRAM_SETTINGS, contact);
+                intent.putExtra(EXTRA_PICTOGRAM_SETTINGS, warded);
                 startActivityForResult(intent, REQUEST_PICTOGRAMSETTINGS);
             }
         });
@@ -80,7 +81,7 @@ public class WardedPersonFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
 
                 intent.putExtra(BackActivity.DATA_STRING, RoomSettingsFragment.class);
-                intent.putExtra(RoomSettingsFragment.CONTACT, contact);
+                intent.putExtra(RoomSettingsFragment.CONTACT, warded);
                 startActivityForResult(intent, REQUEST_ROOMSETTINGS);
             }
         });
@@ -91,7 +92,7 @@ public class WardedPersonFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
 
                 intent.putExtra(BackActivity.DATA_STRING, ContactListFragment.class);
-                intent.putExtra(ContactListFragment.EXTRA_CONTACTS_FOR, contact);
+                intent.putExtra(ContactListFragment.EXTRA_CONTACTS_FOR, warded);
                 startActivityForResult(intent, REQUEST_CONTACTLIST);
             }
         });
@@ -102,7 +103,7 @@ public class WardedPersonFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
 
                 intent.putExtra(BackActivity.DATA_STRING, QuickMessageListFragment.class);
-                intent.putExtra(Contact.class.getName(), contact);
+                intent.putExtra(Contact.class.getName(), warded);
                 startActivityForResult(intent, REQUEST_QUICKMESSAGE);
             }
         });
@@ -110,13 +111,7 @@ public class WardedPersonFragment extends BaseFragment {
         setDetailsOfButton(infoButton, R.string.warded_person_info, R.drawable.ic_info_black_24dp, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String className = Contact.class.getName();
-
-                Intent intent = Helper.getBackActivityIntent(getActivity());
-                intent.putExtra(BasicEditFragment.CLASSNAME, className);
-                intent.putExtra(className, contact);
-                intent.putExtra(Helper.EXTRA_DATA, true);
-                startActivityForResult(intent, REQUEST_EDIT_INFO);
+                goToEditScreen();
             }
         });
 
@@ -149,8 +144,41 @@ public class WardedPersonFragment extends BaseFragment {
 
         if (requestCode == REQUEST_EDIT_INFO && resultCode == RESULT_OK) {
             Contact contact = data.getParcelableExtra(Contact.class.getName());
+            Database db = Database.getInstance(getActivity());
 
-            Helper.toast(getActivity(), R.string.toast_warded_info_saved);
+            if (Helper.isEmpty(contact.getName())) {
+                goToEditScreen();
+                Helper.toast(getActivity(), R.string.toast_error_name_empty);
+                return;
+            }
+
+            if (Helper.isEmpty(contact.getPhonenumber())) {
+                goToEditScreen();
+                Helper.toast(getActivity(), R.string.toast_error_phonenumber_empty);
+                return;
+            }
+
+            if (db.contactIsUnique(contact)) {
+                if (db.genericUpdate(Contact.class, contact)) {
+                    Helper.toast(getActivity(), R.string.toast_saved);
+                } else {
+                    long id = db.genericInsert(Contact.class, contact);
+
+                    if (id != -1) {
+                        Helper.toast(getActivity(), R.string.toast_saved);
+                    } else {
+                        Helper.toast(getActivity(), R.string.toast_not_saved);
+                    }
+                }
+            } else {
+                goToEditScreen();
+                Helper.toast(getActivity(), R.string.toast_error_contact_not_unique);
+                return;
+            }
+
+            warded = contact;
+
+            setDetails(getActivity().findViewById(android.R.id.content));
         } else if (requestCode == REQUEST_ROOMSETTINGS && resultCode == RESULT_OK) {
             Helper.toast(getActivity(), R.string.toast_room_settings_saved);
         }
@@ -176,5 +204,28 @@ public class WardedPersonFragment extends BaseFragment {
         textView.setText(text);
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
         imageView.setImageResource(image);
+    }
+
+    private void goToEditScreen() {
+        String className = Contact.class.getName();
+
+        Intent intent = Helper.getBackActivityIntent(getActivity());
+        intent.putExtra(BasicEditFragment.CLASSNAME, className);
+        intent.putExtra(className, warded);
+        intent.putExtra(Helper.EXTRA_DATA, true);
+        startActivityForResult(intent, REQUEST_EDIT_INFO);
+    }
+
+    private void setDetails(View view) {
+        ImageView image = (ImageView) view.findViewById(R.id.image);
+        TextView name = (TextView) view.findViewById(R.id.name);
+
+        name.setText(warded.getName());
+        Uri uri = Uri.parse(warded.getImagePath() == null ? "" : warded.getImagePath());
+        image.setImageURI(uri);
+
+        if (!Helper.hasImage(image)) {
+            image.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.contact));
+        }
     }
 }
