@@ -113,8 +113,10 @@
     <string name="toast_not_deleted">NOT deleted</string>
 
     <string name="toast_error_room_not_unique">Room name already exists!</string>
+    <string name="toast_error_contact_not_unique">Phonenumber already exists!</string>
     <string name="toast_error_name_empty">Name cannot be empty!</string>
     <string name="toast_error_password_empty">Password cannot be empty!</string>
+    <string name="toast_error_phonenumber_empty">Phonenumber cannot be empty!</string>
 
     <!--
         Following are arrays.

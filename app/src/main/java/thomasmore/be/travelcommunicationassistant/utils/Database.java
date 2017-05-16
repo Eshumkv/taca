@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import thomasmore.be.travelcommunicationassistant.model.BaseModel;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.MessageType;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.Settings;
 import thomasmore.be.travelcommunicationassistant.model.User;
@@ -200,6 +203,33 @@ public class Database extends SQLiteOpenHelper {
         return obj == null || obj.getId() == room.getId();
     }
 
+    public boolean contactIsUnique(Contact contact) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                contact.getTable(),                           // Table
+                contact.getColumns(),
+                where(Contact.PHONENUMBER),                               // Where
+                new String[] {
+                        contact.getPhonenumber()
+                },    // Where-params
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        Contact obj = null;
+        if (cursor.moveToFirst()) {
+            obj = contact.get(cursor);
+        }
+
+        cursor.close();
+        db.close();
+
+        return obj == null || obj.getId() == contact.getId();
+    }
+
     public <T extends BaseModel> long genericInsert(Class<T> type, T obj) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = obj.getContentValues(obj);
@@ -267,6 +297,63 @@ public class Database extends SQLiteOpenHelper {
         return get(Settings.class, 1);
     }
 
+    public Contact getContact(long id) {
+        Contact contact = get(Contact.class, id);
+        contact.setResponsibleTutor(get(Contact.class, contact.getResponsibleTutorId()));
+        contact.setUser(get(User.class, contact.getUserId()));
+        contact.setCurrentRoom(get(Room.class, contact.getCurrentRoomId()));
+
+        return contact;
+    }
+
+    public List<Contact> getContactsFor(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Contact useless = new Contact();
+
+        Cursor cursor = db.query(
+                "ContactList",                        // Table
+                new String[] {
+                        "id",
+                        "ownerId",
+                        "contactId"
+                },                      // Columns
+                where("ownerId"), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(id)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Contact> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Contact contact = get(Contact.class, cursor.getLong(2));
+                list.add(contact);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    public long addContactToContactListFor(long id, Contact contact) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("ownerId", id);
+        values.put("contactId", contact.getId());
+
+        long retid = db.insert("ContactList", null, values);
+        db.close();
+
+        return retid;
+    }
 
     /****
      *
@@ -339,6 +426,17 @@ public class Database extends SQLiteOpenHelper {
         settings.setId(1);
         settings.setUserId(users.get(0).getId());
         db.insert(settings.getTable(), null, settings.getContentValues(settings));
+
+        //================================
+        //      CONTACTS
+        //================================
+        ArrayList<Contact> contacts = getContacts(users.get(0), rooms.get(0));
+        for (Contact contact : contacts) {
+            ContentValues values = contact.getContentValues(contact);
+
+            values.remove("id");
+            db.insert(contact.getTable(), null, values);
+        }
     }
 
     private ArrayList<User> getUsers() {
@@ -349,7 +447,6 @@ public class Database extends SQLiteOpenHelper {
         u.setPassword("test");
         u.setPhonenumber("+7999856235");
         u.setLanguage(Language.English);
-        u.setImagePath("NONE");
         list.add(u);
 
         u = new User();
@@ -357,7 +454,6 @@ public class Database extends SQLiteOpenHelper {
         u.setPassword("test");
         u.setPhonenumber("+7999856235");
         u.setLanguage(Language.Russian);
-        u.setImagePath("NONE");
         list.add(u);
 
         return list;
@@ -388,6 +484,81 @@ public class Database extends SQLiteOpenHelper {
         room.setCreator("Mia");
         room.setCreaterPhonenumber("123456789");
         list.add(room);
+
+        return list;
+    }
+
+    private ArrayList<Contact> getContacts(User user, Room room) {
+        ArrayList<Contact> list = new ArrayList<>();
+
+        Contact tutor = new Contact();
+        tutor.setName("Andrey");
+        tutor.setPhonenumber("+7225352256");
+        tutor.setType(ContactType.Tutor);
+        tutor.setUser(user);
+        list.add(tutor);
+
+        Contact contact = new Contact();
+        contact.setName("Alice");
+        contact.setPhonenumber("+72258522256");
+        contact.setType(ContactType.Warded);
+        contact.setResponsibleTutor(tutor);
+        contact.setMessageType(MessageType.Pictogram);
+        contact.setCurrentRoom(room);
+        contact.setLanguage(Language.Russian);
+        contact.setUser(user);
+        list.add(contact);
+
+        contact = new Contact();
+        contact.setName("Alexander");
+        contact.setPhonenumber("+799562584");
+        contact.setType(ContactType.Warded);
+        contact.setResponsibleTutor(tutor);
+        contact.setMessageType(MessageType.Text);
+        contact.setCurrentRoom(room);
+        contact.setLanguage(Language.English);
+        contact.setUser(user);
+        list.add(contact);
+
+        contact = new Contact();
+        contact.setName("Zoey");
+        contact.setPhonenumber("+7589652365");
+        contact.setType(ContactType.Warded);
+        contact.setResponsibleTutor(tutor);
+        contact.setMessageType(MessageType.Text);
+        contact.setCurrentRoom(room);
+        contact.setLanguage(Language.Dutch);
+        contact.setUser(user);
+        list.add(contact);
+
+        tutor = new Contact();
+        tutor.setName("Svetlana");
+        tutor.setPhonenumber("+785465258");
+        tutor.setType(ContactType.Tutor);
+        tutor.setUser(user);
+        list.add(tutor);
+
+        contact = new Contact();
+        contact.setName("Vlad");
+        contact.setPhonenumber("+745213895");
+        contact.setType(ContactType.Warded);
+        contact.setResponsibleTutor(tutor);
+        contact.setMessageType(MessageType.Pictogram);
+        contact.setCurrentRoom(room);
+        contact.setLanguage(Language.Russian);
+        contact.setUser(user);
+        list.add(contact);
+
+        contact = new Contact();
+        contact.setName("John");
+        contact.setPhonenumber("+784451668");
+        contact.setType(ContactType.Warded);
+        contact.setResponsibleTutor(tutor);
+        contact.setMessageType(MessageType.Text);
+        contact.setCurrentRoom(room);
+        contact.setLanguage(Language.English);
+        contact.setUser(user);
+        list.add(contact);
 
         return list;
     }

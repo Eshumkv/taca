@@ -73,7 +73,7 @@ CREATE TABLE "User" (
     "phonenumber" TEXT  NOT NULL ,
     "password" TEXT  NOT NULL ,
     "language" INTEGER  NOT NULL ,
-    "imagePath" TEXT  NOT NULL
+    "imagePath" TEXT
 );
 --NST
 CREATE TABLE "Room" (

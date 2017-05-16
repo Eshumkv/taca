@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +37,8 @@ import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
+import thomasmore.be.travelcommunicationassistant.model.User;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -82,33 +85,17 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
             }
         }
 
+        Database db = Database.getInstance(getActivity());
+        List<Contact> tempList = null;
+
         if (isContactsForPerson) {
             Helper.setTitle(getActivity(), R.string.warded_contact_list_title, contactsFor.getName());
-            // Get the contacts for this person!!
+            tempList = db.getContactsFor(contactsFor.getId());
+        } else {
+            tempList = db.getAll(Contact.class);
         }
 
-        List<Contact> tempList = new ArrayList<>();
-        tempList.add(new Contact("Alice", "+7225352256", false));
-        tempList.add(new Contact("Bob", "+7225352256", false));
-        tempList.add(new Contact("Jan", "+7225352256", false));
-        tempList.add(new Contact("Andrey", "+7225352256", true));
-        tempList.add(new Contact("Robin", "+7225352256", false));
-        tempList.add(new Contact("Alexander", "+7225352256", false));
-        tempList.add(new Contact("Koen", "+7225352256", false));
-        tempList.add(new Contact("Ivan", "+7225352256", true));
-        tempList.add(new Contact("Zoey", "+7225352256", false));
-        tempList.add(new Contact("Alice", "+7225352256", false));
-        tempList.add(new Contact("Dilbert", "+7225352256", true));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-
-        setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
-            @Override
-            public int compare(Contact lhs, Contact rhs) {
-                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-                return lhs.getName().compareTo(rhs.getName());
-            }
-        });
-
+        setupList(tempList);
         setupPagingBar(rootView);
 
         final ListView list = (ListView) rootView.findViewById(R.id.contacts);
@@ -169,8 +156,21 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Database db = Database.getInstance(getActivity());
+                                Contact contact = (Contact) getList().getAdapter().getItem(selectedPosition);
+
+                                if (db.genericDelete(Contact.class, contact.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                setupList(db.getAll(Contact.class));
+                                setupPagingBar(getActivity().findViewById(android.R.id.content));
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -263,9 +263,51 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
 
         if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
             Contact contact = data.getParcelableExtra(Contact.class.getName());
+            Database db = Database.getInstance(getActivity());
 
-            Log.i("Info", contact.getType().name());
-            // TODO: Save the contact
+            if (Helper.isEmpty(contact.getName())) {
+                goToEditScreen(contact, false);
+                Helper.toast(getActivity(), R.string.toast_error_name_empty);
+                return;
+            }
+
+            if (Helper.isEmpty(contact.getPhonenumber())) {
+                goToEditScreen(contact, false);
+                Helper.toast(getActivity(), R.string.toast_error_phonenumber_empty);
+                return;
+            }
+
+            if (db.contactIsUnique(contact)) {
+                if (db.genericUpdate(Contact.class, contact)) {
+                    Helper.toast(getActivity(), R.string.toast_saved);
+                } else {
+                    long id = db.genericInsert(Contact.class, contact);
+
+                    if (id != -1) {
+                        if (isContactsForPerson) {
+                            long tid = db.addContactToContactListFor(contactsFor.getId(), contact);
+
+                            if (tid != -1) {
+                                Helper.toast(getActivity(), R.string.toast_saved);
+                            } else {
+                                Helper.toast(getActivity(), R.string.toast_not_saved);
+                            }
+                        } else {
+                            Helper.toast(getActivity(), R.string.toast_saved);
+                        }
+                    } else {
+                        Helper.toast(getActivity(), R.string.toast_not_saved);
+                    }
+                }
+            } else {
+                goToEditScreen(contact, false);
+                Helper.toast(getActivity(), R.string.toast_error_contact_not_unique);
+                return;
+            }
+
+            setupList(db.getAll(Contact.class));
+            setupPagingBar(getActivity().findViewById(android.R.id.content));
+            setListAdapter();
         } else if (requestCode == REQUEST_SEARCH && resultCode == RESULT_OK) {
             Bundle extra = data.getBundleExtra("extra");
             List<Contact> contacts = extra.getParcelableArrayList(Contact.class.getName());
@@ -316,6 +358,16 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         }
 
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    private void setupList(List<Contact> list) {
+        setupPagingMap(list, Contact.class, "getName", new Comparator<Contact>() {
+            @Override
+            public int compare(Contact lhs, Contact rhs) {
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                return lhs.getName().compareTo(rhs.getName());
+            }
+        });
     }
 
     /****

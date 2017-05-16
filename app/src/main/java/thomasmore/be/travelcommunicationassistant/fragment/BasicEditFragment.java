@@ -357,8 +357,7 @@ public class BasicEditFragment extends BaseFragment {
         Uri uri = Uri.parse(path == null ? "" : path);
         imageView.setImageURI(uri);
 
-        Drawable bm = imageView.getDrawable();
-        if (bm == null) {
+        if (!Helper.hasImage(imageView)) {
             imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.contact));
         }
 
@@ -544,13 +543,17 @@ public class BasicEditFragment extends BaseFragment {
         contact.setPhonenumber(getTextFromEdit("Phone number"));
         contact.setImagePath(getPathFromImage());
 
+        Database db = Database.getInstance(getActivity());
+        User user = db.getSettings().getLoggedInUser(getActivity());
+
+        contact.setUser(user);
+        contact.setType(ContactType.Warded);
+
         if (isIt) {
             contact.setLanguage(Language.valueOf(getStringFromSpinner("Language")));
             contact.setMessageType(MessageType.valueOf(getStringFromSpinner("Type of message")));
         } else {
-            if (isAddWarded) {
-                contact.setType(ContactType.Warded);
-            } else {
+            if (!isAddWarded) {
                 contact.setType(ContactType.valueOf(getStringFromSpinner("Role")));
             }
         }

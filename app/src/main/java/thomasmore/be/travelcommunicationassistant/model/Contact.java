@@ -24,8 +24,11 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
     private @Nullable MessageType messageType;
     private @Nullable Language language;
     private @Nullable Room currentRoom;
+    private @Nullable long currentRoomId;
     private @Nullable Contact responsibleTutor;
-    private @Nullable User user;
+    private @Nullable long responsibleTutorId;
+    private long userId;
+    private User user;
     private @Nullable ArrayList<Pictogram> pictogramSettings;
     private @Nullable ArrayList<Contact> contactList;
     private @Nullable ArrayList<QuickMessage> quickMessages;
@@ -115,12 +118,11 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
         this.responsibleTutor = responsibleTutor;
     }
 
-    @Nullable
     public User getUser() {
         return user;
     }
 
-    public void setUser(@Nullable User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -149,6 +151,32 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
 
     public void setQuickMessages(@Nullable ArrayList<QuickMessage> quickMessages) {
         this.quickMessages = quickMessages;
+    }
+
+    @Nullable
+    public long getCurrentRoomId() {
+        return currentRoomId;
+    }
+
+    public void setCurrentRoomId(@Nullable long currentRoomId) {
+        this.currentRoomId = currentRoomId;
+    }
+
+    @Nullable
+    public long getResponsibleTutorId() {
+        return responsibleTutorId;
+    }
+
+    public void setResponsibleTutorId(@Nullable long responsibleTutorId) {
+        this.responsibleTutorId = responsibleTutorId;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public Contact(Parcel in) {
@@ -242,11 +270,59 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
     public Contact get(Cursor cursor) {
         Contact obj = new Contact();
 
+        obj.setId(cursor.getLong(0));
+        obj.setName(cursor.getString(1));
+        obj.setPhonenumber(cursor.getString(2));
+        obj.setImagePath(cursor.getString(3));
+
+        obj.setUserId(cursor.getLong(8));
+        obj.setType(ContactType.values()[cursor.getInt(9)]);
+
+        if (obj.getType() == ContactType.Warded) {
+            obj.setMessageType(MessageType.values()[cursor.getInt(4)]);
+            obj.setLanguage(Language.values()[cursor.getInt(5)]);
+            obj.setCurrentRoomId(cursor.getLong(6));
+            obj.setResponsibleTutorId(cursor.getLong(7));
+        }
+
         return obj;
     }
 
     public ContentValues getContentValues(Contact contact) {
         ContentValues values = new ContentValues();
+
+        values.put(ID, contact.getId());
+        values.put(NAME, contact.getName());
+        values.put(PHONENUMBER, contact.getPhonenumber());
+        values.put(IMAGEPATH, contact.getImagePath());
+
+        if (contact.getType() == ContactType.Warded) {
+            if (contact.getMessageType() == null) {
+                contact.setMessageType(MessageType.Pictogram);
+            }
+
+            if (contact.getLanguage() == null) {
+                contact.setLanguage(Language.Russian);
+            }
+
+            Long roomId = null;
+            if (contact.getCurrentRoom() != null) {
+                roomId = contact.getCurrentRoom().getId();
+            }
+
+            Long tutorId = null;
+            if (contact.getResponsibleTutor() != null) {
+                tutorId = contact.getResponsibleTutor().getId();
+            }
+
+            values.put(MESSAGETYPE, contact.getMessageType().ordinal());
+            values.put(LANGUAGE, contact.getLanguage().ordinal());
+            values.put(CURRENTROOMID, roomId);
+            values.put(RESPONSIBLETUTORID, tutorId);
+        }
+
+        values.put(USERID, contact.getUser().getId());
+        values.put(TYPE, contact.getType().ordinal());
 
         return values;
     }

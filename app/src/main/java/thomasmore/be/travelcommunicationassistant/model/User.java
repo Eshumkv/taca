@@ -145,12 +145,12 @@ public class User extends BaseModel<User> implements Parcelable {
     public ContentValues getContentValues(User user) {
         ContentValues values = new ContentValues();
 
-        values.put(User.ID, user.getId());
-        values.put(User.USERNAME, user.getUsername());
-        values.put(User.PHONENUMBER, user.getPhonenumber());
-        values.put(User.PASSWORD, user.getPassword());
-        values.put(User.LANGUAGE, user.getLanguage().ordinal());
-        values.put(User.IMAGEPATH, user.getImagePath());
+        values.put(ID, user.getId());
+        values.put(USERNAME, user.getUsername());
+        values.put(PHONENUMBER, user.getPhonenumber());
+        values.put(PASSWORD, user.getPassword());
+        values.put(LANGUAGE, user.getLanguage().ordinal());
+        values.put(IMAGEPATH, user.getImagePath());
 
         return values;
     }
