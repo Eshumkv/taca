@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -157,16 +156,35 @@ public class RoomsCreatedFragment extends BaseFragment {
             room.setCreator(user.getUsername());
             room.setCreaterPhonenumber(user.getPhonenumber());
 
-            if (db.genericUpdate(Room.class, room)) {
-                Helper.toast(getActivity(), R.string.toast_saved);
-            } else {
-                long id = db.genericInsert(Room.class, room);
+            if (Helper.isEmpty(room.getName())) {
+                goToEditScreen(room, false);
+                Helper.toast(getActivity(), R.string.toast_error_name_empty);
+                return;
+            }
 
-                if (id != 0) {
+            if (Helper.isEmpty(room.getPassword())) {
+                goToEditScreen(room, false);
+                Helper.toast(getActivity(), R.string.toast_error_password_empty);
+                return;
+            }
+
+
+            if (db.roomIsUnique(room)) {
+                if (db.genericUpdate(Room.class, room)) {
                     Helper.toast(getActivity(), R.string.toast_saved);
                 } else {
-                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                    long id = db.genericInsert(Room.class, room);
+
+                    if (id != 0) {
+                        Helper.toast(getActivity(), R.string.toast_saved);
+                    } else {
+                        Helper.toast(getActivity(), R.string.toast_not_saved);
+                    }
                 }
+            } else {
+                goToEditScreen(room, false);
+                Helper.toast(getActivity(), R.string.toast_error_room_not_unique);
+                return;
             }
 
             setListAdapter();

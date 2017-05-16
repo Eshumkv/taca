@@ -8,6 +8,8 @@ import android.database.Cursor;
  */
 
 public abstract class BaseModel<T> {
+    public abstract long getId();
+
     public abstract String getTable();
 
     public abstract String[] getColumns();

@@ -76,11 +76,11 @@ public class ContactSearchFragment
         });
 
         // Empty list to start with
-        Contact[] rooms = new Contact[] {};
+        List<Contact> contacts = getFakeServerContacts();
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
         final ContactSearchAdapter contactAdapter =
-                new ContactSearchAdapter(getActivity(), Arrays.asList(rooms), R.layout.item_contact_search);
+                new ContactSearchAdapter(getActivity(), contacts, R.layout.item_contact_search);
         list.setAdapter(contactAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

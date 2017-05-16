@@ -74,12 +74,11 @@ public class RoomsSearchFragment
             }
         });
 
-        // Empty list to start with
-        Room[] rooms = new Room[] {};
+        List<Room> rooms = getFakeServerRooms();
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
         final RoomsWithCreatorAdapter roomAdapter =
-                new RoomsWithCreatorAdapter(getActivity(), Arrays.asList(rooms), R.layout.item_rooms_search);
+                new RoomsWithCreatorAdapter(getActivity(), rooms, R.layout.item_rooms_search);
         list.setAdapter(roomAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

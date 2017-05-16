@@ -167,8 +167,8 @@ public class Room extends BaseModel<Room> implements Parcelable {
         values.put(Room.ID, room.getId());
         values.put(Room.NAME, room.getName());
         values.put(Room.PASSWORD, room.getPassword());
-        values.put(Room.CREATOR_DB, room.getCreator());
         values.put(Room.USERID, room.getUserId());
+        values.put(Room.CREATOR_DB, room.getCreator());
         values.put(Room.ISAVAILABLEROOM, room.isAvailableRoom());
         values.put(Room.CREATOR_PHONE, room.getCreaterPhonenumber());
 

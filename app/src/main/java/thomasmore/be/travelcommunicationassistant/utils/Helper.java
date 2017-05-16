@@ -357,4 +357,8 @@ public class Helper {
         final float scale = ctx.getApplicationContext().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.trim().equals("");
+    }
 }

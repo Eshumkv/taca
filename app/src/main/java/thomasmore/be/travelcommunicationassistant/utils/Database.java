@@ -21,7 +21,7 @@ import thomasmore.be.travelcommunicationassistant.model.User;
 public class Database extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tacadb";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     private static Database instance;
 
@@ -172,14 +172,32 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
-    private <T> long getId(T obj) {
-        if (obj instanceof Room) {
-            return ((Room)obj).getId();
-        } else if (obj instanceof User) {
-            return ((User)obj).getId();
+    public boolean roomIsUnique(Room room) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                room.getTable(),                           // Table
+                room.getColumns(),
+                where(Room.NAME, Room.CREATOR_DB),                               // Where
+                new String[] {
+                        room.getName(),
+                        room.getCreator()
+                },    // Where-params
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        Room obj = null;
+        if (cursor.moveToFirst()) {
+            obj = room.get(cursor);
         }
 
-        throw new RuntimeException("Could not get id for given object!");
+        cursor.close();
+        db.close();
+
+        return obj == null || obj.getId() == room.getId();
     }
 
     public <T extends BaseModel> long genericInsert(Class<T> type, T obj) {
@@ -200,7 +218,7 @@ public class Database extends SQLiteOpenHelper {
                 obj.getTable(),
                 obj.getContentValues(obj),
                 "id = ?",
-                new String[] { String.valueOf(getId(obj)) }
+                new String[] { String.valueOf(obj.getId()) }
         );
         db.close();
 
@@ -303,6 +321,11 @@ public class Database extends SQLiteOpenHelper {
         //================================
         ArrayList<Room> rooms = getRooms();
         for (Room room : rooms) {
+            if (!room.isAvailableRoom()) {
+                room.setCreator(users.get(0).getUsername());
+                room.setCreaterPhonenumber(users.get(0).getPhonenumber());
+            }
+
             ContentValues values = room.getContentValues(room);
 
             values.remove("id");
