@@ -46,6 +46,7 @@ import static android.app.Activity.RESULT_OK;
 public class ContactListFragment extends BasePagingFragment<Contact> {
 
     public final static String EXTRA_CONTACTS_FOR = "ContactsForASpecificPerson";
+    public final static String EXTRA_SEARCH_SPECIFIC = "AllContactsOfASpecificType";
 
     private final static int REQUEST_SEARCH = 1;
     private final static int REQUEST_EDIT = 2;
@@ -55,6 +56,9 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     private boolean isSearch = false;
     private boolean isContactsForPerson = false;
     private Contact contactsFor;
+
+    private boolean searchSpecific = false;
+    private ContactType searchType = ContactType.Tutor;
 
     public ContactListFragment() {
         // Empty constructor required for fragment subclasses
@@ -77,6 +81,11 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                 if (Contact.class.equals(cls)) {
                     isSearch = true;
                 }
+
+                if (bundle.containsKey(EXTRA_SEARCH_SPECIFIC)) {
+                    searchSpecific = true;
+                    searchType = ContactType.values()[bundle.getInt(EXTRA_SEARCH_SPECIFIC)];
+                }
             }
 
             if (bundle.containsKey(EXTRA_CONTACTS_FOR)) {
@@ -85,18 +94,15 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
             }
         }
 
-        Database db = Database.getInstance(getActivity());
-        List<Contact> tempList = null;
-
-        if (isContactsForPerson) {
-            Helper.setTitle(getActivity(), R.string.warded_contact_list_title, contactsFor.getName());
-            tempList = db.getContactsFor(contactsFor.getId());
-        } else {
-            tempList = db.getAll(Contact.class);
-        }
-
-        setupList(tempList);
+        setupList(getCorrectList());
         setupPagingBar(rootView);
+
+        View empty = rootView.findViewById(R.id.empty_text);
+        if (pagingMap.get(currentPage).size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+        }
 
         final ListView list = (ListView) rootView.findViewById(R.id.contacts);
         list.setAdapter(new ContactsListAdapter(getActivity(), pagingMap.get(currentPage)));
@@ -159,18 +165,33 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                                 Database db = Database.getInstance(getActivity());
                                 Contact contact = (Contact) getList().getAdapter().getItem(selectedPosition);
 
-                                if (db.genericDelete(Contact.class, contact.getId())) {
-                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                if (isContactsForPerson) {
+                                    if (db.removeContactFromContactListFor(contactsFor.getId(), contact.getId())) {
+                                        Helper.toast(getActivity(), R.string.toast_deleted);
+                                    } else {
+                                        Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                    }
                                 } else {
-                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                    if (db.deleteContact(contact.getId())) {
+                                        Helper.toast(getActivity(), R.string.toast_deleted);
+                                    } else {
+                                        Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                    }
                                 }
 
                                 deselectPrevious(getView());
                                 toggleContext();
 
-                                setupList(db.getAll(Contact.class));
+                                setupList(getCorrectList());
                                 setupPagingBar(getActivity().findViewById(android.R.id.content));
                                 setListAdapter();
+
+                                View empty = getActivity().findViewById(R.id.empty_text);
+                                if (pagingMap.get(currentPage).size() == 0) {
+                                    empty.setVisibility(View.VISIBLE);
+                                } else {
+                                    empty.setVisibility(View.GONE);
+                                }
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -190,30 +211,72 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_messages, menu);
+        if (searchSpecific) {
+            inflater.inflate(R.menu.menu_simple_search, menu);
+        } else {
+            inflater.inflate(R.menu.menu_messages, menu);
 
-        MenuItem groupSpinner = menu.findItem(R.id.menu_group_spinner);
-        View view = MenuItemCompat.getActionView(groupSpinner);
+            MenuItem groupSpinner = menu.findItem(R.id.menu_group_spinner);
+            View view = MenuItemCompat.getActionView(groupSpinner);
 
-        if (view instanceof Spinner) {
-            final Spinner spinner = (Spinner) view;
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                    getActivity(),
-                    R.array.groups_array_all,
-                    android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if (view instanceof Spinner) {
+                final Spinner spinner = (Spinner) view;
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                        getActivity(),
+                        R.array.groups_array_all,
+                        android.R.layout.simple_spinner_item);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        Database db = Database.getInstance(getActivity());
+                        List<Contact> tempList = null;
 
-                }
+                        if (isContactsForPerson) {
+                            switch (position) {
+                                case 0: // Everyone
+                                    tempList = db.getContactsFor(contactsFor.getId());
+                                    break;
+                                case 1: // Tutors
+                                    tempList = db.getContactsForOfType(contactsFor.getId(), ContactType.Tutor);
+                                    break;
+                                case 2: // Warded
+                                    tempList = db.getContactsForOfType(contactsFor.getId(), ContactType.Warded);
+                                    break;
+                            }
+                        } else {
+                            switch (position) {
+                                case 0: // Everyone
+                                    tempList = db.getAll(Contact.class);
+                                    break;
+                                case 1: // Tutors
+                                    tempList = db.getContactsOfType(ContactType.Tutor);
+                                    break;
+                                case 2: // Warded
+                                    tempList = db.getContactsOfType(ContactType.Warded);
+                                    break;
+                            }
+                        }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                        setupList(tempList);
+                        setupPagingBar(getActivity().findViewById(android.R.id.content));
+                        setListAdapter();
 
-                }
-            });
+                        View empty = getActivity().findViewById(R.id.empty_text);
+                        if (pagingMap.get(currentPage).size() == 0) {
+                            empty.setVisibility(View.VISIBLE);
+                        } else {
+                            empty.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
         }
 
         // Associate searchable configuration with the SearchView
@@ -305,15 +368,43 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
                 return;
             }
 
-            setupList(db.getAll(Contact.class));
+            setupList(getCorrectList());
             setupPagingBar(getActivity().findViewById(android.R.id.content));
             setListAdapter();
+
+            View empty = getActivity().findViewById(R.id.empty_text);
+            if (pagingMap.get(currentPage).size() == 0) {
+                empty.setVisibility(View.VISIBLE);
+            } else {
+                empty.setVisibility(View.GONE);
+            }
         } else if (requestCode == REQUEST_SEARCH && resultCode == RESULT_OK) {
             Bundle extra = data.getBundleExtra("extra");
             List<Contact> contacts = extra.getParcelableArrayList(Contact.class.getName());
+            Database db = Database.getInstance(getActivity());
 
-            Log.i("Info", contacts.size() + "");
-            // TODO: Save the contacts
+            boolean success = true;
+
+            for (Contact contact : contacts) {
+                success &= (db.addContactToContactListFor(contactsFor.getId(), contact) != -1);
+            }
+
+            if (success) {
+                Helper.toast(getActivity(), R.string.toast_saved);
+            } else {
+                Helper.toast(getActivity(), R.string.toast_not_saved);
+            }
+
+            setupList(getCorrectList());
+            setupPagingBar(getActivity().findViewById(android.R.id.content));
+            setListAdapter();
+
+            View empty = getActivity().findViewById(R.id.empty_text);
+            if (pagingMap.get(currentPage).size() == 0) {
+                empty.setVisibility(View.VISIBLE);
+            } else {
+                empty.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -328,6 +419,29 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
         }
 
         return true;
+    }
+
+    private List<Contact> getCorrectList() {
+        Database db = Database.getInstance(getActivity());
+        List<Contact> tempList = null;
+
+        if (isContactsForPerson) {
+            Helper.setTitle(getActivity(), R.string.warded_contact_list_title, contactsFor.getName());
+
+            if (searchSpecific) {
+                tempList = db.getContactsForOfType(contactsFor.getId(), searchType);
+            } else {
+                tempList = db.getContactsFor(contactsFor.getId());
+            }
+        } else {
+            if (searchSpecific) {
+                tempList = db.getContactsOfType(searchType);
+            } else {
+                tempList = db.getAll(Contact.class);
+            }
+        }
+
+        return tempList;
     }
 
     private void onListItemClick(AdapterView<?> parent, View view, int position, long id) {

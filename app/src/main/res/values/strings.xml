@@ -13,6 +13,8 @@
     <string name="me">Me</string>
 
     <string name="empty_qmessage">No pictograms in this quick message!</string>
+    <string name="empty_contacts">No contacts!</string>
+
     <string name="quick_message_edit_title">Edit quick message</string>
 
     <string name="activity_main_role">Role</string>

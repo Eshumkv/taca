@@ -34,6 +34,7 @@ import thomasmore.be.travelcommunicationassistant.fragment.dialog.SimpleDialogFr
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 public class ContactSearchFragment
@@ -75,7 +76,6 @@ public class ContactSearchFragment
             }
         });
 
-        // Empty list to start with
         List<Contact> contacts = getFakeServerContacts();
 
         final ListView list = (ListView) rootView.findViewById(R.id.rooms);
@@ -183,65 +183,72 @@ public class ContactSearchFragment
     }
 
     private List<Contact> getFakeServerContacts() {
-        List<Contact> list = new ArrayList<>();
+        Database db = Database.getInstance(getActivity());
+        List<Contact> contacts = db.getAll(Contact.class);
 
-        Contact contact = new Contact();
-        contact.setId(1);
-        contact.setName("Alice");
-        contact.setPhonenumber("+79995236412");
-        list.add(contact);
+        return contacts;
 
-        contact = new Contact();
-        contact.setId(2);
-        contact.setName("Bob");
-        contact.setPhonenumber("+7225352256");
-        contact.setType(ContactType.Tutor);
-        list.add(contact);
 
-        contact = new Contact();
-        contact.setId(3);
-        contact.setName("Jan");
-        contact.setPhonenumber("+7123456789");
-        list.add(contact);
 
-        contact = new Contact();
-        contact.setId(4);
-        contact.setName("Andrey");
-        contact.setPhonenumber("+79995236412");
-        list.add(contact);
-
-        contact = new Contact();
-        contact.setId(5);
-        contact.setName("Donovan");
-        contact.setPhonenumber("+7225352256");
-        contact.setType(ContactType.Tutor);
-        list.add(contact);
-
-        contact = new Contact();
-        contact.setId(6);
-        contact.setName("Alexander");
-        contact.setPhonenumber("+79995236412");
-        list.add(contact);
-
-        contact = new Contact();
-        contact.setId(7);
-        contact.setName("Koen");
-        contact.setPhonenumber("+79995236412");
-        list.add(contact);
-
-        contact = new Contact();
-        contact.setId(8);
-        contact.setName("Ivan");
-        contact.setPhonenumber("+7123456789");
-        contact.setType(ContactType.Tutor);
-        list.add(contact);
-
-        contact = new Contact();
-        contact.setId(9);
-        contact.setName("Zoey");
-        contact.setPhonenumber("+7123456789");
-        list.add(contact);
-
-        return list;
+//        List<Contact> list = new ArrayList<>();
+//
+//        Contact contact = new Contact();
+//        contact.setId(1);
+//        contact.setName("Alice");
+//        contact.setPhonenumber("+79995236412");
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(2);
+//        contact.setName("Bob");
+//        contact.setPhonenumber("+7225352256");
+//        contact.setType(ContactType.Tutor);
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(3);
+//        contact.setName("Jan");
+//        contact.setPhonenumber("+7123456789");
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(4);
+//        contact.setName("Andrey");
+//        contact.setPhonenumber("+79995236412");
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(5);
+//        contact.setName("Donovan");
+//        contact.setPhonenumber("+7225352256");
+//        contact.setType(ContactType.Tutor);
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(6);
+//        contact.setName("Alexander");
+//        contact.setPhonenumber("+79995236412");
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(7);
+//        contact.setName("Koen");
+//        contact.setPhonenumber("+79995236412");
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(8);
+//        contact.setName("Ivan");
+//        contact.setPhonenumber("+7123456789");
+//        contact.setType(ContactType.Tutor);
+//        list.add(contact);
+//
+//        contact = new Contact();
+//        contact.setId(9);
+//        contact.setName("Zoey");
+//        contact.setPhonenumber("+7123456789");
+//        list.add(contact);
+//
+//        return list;
     }
 }

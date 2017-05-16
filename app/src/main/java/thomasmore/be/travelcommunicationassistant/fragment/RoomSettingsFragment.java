@@ -28,6 +28,7 @@ import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
@@ -92,6 +93,7 @@ public class RoomSettingsFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
                 intent.putExtra(BackActivity.DATA_STRING, ContactListFragment.class);
                 intent.putExtra(Helper.EXTRA_SEARCH_INTENT, Contact.class);
+                intent.putExtra(ContactListFragment.EXTRA_SEARCH_SPECIFIC, ContactType.Tutor.ordinal());
                 startActivityForResult(intent, REQUEST_SEARCHBUTTON);
             }
         };

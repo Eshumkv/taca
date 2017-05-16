@@ -306,9 +306,40 @@ public class Database extends SQLiteOpenHelper {
         return contact;
     }
 
-    public List<Contact> getContactsFor(long id) {
+    public List<Contact> getContactsOfType(ContactType type) {
         SQLiteDatabase db = this.getReadableDatabase();
         Contact useless = new Contact();
+
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                where(Contact.TYPE), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(type.ordinal())
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                asc(Room.NAME),                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Contact> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Contact obj = useless.get(cursor);
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    public List<Contact> getContactsFor(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(
                 "ContactList",                        // Table
@@ -342,6 +373,46 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
+
+    public List<Contact> getContactsForOfType(long id, ContactType type) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Contact useless = new Contact();
+
+        Cursor cursor = db.query(
+                "ContactList",                        // Table
+                new String[] {
+                        "id",
+                        "ownerId",
+                        "contactId"
+                },                      // Columns
+                where("ownerId"), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(id)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Contact> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Contact contact = get(Contact.class, cursor.getLong(2));
+
+                if (contact.getType() == type) {
+                    list.add(contact);
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
     public long addContactToContactListFor(long id, Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -353,6 +424,31 @@ public class Database extends SQLiteOpenHelper {
         db.close();
 
         return retid;
+    }
+
+    public boolean removeContactFromContactListFor(long ownerId, long contactId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "ContactList",
+                where("ownerId", "contactId"),
+                new String[] { String.valueOf(ownerId), String.valueOf(contactId) });
+        db.close();
+
+        return numrows > 0;
+    }
+
+    public boolean deleteContact(long id) {
+        boolean success = genericDelete(Contact.class, id);
+
+        if (success) {
+            List<Contact> contacts = getAll(Contact.class);
+            for (Contact contact : contacts) {
+                removeContactFromContactListFor(contact.getId(), id);
+            }
+        }
+
+        return success;
     }
 
     /****

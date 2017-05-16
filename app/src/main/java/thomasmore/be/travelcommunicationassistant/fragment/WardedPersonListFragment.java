@@ -33,6 +33,7 @@ import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ContactsListAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -52,18 +53,8 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
 
         Helper.setTitle(getActivity(), R.string.nav_warded);
 
-        // TODO: Get all the warded persons
-        List<Contact> tempList = new ArrayList<>();
-        tempList.add(new Contact("Alice", "+7225352256", false));
-        tempList.add(new Contact("Bob", "+7225352256", false));
-        tempList.add(new Contact("Jan", "+7225352256", false));
-        tempList.add(new Contact("Robin", "+7225352256", false));
-        tempList.add(new Contact("Alexander", "+7225352256", false));
-        tempList.add(new Contact("Koen", "+7225352256", false));
-        tempList.add(new Contact("Zoey", "+7225352256", false));
-        tempList.add(new Contact("Alice", "+7225352256", false));
-        tempList.add(new Contact("Donovan", "+7225352256", false));
-        tempList.add(new Contact("Dmitry", "+799995545", false));
+        Database db = Database.getInstance(getActivity());
+        List<Contact> tempList = db.getContactsOfType(ContactType.Warded);
 
         setupPagingMap(tempList, Contact.class, "getName", new Comparator<Contact>() {
             @Override
@@ -135,7 +126,7 @@ public class WardedPersonListFragment extends BasePagingFragment<Contact> {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_messages, menu);
+        inflater.inflate(R.menu.menu_simple_search, menu);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
