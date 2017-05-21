@@ -9,6 +9,7 @@ CREATE TABLE "Contact" (
     "responsibleTutorId" INTEGER  NULL ,
     "userId" INTEGER  NOT NULL ,
     "type" INTEGER  NOT NULL ,
+    "isUser" INTEGER NOT NULL ,
     FOREIGN KEY ("userId") REFERENCES "User"("id"),
     FOREIGN KEY ("responsibleTutorId") REFERENCES "Contact" ("id"),
     FOREIGN KEY ("currentRoomId") REFERENCES "Room"("id")

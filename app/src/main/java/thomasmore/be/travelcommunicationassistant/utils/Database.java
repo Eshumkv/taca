@@ -306,6 +306,24 @@ public class Database extends SQLiteOpenHelper {
         return get(Settings.class, 1);
     }
 
+    public long addUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = user.getContentValues(user);
+
+        values.remove("id");
+        long id = db.insert(user.getTable(), null, values);
+        user.setId(id);
+
+        if (id != -1) {
+            Contact contact = user.toContact();
+            db.insert(contact.getTable(), null, contact.getContentValues(contact));
+        }
+
+        db.close();
+
+        return id;
+    }
+
     public Contact getContact(long id) {
         Contact contact = get(Contact.class, id);
         contact.setResponsibleTutor(get(Contact.class, contact.getResponsibleTutorId()));
@@ -460,6 +478,13 @@ public class Database extends SQLiteOpenHelper {
         return success;
     }
 
+    public Contact getWarded(long id) {
+        Contact contact = get(Contact.class, id);
+        contact.setResponsibleTutor(get(Contact.class, contact.getResponsibleTutorId()));
+        contact.setCurrentRoom(get(Room.class, contact.getCurrentRoomId()));
+
+        return contact;
+    }
 
     public boolean deleteCategory(long id) {
         boolean success = genericDelete(Category.class, id);
@@ -700,7 +725,13 @@ public class Database extends SQLiteOpenHelper {
             ContentValues values = user.getContentValues(user);
 
             values.remove("id");
-            user.setId(db.insert(user.getTable(), null, values));
+            long id = db.insert(user.getTable(), null, values);
+            user.setId(id);
+
+            if (id != -1) {
+                Contact contact = user.toContact();
+                db.insert(contact.getTable(), null, contact.getContentValues(contact));
+            }
         }
 
         //================================
@@ -728,16 +759,26 @@ public class Database extends SQLiteOpenHelper {
         db.insert(settings.getTable(), null, settings.getContentValues(settings));
 
         //================================
-        //      CONTACTS
+        //      TUTORS
         //================================
-        ArrayList<Contact> contacts = getContacts(users.get(0), rooms.get(0));
-        for (Contact contact : contacts) {
+        ArrayList<Contact> tutors = getTutors(users.get(0));
+        for (Contact contact : tutors) {
+            ContentValues values = contact.getContentValues(contact);
+
+            values.remove("id");
+            contact.setId(db.insert(contact.getTable(), null, values));
+        }
+
+        //================================
+        //      WARDED
+        //================================
+        ArrayList<Contact> wardeds = getContacts(users.get(0), rooms.get(0), tutors);
+        for (Contact contact : wardeds) {
             ContentValues values = contact.getContentValues(contact);
 
             values.remove("id");
             db.insert(contact.getTable(), null, values);
         }
-
 
         //================================
         //      MAJOR CATEGORIES
@@ -823,7 +864,7 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
-    private ArrayList<Contact> getContacts(User user, Room room) {
+    private ArrayList<Contact> getTutors(User user) {
         ArrayList<Contact> list = new ArrayList<>();
 
         Contact tutor = new Contact();
@@ -832,6 +873,21 @@ public class Database extends SQLiteOpenHelper {
         tutor.setType(ContactType.Tutor);
         tutor.setUser(user);
         list.add(tutor);
+
+        tutor = new Contact();
+        tutor.setName("Svetlana");
+        tutor.setPhonenumber("+785465258");
+        tutor.setType(ContactType.Tutor);
+        tutor.setUser(user);
+        list.add(tutor);
+
+        return list;
+    }
+
+    private ArrayList<Contact> getContacts(User user, Room room, ArrayList<Contact> tutors) {
+        ArrayList<Contact> list = new ArrayList<>();
+
+        Contact tutor = tutors.get(0);
 
         Contact contact = new Contact();
         contact.setName("Alice");
@@ -866,12 +922,7 @@ public class Database extends SQLiteOpenHelper {
         contact.setUser(user);
         list.add(contact);
 
-        tutor = new Contact();
-        tutor.setName("Svetlana");
-        tutor.setPhonenumber("+785465258");
-        tutor.setType(ContactType.Tutor);
-        tutor.setUser(user);
-        list.add(tutor);
+        tutor = tutors.get(1);
 
         contact = new Contact();
         contact.setName("Vlad");

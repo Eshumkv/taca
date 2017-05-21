@@ -30,6 +30,7 @@ import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Room;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
@@ -37,13 +38,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class RoomSettingsFragment extends BaseFragment {
 
-    public final static String CONTACT = "ExtraContactData";
     private final static int REQUEST_SEARCHBUTTON = 101;
 
     private Spinner currentRoomSpinner;
     private EditText tutorEdit;
 
     private Contact contact;
+
+    private List<Room> rooms;
 
     public RoomSettingsFragment() {
         // Empty constructor required for fragment subclasses
@@ -55,12 +57,7 @@ public class RoomSettingsFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_room_settings, container, false);
 
         Bundle bundle = getArguments();
-        contact = bundle.getParcelable(CONTACT);
-
-        // TODO: REMOVE THIS
-        if (contact.getResponsibleTutor() == null) {
-            contact.setResponsibleTutor(new Contact("Ivan", "456167894", true));
-        }
+        contact = bundle.getParcelable(Contact.class.getName());
 
         Helper.setTitle(getActivity(), R.string.warded_room_settings_title, contact.getName());
 
@@ -75,16 +72,22 @@ public class RoomSettingsFragment extends BaseFragment {
         ImageButton searchButton = (ImageButton) editSearch.findViewById(R.id.search);
 
         // ------- Current room
-        Room[] rooms = new Room[] {
-        };
+        Database db = Database.getInstance(getActivity());
+        long userid = db.getSettings().getLoggedInUser(getActivity()).getId();
+        rooms = db.getAllRooms(userid, false);
 
         currentRoomLabel.setText(R.string.current_room);
 
-        ArrayList<Room> list = new ArrayList<>(Arrays.asList(rooms));
+        ArrayList<Room> list = new ArrayList<>(rooms);
         ArrayAdapter<Room> adapter  = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        String roomname = null;
+        if (contact.getCurrentRoom() != null) {
+            roomname = contact.getCurrentRoom().getName();
+        }
         currentRoomSpinner.setAdapter(adapter);
-        currentRoomSpinner.setSelection(0);
+        currentRoomSpinner.setSelection(getPosition(roomname));
 
         // --------- Responsible tutor
         View.OnClickListener clickListener = new View.OnClickListener() {
@@ -121,6 +124,13 @@ public class RoomSettingsFragment extends BaseFragment {
                 return true;
             case R.id.action_save:
                 Intent intent = new Intent();
+                Room room = rooms.get(getPosition(currentRoomSpinner.getSelectedItem().toString()));
+
+                if (room != null) {
+                    contact.setCurrentRoom(room);
+                }
+
+                intent.putExtra(Contact.class.getName(), contact);
                 getActivity().setResult(RESULT_OK, intent);
                 getActivity().finish();
                 return true;
@@ -143,5 +153,18 @@ public class RoomSettingsFragment extends BaseFragment {
             contact.setResponsibleTutor(responsible_tutor);
             tutorEdit.setText(responsible_tutor.getName());
         }
+    }
+
+    private int getPosition(String roomName) {
+        int index = -1;
+
+        for (int i = 0; i < rooms.size(); i++) {
+            if (rooms.get(i).getName().equals(roomName)) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
     }
 }

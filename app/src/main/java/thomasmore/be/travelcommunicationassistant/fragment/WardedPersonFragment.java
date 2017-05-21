@@ -46,6 +46,8 @@ public class WardedPersonFragment extends BaseFragment {
 
         Bundle bundle = getArguments();
         warded = bundle.getParcelable(Contact.class.getName());
+        Database db = Database.getInstance(getActivity());
+        warded = db.getWarded(warded.getId());
 
         Button listButton = (Button) rootView.findViewById(R.id.c_list);
         listButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +83,7 @@ public class WardedPersonFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), BackActivity.class);
 
                 intent.putExtra(BackActivity.DATA_STRING, RoomSettingsFragment.class);
-                intent.putExtra(RoomSettingsFragment.CONTACT, warded);
+                intent.putExtra(Contact.class.getName(), warded);
                 startActivityForResult(intent, REQUEST_ROOMSETTINGS);
             }
         });
@@ -180,7 +182,14 @@ public class WardedPersonFragment extends BaseFragment {
 
             setDetails(getActivity().findViewById(android.R.id.content));
         } else if (requestCode == REQUEST_ROOMSETTINGS && resultCode == RESULT_OK) {
-            Helper.toast(getActivity(), R.string.toast_room_settings_saved);
+            warded = data.getParcelableExtra(Contact.class.getName());
+            Database db = Database.getInstance(getActivity());
+
+            if (db.genericUpdate(Contact.class, warded)) {
+                Helper.toast(getActivity(), R.string.toast_saved);
+            } else {
+                Helper.toast(getActivity(), R.string.toast_not_saved);
+            }
         }
     }
 

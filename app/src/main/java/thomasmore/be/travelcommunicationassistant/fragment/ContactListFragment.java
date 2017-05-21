@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -460,6 +461,22 @@ public class ContactListFragment extends BasePagingFragment<Contact> {
     private void goToEditScreen(Contact contact, boolean isnew) {
         deselectPrevious(getView());
         toggleContext();
+
+        if (contact.isUser()) {
+            Fragment fragment = new BasicEditFragment();
+            String classname = User.class.getName();
+            Bundle bundle = new Bundle();
+
+            Database db = Database.getInstance(getActivity());
+            User user = db.getSettings().getLoggedInUser(getActivity());
+
+            bundle.putString(BasicEditFragment.CLASSNAME, classname);
+            bundle.putParcelable(classname, user);
+
+            fragment.setArguments(bundle);
+            Helper.changeFragment(getActivity(), fragment, false);
+            return;
+        }
 
         String className = Contact.class.getName();
 

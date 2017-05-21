@@ -33,6 +33,9 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
     private @Nullable ArrayList<Contact> contactList;
     private @Nullable ArrayList<QuickMessage> quickMessages;
 
+    // To indicate this contact is the user itself
+    private boolean isUser = false;
+
     public Contact() {
     }
 
@@ -107,6 +110,10 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
 
     public void setCurrentRoom(@Nullable Room currentRoom) {
         this.currentRoom = currentRoom;
+
+        if (currentRoom != null) {
+            this.currentRoomId = currentRoom.getId();
+        }
     }
 
     @Nullable
@@ -116,6 +123,10 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
 
     public void setResponsibleTutor(@Nullable Contact responsibleTutor) {
         this.responsibleTutor = responsibleTutor;
+
+        if (responsibleTutor != null) {
+            this.responsibleTutorId = responsibleTutor.getId();
+        }
     }
 
     public User getUser() {
@@ -124,6 +135,10 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
 
     public void setUser(User user) {
         this.user = user;
+
+        if (user != null) {
+            this.userId = user.getId();
+        }
     }
 
     @Nullable
@@ -179,6 +194,14 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
         this.userId = userId;
     }
 
+    public boolean isUser() {
+        return isUser;
+    }
+
+    public void setIsUser(boolean user) {
+        isUser = user;
+    }
+
     public Contact(Parcel in) {
         id = in.readLong();
         name = in.readString();
@@ -187,9 +210,12 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
         type = Helper.parseEnum(ContactType.class, in.readString());
         messageType = Helper.parseEnum(MessageType.class, in.readString());
         language = Helper.parseEnum(Language.class, in.readString());
+        currentRoomId = in.readLong();
         currentRoom = in.readParcelable(Room.class.getClassLoader());
+        responsibleTutorId = in.readLong();
         responsibleTutor = in.readParcelable(Contact.class.getClassLoader());
         user = in.readParcelable(User.class.getClassLoader());
+        isUser = Helper.getParcelableBool(in.readByte());
 
         Bundle bundle = in.readBundle();
 
@@ -212,9 +238,12 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
         dest.writeString(Helper.EnumToString(type));
         dest.writeString(Helper.EnumToString(messageType));
         dest.writeString(Helper.EnumToString(language));
+        dest.writeLong(currentRoomId);
         dest.writeParcelable(currentRoom, 0);
+        dest.writeLong(responsibleTutorId);
         dest.writeParcelable(responsibleTutor, 0);
         dest.writeParcelable(user, 0);
+        dest.writeByte(Helper.parcelableBool(isUser));
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(Pictogram.class.getName(), pictogramSettings);
@@ -247,6 +276,7 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
     public static final String RESPONSIBLETUTORID = "responsibleTutorId";
     public static final String USERID = "userId";
     public static final String TYPE = "type";
+    public static final String ISUSER = "isUser";
 
     public String getTable() {
         return "Contact";
@@ -263,7 +293,8 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
                 CURRENTROOMID,
                 RESPONSIBLETUTORID,
                 USERID,
-                TYPE
+                TYPE,
+                ISUSER
         };
     }
 
@@ -285,6 +316,8 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
             obj.setResponsibleTutorId(cursor.getLong(7));
         }
 
+        obj.setIsUser(cursor.getInt(8) != 0);
+
         return obj;
     }
 
@@ -305,24 +338,15 @@ public class Contact extends BaseModel<Contact> implements Parcelable {
                 contact.setLanguage(Language.Russian);
             }
 
-            Long roomId = null;
-            if (contact.getCurrentRoom() != null) {
-                roomId = contact.getCurrentRoom().getId();
-            }
-
-            Long tutorId = null;
-            if (contact.getResponsibleTutor() != null) {
-                tutorId = contact.getResponsibleTutor().getId();
-            }
-
             values.put(MESSAGETYPE, contact.getMessageType().ordinal());
             values.put(LANGUAGE, contact.getLanguage().ordinal());
-            values.put(CURRENTROOMID, roomId);
-            values.put(RESPONSIBLETUTORID, tutorId);
+            values.put(CURRENTROOMID, contact.getCurrentRoomId());
+            values.put(RESPONSIBLETUTORID, contact.getResponsibleTutorId());
         }
 
-        values.put(USERID, contact.getUser().getId());
+        values.put(USERID, contact.getUserId());
         values.put(TYPE, contact.getType().ordinal());
+        values.put(ISUSER, contact.isUser());
 
         return values;
     }

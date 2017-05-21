@@ -71,6 +71,22 @@ public class User extends BaseModel<User> implements Parcelable {
         this.imagePath = imagePath;
     }
 
+    public Contact toContact() {
+        Contact contact = new Contact();
+
+        contact.setId(id);
+        contact.setName(username);
+        contact.setPhonenumber(phonenumber);
+        contact.setImagePath(imagePath);
+        contact.setUser(this);
+        contact.setUserId(id);
+        contact.setType(ContactType.Tutor);
+        contact.setLanguage(language);
+        contact.setIsUser(true);
+
+        return contact;
+    }
+
     public User(Parcel in) {
         id = in.readLong();
         username = in.readString();
