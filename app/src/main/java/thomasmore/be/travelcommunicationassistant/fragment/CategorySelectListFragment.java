@@ -35,11 +35,15 @@ import thomasmore.be.travelcommunicationassistant.adapter.PictogramAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
 
 public class CategorySelectListFragment extends BasePagingFragment<Category> {
+
+    private final static int REQUEST_EDIT = 1;
+
     MajorCategory majorCategory;
 
     public CategorySelectListFragment() {
@@ -59,21 +63,8 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
         Bundle bundle = getArguments();
         majorCategory = bundle.getParcelable(MajorCategory.class.getName());
 
-        List<Category> tempList = new ArrayList<>();
-        tempList.addAll(Arrays.asList(
-                new Category("A Category 1", "Lorum ipsum"),
-                new Category("A Category 2", "Lorum ipsum"),
-                new Category("B Category 3", "Lorum ipsum"),
-                new Category("B Category 4", "Lorum ipsum"),
-                new Category("E Category 5", "Lorum ipsum"),
-                new Category("E Category 6", "Lorum ipsum"),
-                new Category("F Category 7", "Lorum ipsum"),
-                new Category("G Category 2", "Lorum ipsum"),
-                new Category("Y Category 3", "Lorum ipsum"),
-                new Category("U Category 4", "Lorum ipsum"),
-                new Category("Q Category 5", "Lorum ipsum"),
-                new Category("G Category 6", "Lorum ipsum")
-        ));
+        Database db = Database.getInstance(getActivity());
+        List<Category> tempList = db.getCategoriesForMajorCategory(majorCategory.getId());
 
         setupPagingMap(tempList, Category.class, "getName", new Comparator<Category>() {
             @Override
@@ -146,8 +137,29 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Category category = (Category)getList().getAdapter().getItem(selectedPosition);
+                                Database db = Database.getInstance(getActivity());
+
+                                if (db.deleteCategory(category.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                List<Category> tempList = db.getCategoriesForMajorCategory(majorCategory.getId());
+
+                                setupPagingMap(tempList, Category.class, "getName", new Comparator<Category>() {
+                                    @Override
+                                    public int compare(Category lhs, Category rhs) {
+                                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                        return lhs.getName().compareTo(rhs.getName());
+                                    }
+                                });
+                                setupPagingBar(getActivity().findViewById(android.R.id.content));
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -167,11 +179,46 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
+            Category category = data.getParcelableExtra(Category.class.getName());
+            Database db = Database.getInstance(getActivity());
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Category category = data.getParcelableExtra(Category.class.getName());
+            category.setMajorCategoryId(majorCategory.getId());
+
+            if (Helper.isEmpty(category.getName())) {
+                goToEditScreen(category, false);
+                Helper.toast(getActivity(), R.string.toast_error_name_empty);
+                return;
             }
+
+            if (Helper.isEmpty(category.getDescription())) {
+                goToEditScreen(category, false);
+                Helper.toast(getActivity(), R.string.toast_error_description_empty);
+                return;
+            }
+
+            if (db.genericUpdate(Category.class, category)) {
+                Helper.toast(getActivity(), R.string.toast_saved);
+            } else {
+                long id = db.genericInsert(Category.class, category);
+
+                if (id != -1) {
+                    Helper.toast(getActivity(), R.string.toast_saved);
+                } else {
+                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                }
+            }
+
+            List<Category> tempList = db.getCategoriesForMajorCategory(majorCategory.getId());
+            setupPagingMap(tempList, Category.class, "getName", new Comparator<Category>() {
+                @Override
+                public int compare(Category lhs, Category rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            setupPagingBar(getActivity().findViewById(android.R.id.content));
+            setListAdapter();
         }
     }
 
@@ -249,6 +296,6 @@ public class CategorySelectListFragment extends BasePagingFragment<Category> {
             intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
         }
 
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 }

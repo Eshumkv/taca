@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import thomasmore.be.travelcommunicationassistant.MyApp;
 import thomasmore.be.travelcommunicationassistant.BackActivity;
@@ -94,6 +95,8 @@ public class Helper {
     public static final String EXTRA_DATA_BUNDLE = "databundle";
     public static final String EXTRA_SEARCH_INTENT = "I really need to search";
     public static final String EXTRA_MULTIPLE = "Excuse me, I need multiple of these.";
+
+    public static final Random RANDOM = new Random();
 
     public static MyApp getApp(Activity activity) {
         return (MyApp) activity.getApplication();
@@ -375,5 +378,14 @@ public class Helper {
         }
 
         return hasImage;
+    }
+
+    // Includes both values!
+    public static int randomBetween(int min, int max) {
+        return RANDOM.nextInt(max - min + 1) + min;
+    }
+
+    public static String randomCharacter() {
+        return String.valueOf((char)(RANDOM.nextInt(26) + 'a'));
     }
 }

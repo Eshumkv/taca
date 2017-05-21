@@ -42,11 +42,14 @@ import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
 
 public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
+
+    private final static int REQUEST_EDIT = 1;
 
     Category category;
 
@@ -67,21 +70,8 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         Bundle bundle = getArguments();
         category = bundle.getParcelable(Category.class.getName());
 
-        List<Pictogram> tempList = new ArrayList<>();
-        tempList.addAll(Arrays.asList(
-                new Pictogram("A Pictogram 1", "Lorum ipsum"),
-                new Pictogram("A Pictogram 2", "Lorum ipsum"),
-                new Pictogram("B Pictogram 3", "Lorum ipsum"),
-                new Pictogram("B Pictogram 4", "Lorum ipsum"),
-                new Pictogram("E Pictogram 5", "Lorum ipsum"),
-                new Pictogram("E Pictogram 6", "Lorum ipsum"),
-                new Pictogram("F Pictogram 7", "Lorum ipsum"),
-                new Pictogram("G Pictogram 2", "Lorum ipsum"),
-                new Pictogram("Y Pictogram 3", "Lorum ipsum"),
-                new Pictogram("U Pictogram 4", "Lorum ipsum"),
-                new Pictogram("Q Pictogram 5", "Lorum ipsum"),
-                new Pictogram("G Pictogram 6", "Lorum ipsum")
-        ));
+        Database db = Database.getInstance(getActivity());
+        List<Pictogram> tempList = db.getPictogramsOfCategory(category.getId());
 
         setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
             @Override
@@ -165,6 +155,29 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Pictogram pictogram = (Pictogram) getList().getAdapter().getItem(selectedPosition);
+                                Database db = Database.getInstance(getActivity());
+
+                                if (db.genericDelete(Pictogram.class, pictogram.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_deleted);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                }
+
+                                deselectPrevious(getView());
+                                toggleContext();
+
+                                List<Pictogram> tempList = db.getPictogramsOfCategory(category.getId());
+
+                                setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
+                                    @Override
+                                    public int compare(Pictogram lhs, Pictogram rhs) {
+                                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                        return lhs.getName().compareTo(rhs.getName());
+                                    }
+                                });
+                                setupPagingBar(getActivity().findViewById(android.R.id.content));
+                                setListAdapter();
                                 deselectPrevious(getView());
                                 toggleContext();
                             }
@@ -222,6 +235,49 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
         return true;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
+            Pictogram pictogram = data.getParcelableExtra(Pictogram.class.getName());
+            Database db = Database.getInstance(getActivity());
+
+            if (Helper.isEmpty(pictogram.getName())) {
+                goToEditScreen(pictogram, false);
+                Helper.toast(getActivity(), R.string.toast_error_name_empty);
+                return;
+            }
+
+            if (Helper.isEmpty(pictogram.getDescription())) {
+                goToEditScreen(pictogram, false);
+                Helper.toast(getActivity(), R.string.toast_error_description_empty);
+                return;
+            }
+
+            if (db.genericUpdate(Pictogram.class, pictogram)) {
+                Helper.toast(getActivity(), R.string.toast_saved);
+            } else {
+                long id = db.genericInsert(Pictogram.class, pictogram);
+
+                if (id != -1) {
+                    Helper.toast(getActivity(), R.string.toast_saved);
+                } else {
+                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                }
+            }
+
+            List<Pictogram> tempList = db.getPictogramsOfCategory(category.getId());
+            setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
+                @Override
+                public int compare(Pictogram lhs, Pictogram rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            setupPagingBar(getActivity().findViewById(android.R.id.content));
+            setListAdapter();
+        }
+    }
+
     private void goBack() {
         MajorCategory cat = category.getMajorCategory();
 
@@ -261,6 +317,6 @@ public class PictogramSelectListFragment extends BasePagingFragment<Pictogram> {
             intent.putExtra(BasicEditFragment.EXTRA_ADD_INSTEAD_OF_SAVE, true);
         }
 
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 }

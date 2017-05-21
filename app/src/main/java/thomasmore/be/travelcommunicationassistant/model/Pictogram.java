@@ -1,5 +1,7 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -8,8 +10,9 @@ import android.support.annotation.Nullable;
  * Created by Eshum on 18/04/2017.
  */
 
-public class Pictogram implements Parcelable {
+public class Pictogram extends BaseModel<Pictogram> implements Parcelable {
     private long id;
+    private long categoryId;
     private Category category;
     private String name;
     private String description;
@@ -37,6 +40,10 @@ public class Pictogram implements Parcelable {
 
     public void setCategory(Category category) {
         this.category = category;
+
+        if (category != null) {
+            this.categoryId = category.getId();
+        }
     }
 
     public String getName() {
@@ -63,8 +70,17 @@ public class Pictogram implements Parcelable {
         this.imagePath = imagePath;
     }
 
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public Pictogram(Parcel in) {
         id = in.readLong();
+        categoryId = in.readLong();
         category = in.readParcelable(Category.class.getClassLoader());
         name = in.readString();
         description = in.readString();
@@ -79,6 +95,7 @@ public class Pictogram implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
+        dest.writeLong(categoryId);
         dest.writeParcelable(category, 0);
         dest.writeString(name);
         dest.writeString(description);
@@ -96,4 +113,48 @@ public class Pictogram implements Parcelable {
         }
     };
 
+    // DATABASE HELPER THINGS
+    public static final String ID = "id";
+    public static final String CATEGORYID = "categoryId";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String IMAGEPATH = "imagePath";
+
+    public String getTable() {
+        return "Pictogram";
+    }
+
+    public String[] getColumns() {
+        return new String[] {
+                ID,
+                NAME,
+                DESCRIPTION,
+                IMAGEPATH,
+                CATEGORYID
+        };
+    }
+
+    public Pictogram get(Cursor cursor) {
+        Pictogram obj = new Pictogram();
+
+        obj.setId(cursor.getLong(0));
+        obj.setName(cursor.getString(1));
+        obj.setDescription(cursor.getString(2));
+        obj.setImagePath(cursor.getString(3));
+        obj.setCategoryId(cursor.getLong(4));
+
+        return obj;
+    }
+
+    public ContentValues getContentValues(Pictogram pictogram) {
+        ContentValues values = new ContentValues();
+
+        values.put(ID, pictogram.getId());
+        values.put(NAME, pictogram.getName());
+        values.put(DESCRIPTION, pictogram.getDescription());
+        values.put(IMAGEPATH, pictogram.getImagePath());
+        values.put(CATEGORYID, pictogram.getCategoryId());
+
+        return values;
+    }
 }

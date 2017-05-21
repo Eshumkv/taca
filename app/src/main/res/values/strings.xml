@@ -119,6 +119,7 @@
     <string name="toast_error_name_empty">Name cannot be empty!</string>
     <string name="toast_error_password_empty">Password cannot be empty!</string>
     <string name="toast_error_phonenumber_empty">Phonenumber cannot be empty!</string>
+    <string name="toast_error_description_empty">Description cannot be empty!</string>
 
     <!--
         Following are arrays.

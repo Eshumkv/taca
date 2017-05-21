@@ -29,11 +29,11 @@ CREATE TABLE "MajorCategory" (
 --NST
 CREATE TABLE "Category" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "magorCategoryId" INTEGER  NOT NULL ,
+    "majorCategoryId" INTEGER  NOT NULL ,
     "name" TEXT  NOT NULL ,
     "description" TEXT  NOT NULL ,
-    "imagePath" TEXT  NOT NULL ,
-    FOREIGN KEY ("magorCategoryId") REFERENCES "MajorCategory"("id")
+    "imagePath" TEXT  NULL ,
+    FOREIGN KEY ("majorCategoryId") REFERENCES "MajorCategory"("id")
 );
 --NST
 CREATE TABLE "Pictogram" (
@@ -41,7 +41,7 @@ CREATE TABLE "Pictogram" (
     "categoryId" INTEGER  NOT NULL ,
     "name" TEXT  NOT NULL ,
     "description" TEXT  NOT NULL ,
-    "imagePath" TEXT  NOT NULL ,
+    "imagePath" TEXT  NULL ,
     FOREIGN KEY ("categoryId") REFERENCES "Category"("id")
 );
 --NST

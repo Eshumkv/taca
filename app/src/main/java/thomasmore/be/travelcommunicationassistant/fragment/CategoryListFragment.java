@@ -36,6 +36,7 @@ import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -89,17 +90,17 @@ public class CategoryListFragment extends BaseFragment {
 
         Helper.setTitle(getActivity(), title);
 
-        final Category[] categories = new Category[] {
-                new Category("Category 1", "HERE'S THE DESCRIPTION!"),
-                new Category("Category 2", "DESCRIPTION TIME"),
-                new Category("Category 3", "HERE'S THE DESCRIPTION!"),
-                new Category("Category 4", "DESCRIPTION TIME"),
-                new Category("Category 5", "HERE'S THE DESCRIPTION!"),
-                new Category("Category 6", "DESCRIPTION TIME")
-        };
+        Database db = Database.getInstance(getActivity());
+        List<Category> categories = null;
+
+        if (isPictogramSettingsList) {
+            categories = db.getCategoriesForMajorCategoryOfWarded(majorCategory.getId(), warded.getId());
+        } else {
+            categories = db.getCategoriesForMajorCategory(majorCategory.getId());
+        }
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
-        list.setAdapter(new CategoryAdapter(getActivity(), Arrays.asList(categories)));
+        list.setAdapter(new CategoryAdapter(getActivity(), categories));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

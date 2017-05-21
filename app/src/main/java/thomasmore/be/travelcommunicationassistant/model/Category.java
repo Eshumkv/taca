@@ -1,5 +1,7 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,8 +13,9 @@ import java.util.ArrayList;
  * Created by Eshum on 18/04/2017.
  */
 
-public class Category implements Parcelable {
+public class Category extends BaseModel<Category> implements Parcelable {
     private long id;
+    private long majorCategoryId;
     private MajorCategory majorCategory;
     private String name;
     private String description;
@@ -41,6 +44,10 @@ public class Category implements Parcelable {
 
     public void setMajorCategory(MajorCategory majorCategory) {
         this.majorCategory = majorCategory;
+
+        if (majorCategory != null) {
+            this.majorCategoryId = majorCategory.getId();
+        }
     }
 
     public String getName() {
@@ -75,6 +82,14 @@ public class Category implements Parcelable {
         this.pictograms = pictograms;
     }
 
+    public long getMajorCategoryId() {
+        return majorCategoryId;
+    }
+
+    public void setMajorCategoryId(long majorCategoryId) {
+        this.majorCategoryId = majorCategoryId;
+    }
+
     public int getLinkedPictograms() {
         if (pictograms == null) {
             return 0;
@@ -97,8 +112,7 @@ public class Category implements Parcelable {
         description = in.readString();
         imagePath = in.readString();
 
-        Bundle bundle = in.readBundle();
-
+        Bundle bundle = in.readBundle(Pictogram.class.getClassLoader());
         pictograms = bundle.getParcelableArrayList(Pictogram.class.getName());
     }
 
@@ -131,4 +145,48 @@ public class Category implements Parcelable {
         }
     };
 
+    // DATABASE HELPER THINGS
+    public static final String ID = "id";
+    public static final String MAJORCATEGORYID = "majorCategoryId";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String IMAGEPATH = "imagePath";
+
+    public String getTable() {
+        return "Category";
+    }
+
+    public String[] getColumns() {
+        return new String[] {
+                ID,
+                NAME,
+                DESCRIPTION,
+                IMAGEPATH,
+                MAJORCATEGORYID
+        };
+    }
+
+    public Category get(Cursor cursor) {
+        Category obj = new Category();
+
+        obj.setId(cursor.getLong(0));
+        obj.setName(cursor.getString(1));
+        obj.setDescription(cursor.getString(2));
+        obj.setImagePath(cursor.getString(3));
+        obj.setMajorCategoryId(cursor.getLong(4));
+
+        return obj;
+    }
+
+    public ContentValues getContentValues(Category cat) {
+        ContentValues values = new ContentValues();
+
+        values.put(ID, cat.getId());
+        values.put(NAME, cat.getName());
+        values.put(DESCRIPTION, cat.getDescription());
+        values.put(IMAGEPATH, cat.getImagePath());
+        values.put(MAJORCATEGORYID, cat.getMajorCategoryId());
+
+        return values;
+    }
 }

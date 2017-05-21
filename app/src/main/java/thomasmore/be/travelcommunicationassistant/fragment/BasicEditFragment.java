@@ -516,7 +516,6 @@ public class BasicEditFragment extends BaseFragment {
             intent.putExtra(classname, getPictogramData());
         }
 
-
         return intent;
     }
 
@@ -591,6 +590,7 @@ public class BasicEditFragment extends BaseFragment {
 
         pictogram.setId((Long)getHiddenValue("Id"));
         pictogram.setName(getTextFromEdit("Name"));
+        pictogram.setCategory((Category)getValueFromSearch("Category"));
         pictogram.setDescription(getTextFromEdit("Description"));
         pictogram.setImagePath(getPathFromImage());
 

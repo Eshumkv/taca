@@ -33,6 +33,7 @@ import thomasmore.be.travelcommunicationassistant.adapter.MajorCategoryAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -93,13 +94,11 @@ public class MajorCategoryListFragment extends BaseFragment {
 
         Helper.setTitle(getActivity(), title);
 
-        MajorCategory[] mcategories = new MajorCategory[] {
-                new MajorCategory("Noun"),
-                new MajorCategory("Verb")
-        };
+        Database db = Database.getInstance(getActivity());
+        List<MajorCategory> mcategories = db.getAll(MajorCategory.class);
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
-        list.setAdapter(new MajorCategoryAdapter(getActivity(), Arrays.asList(mcategories)));
+        list.setAdapter(new MajorCategoryAdapter(getActivity(), mcategories));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

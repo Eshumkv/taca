@@ -37,6 +37,7 @@ import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 
 import static android.app.Activity.RESULT_OK;
@@ -90,21 +91,8 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
             Helper.setTitle(getActivity(), title);
         }
 
-        List<Pictogram> tempList = new ArrayList<>();
-        tempList.addAll(Arrays.asList(
-                new Pictogram("A Pictogram 1", "Lorum ipsum"),
-                new Pictogram("A Pictogram 2", "Lorum ipsum"),
-                new Pictogram("B Pictogram 3", "Lorum ipsum"),
-                new Pictogram("B Pictogram 4", "Lorum ipsum"),
-                new Pictogram("E Pictogram 5", "Lorum ipsum"),
-                new Pictogram("E Pictogram 6", "Lorum ipsum"),
-                new Pictogram("F Pictogram 7", "Lorum ipsum"),
-                new Pictogram("G Pictogram 2", "Lorum ipsum"),
-                new Pictogram("Y Pictogram 3", "Lorum ipsum"),
-                new Pictogram("U Pictogram 4", "Lorum ipsum"),
-                new Pictogram("Q Pictogram 5", "Lorum ipsum"),
-                new Pictogram("G Pictogram 6", "Lorum ipsum")
-        ));
+        Database db = Database.getInstance(getActivity());
+        List<Pictogram> tempList = db.getPictogramsOfCategory(category.getId());
 
         setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
             @Override
@@ -117,11 +105,12 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
         RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
 
-        if (selectMultiple) {
-            bar.setVisibility(View.GONE);
-        } else {
-            bar.setVisibility(View.VISIBLE);
-        }
+        bar.setVisibility(View.GONE);
+//        if (selectMultiple) {
+//            bar.setVisibility(View.GONE);
+//        } else {
+//            bar.setVisibility(View.VISIBLE);
+//        }
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
         list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));

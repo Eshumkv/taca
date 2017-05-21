@@ -7,16 +7,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.util.LongSparseArray;
+import android.util.SparseArray;
+import android.util.SparseLongArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import thomasmore.be.travelcommunicationassistant.model.BaseModel;
+import thomasmore.be.travelcommunicationassistant.model.Category;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Language;
+import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.MessageType;
+import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.Settings;
 import thomasmore.be.travelcommunicationassistant.model.User;
@@ -451,6 +460,139 @@ public class Database extends SQLiteOpenHelper {
         return success;
     }
 
+
+    public boolean deleteCategory(long id) {
+        boolean success = genericDelete(Category.class, id);
+
+        if (success) {
+            List<Pictogram> pictograms = getPictogramsOfCategory(id);
+            for (Pictogram picto : pictograms) {
+                genericDelete(Pictogram.class, picto.getId());
+            }
+        }
+
+        return success;
+    }
+
+    public List<Category> getCategoriesForMajorCategory(long majorCategoryId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Category useless = new Category();
+
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                where(Category.MAJORCATEGORYID), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(majorCategoryId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                asc(Category.NAME),                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Category> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Category obj = useless.get(cursor);
+                List<Pictogram> pictograms = getPictogramsOfCategory(obj.getId());
+                obj.setPictograms(new ArrayList<>(pictograms));
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    public List<Category> getCategoriesForMajorCategoryOfWarded(long majorCategoryId, long wardedId) {
+        List<Pictogram> pictograms = getPictogramsOfWarded(wardedId);
+        HashMap<Long, Category> map = new HashMap<>();
+
+        for (Pictogram pictogram : pictograms) {
+            Category cat = get(Category.class, pictogram.getCategoryId());
+
+            if (cat.getMajorCategoryId() == majorCategoryId) {
+                List<Pictogram> pictos = getPictogramsOfCategory(cat.getId());
+                cat.setPictograms(new ArrayList<>(pictos));
+                map.put(cat.getId(), cat);
+            }
+        }
+
+        return new ArrayList<>(map.values());
+    }
+
+    public List<Pictogram> getPictogramsOfWarded(long wardedId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                "WardedPictogram",                        // Table
+                new String[] {
+                        "id",
+                        "wardedId",
+                        "pictogramId"
+                },                      // Columns
+                where("wardedId"), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(wardedId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Pictogram> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Pictogram obj = get(Pictogram.class, cursor.getLong(2));
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+
+    public List<Pictogram> getPictogramsOfCategory(long categoryId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Pictogram useless = new Pictogram();
+
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                where(Pictogram.CATEGORYID), // Where
+                new String[] {
+                        String.valueOf(categoryId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                asc(Pictogram.NAME),                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Pictogram> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Pictogram obj = useless.get(cursor);
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
     /****
      *
      * HELPER METHODS
@@ -532,6 +674,41 @@ public class Database extends SQLiteOpenHelper {
 
             values.remove("id");
             db.insert(contact.getTable(), null, values);
+        }
+
+
+        //================================
+        //      MAJOR CATEGORIES
+        //================================
+        ArrayList<MajorCategory> majorcategories = getMajorCategories();
+        for (MajorCategory category : majorcategories) {
+            ContentValues values = category.getContentValues(category);
+
+            values.remove("id");
+            category.setId(db.insert(category.getTable(), null, values));
+        }
+
+        //================================
+        //      CATEGORIES
+        //================================
+        ArrayList<Category> categories = getCategories(majorcategories);
+        for (Category category : categories) {
+            ContentValues values = category.getContentValues(category);
+
+            values.remove("id");
+            category.setId(db.insert(category.getTable(), null, values));
+        }
+
+
+        //================================
+        //      PICTOGRAMS
+        //================================
+        ArrayList<Pictogram> pictograms = getPictograms(categories);
+        for (Pictogram pictogram : pictograms) {
+            ContentValues values = pictogram.getContentValues(pictogram);
+
+            values.remove("id");
+            pictogram.setId(db.insert(pictogram.getTable(), null, values));
         }
     }
 
@@ -655,6 +832,60 @@ public class Database extends SQLiteOpenHelper {
         contact.setLanguage(Language.English);
         contact.setUser(user);
         list.add(contact);
+
+        return list;
+    }
+
+    private ArrayList<MajorCategory> getMajorCategories() {
+        ArrayList<MajorCategory> list = new ArrayList<>();
+
+        MajorCategory majorCategory = new MajorCategory();
+        majorCategory.setName("Verb");
+        list.add(majorCategory);
+
+        majorCategory = new MajorCategory();
+        majorCategory.setName("Noun");
+        list.add(majorCategory);
+
+        return list;
+    }
+
+    private ArrayList<Category> getCategories(ArrayList<MajorCategory> mcats) {
+        ArrayList<Category> list = new ArrayList<>();
+
+        for (MajorCategory mcat : mcats) {
+            for (int i = 0; i < Helper.randomBetween(1, 5); i++) {
+                String letter = Helper.randomCharacter();
+                String name = letter.toUpperCase() + " Category " + i;
+
+                Category category = new Category();
+                category.setMajorCategoryId(mcat.getId());
+                category.setMajorCategory(mcat);
+                category.setName(name);
+                category.setDescription("DESCRIPTION");
+                list.add(category);
+            }
+        }
+
+        return list;
+    }
+
+    private ArrayList<Pictogram> getPictograms(ArrayList<Category> cats) {
+        ArrayList<Pictogram> list = new ArrayList<>();
+
+        for (Category cat : cats) {
+            for (int i = 0; i < Helper.randomBetween(3, 9); i++) {
+                String letter = Helper.randomCharacter();
+                String name = letter.toUpperCase() + " Pictogram " + i;
+
+                Pictogram pictogram = new Pictogram();
+                pictogram.setCategory(cat);
+                pictogram.setCategoryId(cat.getId());
+                pictogram.setName(name);
+                pictogram.setDescription("DESCRIPTION");
+                list.add(pictogram);
+            }
+        }
 
         return list;
     }
