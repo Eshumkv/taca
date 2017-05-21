@@ -91,10 +91,7 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
             Helper.setTitle(getActivity(), title);
         }
 
-        Database db = Database.getInstance(getActivity());
-        List<Pictogram> tempList = db.getPictogramsOfCategory(category.getId());
-
-        setupPagingMap(tempList, Pictogram.class, "getName", new Comparator<Pictogram>() {
+        setupPagingMap(getCorrectList(), Pictogram.class, "getName", new Comparator<Pictogram>() {
             @Override
             public int compare(Pictogram lhs, Pictogram rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
@@ -105,12 +102,11 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
 
         RelativeLayout bar = (RelativeLayout) rootView.findViewById(R.id.context_menu);
 
-        bar.setVisibility(View.GONE);
-//        if (selectMultiple) {
-//            bar.setVisibility(View.GONE);
-//        } else {
-//            bar.setVisibility(View.VISIBLE);
-//        }
+        if (selectMultiple) {
+            bar.setVisibility(View.GONE);
+        } else {
+            bar.setVisibility(View.VISIBLE);
+        }
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
         list.setAdapter(new PictogramAdapter(getActivity(), pagingMap.get(currentPage)));
@@ -211,15 +207,37 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Database db = Database.getInstance(getActivity());
+
                                 // TODO: delete it
                                 if (isPictogramSettingsList) {
-                                    // Do it
+                                    boolean success = true;
+                                    for (Pictogram p : selectedPictograms) {
+                                        success &= db.deletePictogramFromWarded(warded.getId(), p.getId());
+                                    }
+
+                                    if (success) {
+                                        Helper.toast(getActivity(), R.string.toast_deleted);
+                                    } else {
+                                        Helper.toast(getActivity(), R.string.toast_not_deleted);
+                                    }
                                 } else {
                                     // Do the other thing
+                                    Pictogram pictogram = (Pictogram) getList().getAdapter().getItem(selectedPosition);
                                 }
 
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                setupPagingMap(getCorrectList(), Pictogram.class, "getName", new Comparator<Pictogram>() {
+                                    @Override
+                                    public int compare(Pictogram lhs, Pictogram rhs) {
+                                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                        return lhs.getName().compareTo(rhs.getName());
+                                    }
+                                });
+                                setupPagingBar(getActivity().findViewById(android.R.id.content));
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -291,9 +309,17 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         if (requestCode == REQUEST_ADDPICTOGRAM && resultCode == RESULT_OK) {
             Bundle extra = data.getBundleExtra("extra");
             List<Pictogram> pictograms = extra.getParcelableArrayList(Pictogram.class.getName());
+            PictogramListFragment.addPictogramsToWarded(warded.getId(), pictograms, getActivity());
 
-            Log.i("INFO", pictograms.size() + "");
-            Helper.toast(getActivity(), R.string.toast_saved);
+            setupPagingMap(getCorrectList(), Pictogram.class, "getName", new Comparator<Pictogram>() {
+                @Override
+                public int compare(Pictogram lhs, Pictogram rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            setupPagingBar(getActivity().findViewById(android.R.id.content));
+            setListAdapter();
         }
     }
 
@@ -301,6 +327,23 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
     public boolean onBackPressed() {
         goBack();
         return true;
+    }
+
+    public static void addPictogramsToWarded(long wardedId, List<Pictogram> pictograms, Context ctx) {
+        ctx = ctx.getApplicationContext();
+        Database db = Database.getInstance(ctx);
+
+        boolean success = true;
+        for (Pictogram pictogram : pictograms) {
+            long id = db.addPictogramToPictogramSettings(wardedId, pictogram);
+            success &= (id != -1);
+        }
+
+        if (success) {
+            Helper.toast(ctx, R.string.toast_saved);
+        } else {
+            Helper.toast(ctx, R.string.toast_not_saved);
+        }
     }
 
     private void goBack() {
@@ -344,6 +387,19 @@ public class PictogramListFragment extends BasePagingFragment<Pictogram> {
         intent.putExtra(BasicEditFragment.CLASSNAME, className);
         intent.putExtra(className, pictogram);
         startActivityForResult(intent, 1);
+    }
+
+    private List<Pictogram> getCorrectList() {
+        List<Pictogram> tempList = null;
+        Database db = Database.getInstance(getActivity());
+
+        if (isPictogramSettingsList) {
+            tempList = db.getPictogramsForCategoryOfWarded(warded.getId(), category.getId());
+        } else {
+            tempList = db.getPictogramsOfCategory(category.getId());
+        }
+
+        return tempList;
     }
 
     @Override

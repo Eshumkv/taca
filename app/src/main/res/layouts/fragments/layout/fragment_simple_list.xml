@@ -106,4 +106,14 @@
         android:layout_above="@+id/paging">
     </ListView>
 
+    <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/breadcrumblayout"
+        android:text="@string/empty_contacts"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone" />
+
 </RelativeLayout>

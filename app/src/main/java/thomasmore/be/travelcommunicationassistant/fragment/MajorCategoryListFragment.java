@@ -221,9 +221,7 @@ public class MajorCategoryListFragment extends BaseFragment {
         if (requestCode == REQUEST_ADDPICTOGRAM && resultCode == RESULT_OK) {
             Bundle extra = data.getBundleExtra("extra");
             List<Pictogram> pictograms = extra.getParcelableArrayList(Pictogram.class.getName());
-
-            Log.i("INFO", pictograms.size() + "");
-            Helper.toast(getActivity(), R.string.toast_saved);
+            PictogramListFragment.addPictogramsToWarded(warded.getId(), pictograms, getActivity());
         }
     }
 }

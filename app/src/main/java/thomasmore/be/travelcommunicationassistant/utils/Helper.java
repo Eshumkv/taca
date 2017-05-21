@@ -344,12 +344,17 @@ public class Helper {
     }
 
     public static void toast(Activity act, String text) {
-        Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
+        toast(act.getApplicationContext(), text);
     }
 
-    public static void toast(Activity act, int resId, Object... vars) {
-        String text = act.getResources().getString(resId, vars);
-        Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
+    public static void toast(Context ctx, String text) {
+        Toast.makeText(ctx.getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void toast(Context ctx, int resId, Object... vars) {
+        ctx = ctx.getApplicationContext();
+        String text = ctx.getResources().getString(resId, vars);
+        Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
     }
 
     public static byte parcelableBool(boolean bool) {

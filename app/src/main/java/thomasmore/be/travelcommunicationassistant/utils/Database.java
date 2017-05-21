@@ -560,6 +560,68 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
+    public List<Pictogram> getPictogramsForCategoryOfWarded(long wardedId, long categoryId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                "WardedPictogram",                        // Table
+                new String[] {
+                        "id",
+                        "wardedId",
+                        "pictogramId"
+                },                      // Columns
+                where("wardedId"), // Where
+                new String[] {                              // Where-params
+                        String.valueOf(wardedId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Pictogram> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Pictogram obj = get(Pictogram.class, cursor.getLong(2));
+
+                if (obj.getCategoryId() == categoryId) {
+                    list.add(obj);
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    public long addPictogramToPictogramSettings(long wardedId, Pictogram pictogram) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("wardedId", wardedId);
+        values.put("pictogramId", pictogram.getId());
+
+        long retid = db.insert("WardedPictogram", null, values);
+        db.close();
+
+        return retid;
+    }
+
+    public boolean deletePictogramFromWarded(long wardedId, long pictogramId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "WardedPictogram",
+                where("wardedId", "pictogramId"),
+                new String[] { String.valueOf(wardedId), String.valueOf(pictogramId) });
+        db.close();
+
+        return numrows > 0;
+    }
 
     public List<Pictogram> getPictogramsOfCategory(long categoryId) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -773,7 +835,7 @@ public class Database extends SQLiteOpenHelper {
 
         Contact contact = new Contact();
         contact.setName("Alice");
-        contact.setPhonenumber("+72258522256");
+        contact.setPhonenumber("+722585282256");
         contact.setType(ContactType.Warded);
         contact.setResponsibleTutor(tutor);
         contact.setMessageType(MessageType.Pictogram);

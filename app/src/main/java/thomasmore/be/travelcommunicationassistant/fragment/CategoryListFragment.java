@@ -45,6 +45,8 @@ public class CategoryListFragment extends BaseFragment {
 
     private final static int REQUEST_ADDPICTOGRAM = 1;
 
+    private MajorCategory majorCategory;
+
     private boolean isSearch = false;
     private boolean isSearchCat = false;
     private Class<?> searchClass;
@@ -66,7 +68,7 @@ public class CategoryListFragment extends BaseFragment {
         int title = R.string.nav_pictogram;
 
         final Bundle bundle = getArguments();
-        final MajorCategory majorCategory = bundle.getParcelable(MajorCategory.class.getName());
+        majorCategory = bundle.getParcelable(MajorCategory.class.getName());
 
         if (bundle.containsKey(Helper.EXTRA_SEARCH_INTENT)) {
             isSearch = true;
@@ -90,17 +92,8 @@ public class CategoryListFragment extends BaseFragment {
 
         Helper.setTitle(getActivity(), title);
 
-        Database db = Database.getInstance(getActivity());
-        List<Category> categories = null;
-
-        if (isPictogramSettingsList) {
-            categories = db.getCategoriesForMajorCategoryOfWarded(majorCategory.getId(), warded.getId());
-        } else {
-            categories = db.getCategoriesForMajorCategory(majorCategory.getId());
-        }
-
         final ListView list = (ListView) rootView.findViewById(R.id.list);
-        list.setAdapter(new CategoryAdapter(getActivity(), categories));
+        list.setAdapter(new CategoryAdapter(getActivity(), getCorrectList(rootView)));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -237,9 +230,10 @@ public class CategoryListFragment extends BaseFragment {
         if (requestCode == REQUEST_ADDPICTOGRAM && resultCode == RESULT_OK) {
             Bundle extra = data.getBundleExtra("extra");
             List<Pictogram> pictograms = extra.getParcelableArrayList(Pictogram.class.getName());
+            PictogramListFragment.addPictogramsToWarded(warded.getId(), pictograms, getActivity());
 
-            Log.i("INFO", pictograms.size() + "");
-            Helper.toast(getActivity(), R.string.toast_saved);
+            final ListView list = (ListView) getActivity().findViewById(R.id.list);
+            list.setAdapter(new CategoryAdapter(getActivity(), getCorrectList()));
         }
     }
 
@@ -247,5 +241,31 @@ public class CategoryListFragment extends BaseFragment {
         BaseFragment fragment = new MajorCategoryListFragment();
         fragment.setArguments(cachedBundle);
         Helper.changeFragment(getActivity(), fragment, false);
+    }
+
+
+    private List<Category> getCorrectList() {
+        return getCorrectList(getActivity().findViewById(android.R.id.content));
+    }
+
+    private List<Category> getCorrectList(View root) {
+        Database db = Database.getInstance(getActivity());
+        List<Category> categories = null;
+
+        if (isPictogramSettingsList) {
+            categories = db.getCategoriesForMajorCategoryOfWarded(majorCategory.getId(), warded.getId());
+        } else {
+            categories = db.getCategoriesForMajorCategory(majorCategory.getId());
+        }
+
+        final TextView emptyText = (TextView) root.findViewById(R.id.empty_text);
+        emptyText.setText(R.string.empty_categories);
+        if (categories.size() == 0) {
+            emptyText.setVisibility(View.VISIBLE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+        }
+
+        return categories;
     }
 }
