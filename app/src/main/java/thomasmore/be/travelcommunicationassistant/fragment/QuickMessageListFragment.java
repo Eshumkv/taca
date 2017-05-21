@@ -30,6 +30,7 @@ import thomasmore.be.travelcommunicationassistant.adapter.QuickMessageAdapter;
 import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.QuickMessage;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
@@ -58,18 +59,7 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
 
         Helper.setTitle(getActivity(), R.string.warded_quick_message_list_title, contact.getName());
 
-        ArrayList<Pictogram> picts = new ArrayList<>();
-        picts.addAll(Arrays.asList(
-                new Pictogram("A Pictogram 1", "Lorum ipsum"),
-                new Pictogram("R Pictogram 2", "Lorum ipsum"),
-                new Pictogram("B Pictogram 3", "Lorum ipsum")
-        ));
-
-        List<QuickMessage> tempList = new ArrayList<>();
-        tempList.addAll(Arrays.asList(
-                new QuickMessage(picts),
-                new QuickMessage(picts)
-        ));
+        Database db = Database.getInstance(getActivity());
 
         setupContextMenu(rootView);
 
@@ -77,7 +67,7 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
         bar.setVisibility(View.VISIBLE);
 
         final ListView list = (ListView) rootView.findViewById(R.id.list);
-        list.setAdapter(new QuickMessageAdapter(getActivity(), tempList));
+        list.setAdapter(new QuickMessageAdapter(getActivity(), db.getQuickMessages(contact.getId())));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,8 +112,19 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                QuickMessage qmessage = (QuickMessage) getList().getAdapter().getItem(selectedPosition);
+                                Database db = Database.getInstance(getActivity());
+
+                                if (db.removeQuickMessage(qmessage.getId())) {
+                                    Helper.toast(getActivity(), R.string.toast_saved);
+                                } else {
+                                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                                }
+
                                 deselectPrevious(getView());
                                 toggleContext();
+
+                                setListAdapter();
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -172,13 +173,17 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
-            // do it
+            Contact contact = data.getParcelableExtra(Contact.class.getName());
         }
     }
 
     private void goToEditScreen(QuickMessage message) {
         deselectPrevious(getView());
         toggleContext();
+
+        if (message.getWardedId() == 0) {
+            message.setWardedId(contact.getId());
+        }
 
         BaseFragment fragment = new QuickMessageEditFragment();
         Bundle bundle = new Bundle();
@@ -189,6 +194,9 @@ public class QuickMessageListFragment extends BasePagingFragment<QuickMessage> {
 
     @Override
     protected void setListAdapter() {
+        Database db = Database.getInstance(getActivity());
+        final ListView list = getList();
+        list.setAdapter(new QuickMessageAdapter(getActivity(), db.getQuickMessages(contact.getId())));
     }
 
     @Override

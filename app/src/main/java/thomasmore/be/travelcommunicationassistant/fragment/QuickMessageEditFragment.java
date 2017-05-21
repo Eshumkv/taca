@@ -3,6 +3,7 @@ package thomasmore.be.travelcommunicationassistant.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -30,9 +31,11 @@ import thomasmore.be.travelcommunicationassistant.LoginActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.HomeScreenAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.QuickMessageAdapter;
+import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.QuickMessage;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.utils.Helper;
 import thomasmore.be.travelcommunicationassistant.utils.NavigationItems;
 
@@ -155,10 +158,33 @@ public class QuickMessageEditFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
-                getFragmentManager().popBackStack();
+                getFragmentManager().popBackStackImmediate();
                 return true;
             case R.id.action_save:
-                getFragmentManager().popBackStack();
+                Database db = Database.getInstance(getActivity());
+
+                db.removeQuickMessage(qmessage.getId());
+
+                if (qmessage.getMessage().size() != 0) {
+                    if (db.addQuickMessage(qmessage) != 0) {
+                        Helper.toast(getActivity(), R.string.toast_saved);
+                    } else {
+                        Helper.toast(getActivity(), R.string.toast_not_saved);
+                    }
+                } else {
+                    Helper.toast(getActivity(), R.string.toast_not_saved);
+                }
+
+
+                Contact warded = db.getWarded(qmessage.getWardedId());
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Contact.class.getName(), warded);
+
+                Fragment fragment = new QuickMessageListFragment();
+                fragment.setArguments(bundle);
+                Helper.changeFragment(getActivity(), fragment, false);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

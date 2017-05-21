@@ -1,5 +1,7 @@
 package thomasmore.be.travelcommunicationassistant.model;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,8 +14,9 @@ import java.util.List;
  * Created by Eshum on 18/04/2017.
  */
 
-public class QuickMessage implements Parcelable {
+public class QuickMessage extends BaseModel<QuickMessage> implements Parcelable {
     private long id;
+    private long wardedId;
     private ArrayList<Pictogram> message;
 
     public QuickMessage() {
@@ -39,11 +42,18 @@ public class QuickMessage implements Parcelable {
         this.message = message;
     }
 
+    public long getWardedId() {
+        return wardedId;
+    }
+
+    public void setWardedId(long wardedId) {
+        this.wardedId = wardedId;
+    }
 
     public QuickMessage(Parcel in) {
         id = in.readLong();
 
-        Bundle bundle = in.readBundle();
+        Bundle bundle = in.readBundle(Pictogram.class.getClassLoader());
         message = bundle.getParcelableArrayList(Pictogram.class.getName());
     }
 
@@ -72,4 +82,36 @@ public class QuickMessage implements Parcelable {
         }
     };
 
+    // DATABASE HELPER THINGS
+    public static final String ID = "id";
+    public static final String WARDEDID = "wardedId";
+
+    public String getTable() {
+        return "QuickMessage";
+    }
+
+    public String[] getColumns() {
+        return new String[] {
+                ID,
+                WARDEDID
+        };
+    }
+
+    public QuickMessage get(Cursor cursor) {
+        QuickMessage obj = new QuickMessage();
+
+        obj.setId(cursor.getLong(0));
+        obj.setWardedId(cursor.getLong(1));
+
+        return obj;
+    }
+
+    public ContentValues getContentValues(QuickMessage qmessage) {
+        ContentValues values = new ContentValues();
+
+        values.put(ID, qmessage.getId());
+        values.put(WARDEDID, qmessage.getWardedId());
+
+        return values;
+    }
 }

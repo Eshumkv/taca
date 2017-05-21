@@ -7,16 +7,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.util.LongSparseArray;
-import android.util.SparseArray;
-import android.util.SparseLongArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 import thomasmore.be.travelcommunicationassistant.model.BaseModel;
 import thomasmore.be.travelcommunicationassistant.model.Category;
@@ -26,6 +20,7 @@ import thomasmore.be.travelcommunicationassistant.model.Language;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
 import thomasmore.be.travelcommunicationassistant.model.MessageType;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
+import thomasmore.be.travelcommunicationassistant.model.QuickMessage;
 import thomasmore.be.travelcommunicationassistant.model.Room;
 import thomasmore.be.travelcommunicationassistant.model.Settings;
 import thomasmore.be.travelcommunicationassistant.model.User;
@@ -680,6 +675,149 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
+    public long addQuickMessage(QuickMessage qmessage) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Add the quick message
+        ContentValues values = qmessage.getContentValues(qmessage);
+
+        values.remove("id");
+        qmessage.setId(db.insert(qmessage.getTable(), null, values));
+
+        // Add the messages
+        for (Pictogram p : qmessage.getMessage()) {
+            values = new ContentValues();
+            values.put("quickMessageId", qmessage.getId());
+            values.put("pictogramId", p.getId());
+
+            db.insert("QMMessage", null, values);
+        }
+        db.close();
+
+        return qmessage.getId();
+    }
+
+    public boolean addPictogramToQuickMessage(Pictogram pictogram, long qmessageId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("quickMessageId", qmessageId);
+        values.put("pictogramId", pictogram.getId());
+
+        long id = db.insert("QMMessage", null, values);
+
+        return id != -1;
+    }
+
+    public boolean removePictogramFromQuickMessage(long pictogramId, long qmessageId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "QMMessage",
+                where("pictogramId", "quickMessageId"),
+                new String[] { String.valueOf(pictogramId), String.valueOf(qmessageId) });
+        db.close();
+
+        return numrows > 0;
+    }
+
+    public boolean removeQuickMessage(long qmessageId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "QMMessage",
+                where("quickMessageId"),
+                new String[] {String.valueOf(qmessageId) });
+
+        QuickMessage useless = new QuickMessage();
+        db.delete(
+            useless.getTable(),
+            where(QuickMessage.ID),
+            new String[] {String.valueOf(qmessageId) });
+
+        db.close();
+
+        return numrows > 0;
+    }
+
+    public List<QuickMessage> getQuickMessages(long wardedId) {
+        List<QuickMessage> list = __getQuickMessages(wardedId);
+
+        for (QuickMessage quickMessage : list) {
+            ArrayList<Pictogram> messages =
+                    new ArrayList<>(__getMessageOfQuickMessage(quickMessage.getId()));
+            quickMessage.setMessage(messages);
+        }
+
+        return list;
+    }
+
+    private List<QuickMessage> __getQuickMessages(long wardedId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        QuickMessage useless = new QuickMessage();
+
+        Cursor cursor = db.query(
+                useless.getTable(),                        // Table
+                useless.getColumns(),                      // Columns
+                where(QuickMessage.WARDEDID), // Where
+                new String[] {
+                        String.valueOf(wardedId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<QuickMessage> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                QuickMessage obj = useless.get(cursor);
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
+    private List<Pictogram> __getMessageOfQuickMessage(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                "QMMessage",                        // Table
+                new String[] {
+                        "quickMessageId",
+                        "pictogramId"
+                },                      // Columns
+                where("quickMessageId"), // Where
+                new String[] {
+                        String.valueOf(id)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Pictogram> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Pictogram obj = get(Pictogram.class, cursor.getLong(1));
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
     /****
      *
      * HELPER METHODS
@@ -777,7 +915,7 @@ public class Database extends SQLiteOpenHelper {
             ContentValues values = contact.getContentValues(contact);
 
             values.remove("id");
-            db.insert(contact.getTable(), null, values);
+            contact.setId(db.insert(contact.getTable(), null, values));
         }
 
         //================================
@@ -812,6 +950,27 @@ public class Database extends SQLiteOpenHelper {
 
             values.remove("id");
             pictogram.setId(db.insert(pictogram.getTable(), null, values));
+        }
+
+        //================================
+        //      QUICK MESSAGES
+        //================================
+        ArrayList<QuickMessage> quickMessages = getQuickMessages(pictograms, wardeds);
+        for (QuickMessage qmessage : quickMessages) {
+            // Add the quick message
+            ContentValues values = qmessage.getContentValues(qmessage);
+
+            values.remove("id");
+            qmessage.setId(db.insert(qmessage.getTable(), null, values));
+
+            // Add the messages
+            for (Pictogram p : qmessage.getMessage()) {
+                values = new ContentValues();
+                values.put("quickMessageId", qmessage.getId());
+                values.put("pictogramId", p.getId());
+
+                db.insert("QMMessage", null, values);
+            }
         }
     }
 
@@ -997,6 +1156,31 @@ public class Database extends SQLiteOpenHelper {
                 pictogram.setName(name);
                 pictogram.setDescription("DESCRIPTION");
                 list.add(pictogram);
+            }
+        }
+
+        return list;
+    }
+
+    private ArrayList<QuickMessage> getQuickMessages(ArrayList<Pictogram> pictograms, ArrayList<Contact> wardeds) {
+        ArrayList<QuickMessage> list = new ArrayList<>();
+        int count = Helper.randomBetween(1, 3);
+
+        for (Contact warded : wardeds) {
+            for (int i = 0; i < count; i++) {
+                QuickMessage qmessage = new QuickMessage();
+                ArrayList<Pictogram> message = new ArrayList<>();
+
+                for (int j = 0; j < Helper.randomBetween(2, 5); j++) {
+                    int random = Helper.randomBetween(0, pictograms.size() - 1);
+                    Pictogram pictogram = pictograms.get(random);
+                    message.add(pictogram);
+                }
+
+                qmessage.setMessage(message);
+                qmessage.setWardedId(warded.getId());
+
+                list.add(qmessage);
             }
         }
 
