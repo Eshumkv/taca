@@ -393,4 +393,18 @@ public class Helper {
     public static String randomCharacter() {
         return String.valueOf((char)(RANDOM.nextInt(26) + 'a'));
     }
+
+    public static Long getDateForDB(Date date) {
+        if (date != null) {
+            return date.getTime();
+        }
+        return null;
+    }
+
+    public static Date getDateFromDB(Cursor cursor, int index) {
+        if (cursor.isNull(index)) {
+            return null;
+        }
+        return new Date(cursor.getLong(index));
+    }
 }

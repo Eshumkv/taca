@@ -33,6 +33,7 @@ import thomasmore.be.travelcommunicationassistant.NavigationDrawerActivity;
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.QuickMessageAdapter;
 import thomasmore.be.travelcommunicationassistant.adapter.SingleConversationAdapter;
+import thomasmore.be.travelcommunicationassistant.model.Message;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.User;
 import thomasmore.be.travelcommunicationassistant.utils.Database;
@@ -61,6 +62,10 @@ public class MessagesConversationFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         this.inflater = inflater;
         final View rootView = inflater.inflate(R.layout.fragment_messages_conversation, container, false);
+
+        Database db = Database.getInstance(getActivity());
+        long userId = db.getSettings().getLoggedInUser(getActivity()).getId();
+        List<Message> messages = db.getMessages(userId);
 
         tempList = new ArrayList<>();
         tempList.add(new MessageSingleConversationViewModel(getMeString(), "Hello", true));

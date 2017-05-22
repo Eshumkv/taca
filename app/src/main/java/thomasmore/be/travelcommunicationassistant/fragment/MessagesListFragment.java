@@ -22,6 +22,8 @@ import java.util.List;
 
 import thomasmore.be.travelcommunicationassistant.R;
 import thomasmore.be.travelcommunicationassistant.adapter.ConversationsAdapter;
+import thomasmore.be.travelcommunicationassistant.model.Message;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
 import thomasmore.be.travelcommunicationassistant.viewmodel.MessagesListViewModel;
 
 public class MessagesListFragment extends BaseFragment {
@@ -35,18 +37,19 @@ public class MessagesListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_messages_list, container, false);
 
-        List<MessagesListViewModel> tempList = new ArrayList<>();
-        tempList.add(new MessagesListViewModel("Ivan", "What're you doing?"));
-        tempList.add(new MessagesListViewModel("Viktor", "Hello"));
-        tempList.add(new MessagesListViewModel("Anna", "Sometimes"));
-        tempList.add(new MessagesListViewModel("John", "I think so ..."));
-        tempList.add(new MessagesListViewModel("Bobby", "Have fun :)"));
+        Database db = Database.getInstance(getActivity());
+        long userId = db.getSettings().getLoggedInUser(getActivity()).getId();
+        List<Message> messages = db.getMessages(userId);
 
-        ListView list = (ListView) rootView.findViewById(R.id.conversations);
+        List<MessagesListViewModel> tempList = MessagesListViewModel.fromMessages(messages, getActivity());
+
+        final ListView list = (ListView) rootView.findViewById(R.id.conversations);
         list.setAdapter(new ConversationsAdapter(getActivity(), tempList));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MessagesListViewModel msg = (MessagesListViewModel) list.getAdapter().getItem(position);
+
                 TextView text = (TextView) view.findViewById(R.id.contact_name);
                 MessagesListViewModel model = (MessagesListViewModel)text.getTag();
                 callback.onFragmentInteraction(MessagesListFragment.class, model);

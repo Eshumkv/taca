@@ -98,11 +98,13 @@ CREATE TABLE "Message" (
 CREATE TABLE "Conversation" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "contactId" INTEGER  NULL ,
+    "fromUserId" INTEGER NULL ,
     "roomId" INTEGER  NULL ,
     "messageId" INTEGER  NOT NULL ,
     FOREIGN KEY ("contactId") REFERENCES "Contact"("id"),
     FOREIGN KEY ("roomId") REFERENCES "Room"("id"),
-    FOREIGN KEY ("messageId") REFERENCES "Message"("id")
+    FOREIGN KEY ("messageId") REFERENCES "Message"("id"),
+    FOREIGN KEY ("fromUserId") REFERENCES "User"("id")
 );
 --NST
 CREATE TABLE "Settings" (

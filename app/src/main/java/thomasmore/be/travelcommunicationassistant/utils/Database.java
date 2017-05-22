@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import thomasmore.be.travelcommunicationassistant.model.Contact;
 import thomasmore.be.travelcommunicationassistant.model.ContactType;
 import thomasmore.be.travelcommunicationassistant.model.Language;
 import thomasmore.be.travelcommunicationassistant.model.MajorCategory;
+import thomasmore.be.travelcommunicationassistant.model.Message;
 import thomasmore.be.travelcommunicationassistant.model.MessageType;
 import thomasmore.be.travelcommunicationassistant.model.Pictogram;
 import thomasmore.be.travelcommunicationassistant.model.QuickMessage;
@@ -818,6 +820,45 @@ public class Database extends SQLiteOpenHelper {
         return list;
     }
 
+    public List<Message> getMessages(long userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                "Conversation",                        // Table
+                new String[] {
+                        "contactId",
+                        "roomId",
+                        "messageId",
+                        "fromUserId"
+                },                      // Columns
+                where("fromUserId"), // Where
+                new String[] {
+                        String.valueOf(userId)
+                },
+                null,                                   // Group By
+                null,                                   // Having
+                null,                                   // Sorting
+                null                                    // Dunno
+        );
+
+        ArrayList<Message> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Message obj = get(Message.class, cursor.getLong(2));
+                obj.setToContactId(cursor.getLong(0));
+                obj.setRoomId(cursor.getLong(1));
+                obj.setFromUserId(cursor.getLong(3));
+                list.add(obj);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
+
     /****
      *
      * HELPER METHODS
@@ -918,6 +959,9 @@ public class Database extends SQLiteOpenHelper {
             contact.setId(db.insert(contact.getTable(), null, values));
         }
 
+        ArrayList<Contact> contacts = new ArrayList<>(wardeds);
+        contacts.addAll(tutors);
+
         //================================
         //      MAJOR CATEGORIES
         //================================
@@ -939,7 +983,6 @@ public class Database extends SQLiteOpenHelper {
             values.remove("id");
             category.setId(db.insert(category.getTable(), null, values));
         }
-
 
         //================================
         //      PICTOGRAMS
@@ -971,6 +1014,25 @@ public class Database extends SQLiteOpenHelper {
 
                 db.insert("QMMessage", null, values);
             }
+        }
+
+        //================================
+        //      MESSAGES
+        //================================
+        ArrayList<Message> messages = getMessages(users, contacts);
+        for (Message msg : messages) {
+            ContentValues values = msg.getContentValues(msg);
+
+            values.remove("id");
+            msg.setId(db.insert(msg.getTable(), null, values));
+
+            values = new ContentValues();
+            values.put("contactId", msg.getToContactId());
+            values.put("fromUserId", msg.getFromUserId());
+            values.put("messageId", msg.getId());
+            values.put("roomId", msg.getRoomId());
+
+            db.insert("Conversation", null, values);
         }
     }
 
@@ -1182,6 +1244,27 @@ public class Database extends SQLiteOpenHelper {
 
                 list.add(qmessage);
             }
+        }
+
+        return list;
+    }
+
+    private ArrayList<Message> getMessages(List<User> users, List<Contact> contacts) {
+        ArrayList<Message> list = new ArrayList<>();
+
+        for (Contact contact : contacts) {
+            if (Helper.randomBetween(0, 1) == 1) continue;
+
+            int hour = Helper.randomBetween(1, 30);
+            int minute = Helper.randomBetween(1, 59);
+
+            Message message = new Message();
+            message.setTime(new Date(2017, 5, 21, hour, minute));
+            message.setMessage("Testing, 1, 2, 3");
+            message.setMessageType(MessageType.Text);
+            message.setToContactId(contact.getId());
+            message.setFromUserId(users.get(0).getId());
+            list.add(message);
         }
 
         return list;

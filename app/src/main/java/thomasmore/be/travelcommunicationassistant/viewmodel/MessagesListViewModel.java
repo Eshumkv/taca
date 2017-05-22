@@ -1,5 +1,14 @@
 package thomasmore.be.travelcommunicationassistant.viewmodel;
 
+import android.content.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import thomasmore.be.travelcommunicationassistant.model.Contact;
+import thomasmore.be.travelcommunicationassistant.model.Message;
+import thomasmore.be.travelcommunicationassistant.utils.Database;
+
 /**
  * Created by Eshum on 16/04/2017.
  */
@@ -27,5 +36,25 @@ public class MessagesListViewModel {
 
     public void setMessagePart(String messagePart) {
         this.messagePart = messagePart;
+    }
+
+    public static List<MessagesListViewModel> fromMessages(List<Message> list, Context ctx) {
+        ArrayList<MessagesListViewModel> ret = new ArrayList<>();
+
+        for (Message msg : list) {
+            ret.add(fromMessage(msg, ctx.getApplicationContext()));
+        }
+
+        return ret;
+    }
+
+    public static MessagesListViewModel fromMessage(Message msg, Context ctx) {
+        Database db = Database.getInstance(ctx.getApplicationContext());
+        Contact contact = db.getContact(msg.getToContactId());
+
+        String name = contact.getName();
+        String message = msg.getMessage();
+
+        return new MessagesListViewModel(name, message);
     }
 }
